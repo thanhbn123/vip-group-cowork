@@ -51,3 +51,19 @@ Chỉ sau khi chủ dự án duyệt:
    `BRAIN_ENABLED=1`, Brain base/public URL thật), restart container.
 4. Chuyển backup/offsite sang VPS; giữ bản Studio làm dự phòng đến khi ổn định.
 5. Rollback: Caddy về 18835; Brain internal về `http://127.0.0.1:8899`; restart.
+
+## Truy cập staging (nội bộ)
+
+Từ MacBook:
+```bash
+ssh -L 18899:127.0.0.1:8899 viporder-staging
+# mở http://127.0.0.1:18899
+```
+Mật khẩu owner lấy trên Studio như production; DB copy đang để MFA tắt.
+
+## Cập nhật staging
+```bash
+ssh viporder-staging
+cd /srv/vip-staging/cowork
+./deploy/vps/deploy.sh
+```
