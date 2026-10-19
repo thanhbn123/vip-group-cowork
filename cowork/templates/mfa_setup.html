@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/ho-so">{{ ui.icon('back', 16) }} Hồ sơ</a>
+    <h1>Bật xác thực 2 lớp</h1>
+    <p class="muted">Thêm một lớp bảo vệ cho tài khoản {{ user.id }}.</p>
+  </div>
+</section>
+
+<div class="detail-grid">
+  <div class="detail-main">
+    <section class="card">
+      <div class="card-head"><div><h2>1. Thêm vào ứng dụng authenticator</h2><p class="muted">Mở Google Authenticator, Authy, 1Password hoặc ứng dụng TOTP.</p></div></div>
+      <p class="muted">Nhập thủ công khóa bí mật bên dưới (chọn loại “Time-based” nếu được hỏi):</p>
+      <div class="secret-box">
+        <code id="mfa-secret">{{ secret }}</code>
+        <button type="button" class="btn btn-ghost btn-sm" data-copy="#mfa-secret">{{ ui.icon('key', 16) }} Sao chép</button>
+      </div>
+      <details class="inline-edit">
+        <summary>Hoặc dùng URI otpauth</summary>
+        <pre class="json-box break">{{ uri }}</pre>
+      </details>
+      <div class="callout">
+        <b>Lưu khóa này an toàn</b>
+        <p>Khóa chỉ hiện trong lần thiết lập này. Nếu mất thiết bị và hết mã dự phòng, quản trị phải reset MFA bằng CLI trên máy chủ.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>2. Xác nhận mã</h2><p class="muted">Nhập mã 6 số ứng dụng đang hiển thị và mật khẩu hiện tại.</p></div></div>
+      <form method="post" action="/ho-so/mfa/bat" class="form-grid">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <input type="hidden" name="secret" value="{{ secret }}">
+        <label class="field"><span class="field-label">Mã xác thực <em>*</em></span>
+          <input type="text" name="ma" required inputmode="numeric" autocomplete="one-time-code"
+                 maxlength="6" placeholder="123456"></label>
+        <label class="field"><span class="field-label">Mật khẩu hiện tại <em>*</em></span>
+          <input type="password" name="matKhau" required autocomplete="current-password"></label>
+        <div class="form-actions span-2">
+          <a class="btn btn-ghost" href="/ho-so">Huỷ</a>
+          <button class="btn btn-primary" type="submit">{{ ui.icon('shield', 18) }} Bật MFA</button>
+        </div>
+      </form>
+    </section>
+  </div>
+  <aside class="detail-side">
+    <section class="card">
+      <div class="card-head"><div><h2>Nguyên tắc</h2></div></div>
+      <ul class="rules-list">
+        <li>{{ ui.icon('check', 14) }} Mã đổi mỗi 30 giây</li>
+        <li>{{ ui.icon('check', 14) }} Chấp nhận lệch ±30 giây</li>
+        <li>{{ ui.icon('check', 14) }} 10 mã dự phòng dùng một lần</li>
+        <li>{{ ui.icon('check', 14) }} Tắt MFA cần mật khẩu + mã</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -28,6 +28,13 @@
   </div>
 </section>
 
+{% if not user.mfa_enabled and (is_super or user.role_code == 'admin') %}
+<div class="callout warn" role="status">
+  <b>{{ ui.icon('shield', 16) }} Tài khoản quản trị chưa bật xác thực 2 lớp</b>
+  <p>Bật MFA để bảo vệ tài khoản khỏi mật khẩu bị lộ. <a href="/ho-so/mfa">Bật ngay</a> — mất tối đa 2 phút.</p>
+</div>
+{% endif %}
+
 <section class="stat-grid" aria-label="Chỉ số nhanh">
   {% set xem_tk = 'accounts.view' in perms or is_super %}
   <article class="stat-card">

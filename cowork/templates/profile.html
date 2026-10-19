@@ -14,7 +14,10 @@
       </div>
     </div>
   </div>
-  <div class="page-actions"><a class="btn btn-ghost" href="/doi-mat-khau">{{ ui.icon('lock', 16) }} Đổi mật khẩu</a></div>
+  <div class="page-actions">
+    <a class="btn btn-ghost" href="/ho-so/mfa">{{ ui.icon('shield', 16) }} {{ 'Quản lý MFA' if user.mfa_enabled else 'Bật MFA' }}</a>
+    <a class="btn btn-ghost" href="/doi-mat-khau">{{ ui.icon('lock', 16) }} Đổi mật khẩu</a>
+  </div>
 </section>
 
 <div class="detail-grid">

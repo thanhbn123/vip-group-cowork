@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/ho-so">{{ ui.icon('back', 16) }} Hồ sơ</a>
+    <h1>Xác thực 2 lớp</h1>
+    <p class="muted">Tài khoản {{ user.id }} đang được bảo vệ bằng TOTP.</p>
+  </div>
+  <div class="page-actions"><span class="health-pill is-ok"><i></i> Đang bật</span></div>
+</section>
+
+<div class="detail-grid">
+  <div class="detail-main">
+    <section class="card">
+      <div class="card-head"><div><h2>Mã dự phòng</h2><p class="muted">Dùng khi mất thiết bị authenticator.</p></div>
+        <span class="badge {{ 'status-ok' if con_lai > 0 else 'status-danger' }}">{{ con_lai }} mã còn lại</span></div>
+      <p class="muted">Mỗi mã chỉ dùng một lần. Tạo lại sẽ vô hiệu toàn bộ mã cũ.</p>
+      <form method="post" action="/ho-so/mfa/ma-du-phong" class="form-grid" data-confirm="Tạo lại mã dự phòng? Toàn bộ mã cũ sẽ mất hiệu lực.">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <label class="field"><span class="field-label">Mật khẩu hiện tại</span>
+          <input type="password" name="matKhau" required autocomplete="current-password"></label>
+        <label class="field"><span class="field-label">Mã TOTP hiện tại</span>
+          <input type="text" name="ma" required inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="123456"></label>
+        <div class="form-actions span-2"><button class="btn btn-primary" type="submit">Tạo lại mã dự phòng</button></div>
+      </form>
+    </section>
+
+    <section class="card danger-card">
+      <div class="card-head"><div><h2>Tắt xác thực 2 lớp</h2></div></div>
+      <p class="muted">Tắt MFA cần mật khẩu và mã TOTP hiện tại. Chỉ nên tắt khi đổi thiết bị hoặc có lý do vận hành.</p>
+      <form method="post" action="/ho-so/mfa/tat" class="form-grid" data-confirm="Tắt xác thực 2 lớp cho tài khoản này?">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <label class="field"><span class="field-label">Mật khẩu hiện tại</span>
+          <input type="password" name="matKhau" required autocomplete="current-password"></label>
+        <label class="field"><span class="field-label">Mã TOTP hiện tại</span>
+          <input type="text" name="ma" required inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="123456"></label>
+        <div class="form-actions span-2"><button class="btn btn-danger" type="submit">Tắt MFA</button></div>
+      </form>
+    </section>
+  </div>
+  <aside class="detail-side">
+    <section class="card">
+      <div class="card-head"><div><h2>Trạng thái</h2></div></div>
+      <dl class="kv tight">
+        <div><dt>Tài khoản</dt><dd><code>{{ user.id }}</code></dd></div>
+        <div><dt>Phương thức</dt><dd>TOTP · 30 giây</dd></div>
+        <div><dt>Mã dự phòng</dt><dd>{{ con_lai }}</dd></div>
+        <div><dt>Bật từ</dt><dd>{{ user.updated_at|dt }}</dd></div>
+      </dl>
+    </section>
+    <section class="card">
+      <div class="card-head"><div><h2>Khôi phục</h2></div></div>
+      <p class="muted">Mất thiết bị và hết mã dự phòng? Quản trị chạy CLI trên máy chủ:</p>
+      <pre class="json-box">python -m cowork.cli mfa-reset --id {{ user.id }}</pre>
+    </section>
+  </aside>
+</div>
+{% endblock %}

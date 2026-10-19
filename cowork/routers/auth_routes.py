@@ -1,6 +1,8 @@
 """Đăng nhập / đăng xuất / đổi mật khẩu / hồ sơ và phiên cá nhân."""
 from __future__ import annotations
 
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import RedirectResponse
 
@@ -44,6 +46,21 @@ async def xu_ly_dang_nhap(request: Request, userId: str = Form(""),
                 f"/dang-nhap?next={security.safe_next(tiep)}",
                 getattr(e, "message", "Sai ID hoặc mật khẩu."), "err")
             return resp
+        # MFA: mật khẩu đúng CHƯA đủ để tạo phiên. Phát challenge 5 phút.
+        if user.get("mfa_enabled"):
+            if not user.get("mfa_secret"):
+                audit.ghi(conn, user, "auth.mfa_fail", detail={"lyDo": "thieu_secret"},
+                          request=request)
+                return web.chuyen_huong("/dang-nhap", "MFA đang bật nhưng chưa cấu hình — "
+                                                      "liên hệ quản trị (fail-closed).", "err")
+            thach = auth.tao_thach_thuc_mfa(conn, user, request)
+            audit.ghi(conn, user, "auth.mfa_challenge", target_type="mfa",
+                      detail={"ip": ip, "hetHan": thach["expires_at"]}, request=request)
+            resp = RedirectResponse(
+                f"/dang-nhap/mfa?next={quote(security.safe_next(tiep))}", status_code=303)
+            resp.set_cookie(auth.TEN_COOKIE_MFA, thach["token"],
+                            **auth.cookie_kwargs(request, auth.MFA_PHUT * 60))
+            return resp
         phien, token = auth.tao_phien(conn, user, request, ip=web.ip_cua(request))
         audit.ghi(conn, user, "auth.login", target_type="session", target_id=phien["id"],
                   detail={"ip": ip}, request=request)
@@ -51,6 +68,43 @@ async def xu_ly_dang_nhap(request: Request, userId: str = Form(""),
         url = "/doi-mat-khau" if user.get("must_change_password") else security.safe_next(tiep)
         resp = RedirectResponse(url, status_code=303)
         auth.dat_cookie(resp, request, token)
+        return resp
+    finally:
+        conn.close()
+
+
+@router.get("/dang-nhap/mfa")
+async def trang_mfa(request: Request, tiep: str = Query("/", alias="next")):
+    if request.state.user:
+        return RedirectResponse("/", status_code=303)
+    if not request.cookies.get(auth.TEN_COOKIE_MFA):
+        return web.chuyen_huong("/dang-nhap", "Phiên xác thực 2 lớp không còn — đăng nhập lại.", "err")
+    resp = web.render(request, "login_mfa.html", page_title="Xác thực 2 lớp",
+                      next_url=security.safe_next(tiep))
+    if not request.cookies.get(config.CSRF_COOKIE):
+        auth.dat_cookie_csrf(resp, request, request.state.csrf)
+    return resp
+
+
+@router.post("/dang-nhap/mfa", dependencies=[Depends(web.kiem_csrf)])
+async def xu_ly_mfa(request: Request, ma: str = Form(""),
+                    tiep: str = Form("/", alias="next")):
+    token = request.cookies.get(auth.TEN_COOKIE_MFA)
+    conn = db.connect()
+    try:
+        user = auth.xac_thuc_mfa(conn, token, ma)
+        if not user:
+            return web.chuyen_huong(
+                f"/dang-nhap/mfa?next={quote(security.safe_next(tiep))}",
+                "Mã xác thực không đúng, đã dùng hoặc đã hết hạn. Thử mã mới/mã dự phòng.", "err")
+        phien, token_phien = auth.tao_phien(conn, user, request, ip=web.ip_cua(request))
+        audit.ghi(conn, user, "auth.mfa_ok", target_type="session", target_id=phien["id"],
+                  detail={"ip": web.ip_cua(request)}, request=request)
+        conn.commit()
+        url = "/doi-mat-khau" if user.get("must_change_password") else security.safe_next(tiep)
+        resp = RedirectResponse(url, status_code=303)
+        auth.dat_cookie(resp, request, token_phien)
+        resp.delete_cookie(auth.TEN_COOKIE_MFA, path="/")
         return resp
     finally:
         conn.close()
@@ -163,3 +217,81 @@ async def thu_hoi_phien_ca_nhan(request: Request, session_id: str):
         web.set_flash(resp, "Đã thu hồi phiên hiện tại. Hãy đăng nhập lại.", "ok")
         return resp
     return web.chuyen_huong("/ho-so", "Đã thu hồi phiên.")
+
+
+# ------------------------------- MFA cá nhân -------------------------------
+@router.get("/ho-so/mfa")
+async def trang_mfa_ca_nhan(request: Request):
+    user = await web.yeu_cau_dang_nhap(request)
+    conn = db.connect()
+    try:
+        user = auth.nguoi_dung_day_du(conn, user["id"])
+        if user.get("mfa_enabled"):
+            con_lai = auth.ma_du_phong_con_lai(conn, user["id"])
+            return web.render(request, "mfa_manage.html", page_title="Xác thực 2 lớp",
+                              user=user, con_lai=con_lai)
+        secret = security.tao_bi_mat_totp()
+        uri = security.otpauth_uri(secret, user["id"])
+        return web.render(request, "mfa_setup.html", page_title="Bật xác thực 2 lớp",
+                          user=user, secret=secret, uri=uri)
+    finally:
+        conn.close()
+
+
+@router.post("/ho-so/mfa/bat", dependencies=[Depends(web.kiem_csrf)])
+async def bat_mfa(request: Request):
+    user = await web.yeu_cau_dang_nhap(request)
+    form = await request.form()
+    conn = db.connect()
+    try:
+        try:
+            codes = auth.bat_mfa(conn, user, (form.get("secret") or "").strip(),
+                                 (form.get("ma") or "").strip(),
+                                 (form.get("matKhau") or "").strip())
+        except ValidationError as e:
+            return web.chuyen_huong("/ho-so/mfa", e.message, "err")
+        audit.ghi(conn, user, "mfa.enable", target_type="user", target_id=user["id"],
+                  detail={"soMaDuPhong": len(codes)}, request=request)
+        user = auth.nguoi_dung_day_du(conn, user["id"])
+    finally:
+        conn.close()
+    return web.render(request, "mfa_codes.html", page_title="Mã dự phòng MFA",
+                      user=user, codes=codes, che_do="bat")
+
+
+@router.post("/ho-so/mfa/tat", dependencies=[Depends(web.kiem_csrf)])
+async def tat_mfa(request: Request):
+    user = await web.yeu_cau_dang_nhap(request)
+    form = await request.form()
+    conn = db.connect()
+    try:
+        try:
+            auth.tat_mfa(conn, user, (form.get("matKhau") or "").strip(),
+                         (form.get("ma") or "").strip())
+        except ValidationError as e:
+            return web.chuyen_huong("/ho-so/mfa", e.message, "err")
+        audit.ghi(conn, user, "mfa.disable", target_type="user", target_id=user["id"],
+                  request=request)
+    finally:
+        conn.close()
+    return web.chuyen_huong("/ho-so/mfa", "Đã tắt xác thực 2 lớp.")
+
+
+@router.post("/ho-so/mfa/ma-du-phong", dependencies=[Depends(web.kiem_csrf)])
+async def tao_lai_ma_du_phong(request: Request):
+    user = await web.yeu_cau_dang_nhap(request)
+    form = await request.form()
+    conn = db.connect()
+    try:
+        try:
+            codes = auth.tao_lai_ma_du_phong(conn, user, (form.get("matKhau") or "").strip(),
+                                             (form.get("ma") or "").strip())
+        except ValidationError as e:
+            return web.chuyen_huong("/ho-so/mfa", e.message, "err")
+        audit.ghi(conn, user, "mfa.backup_codes", target_type="user", target_id=user["id"],
+                  detail={"soMa": len(codes)}, request=request)
+        user = auth.nguoi_dung_day_du(conn, user["id"])
+    finally:
+        conn.close()
+    return web.render(request, "mfa_codes.html", page_title="Mã dự phòng mới",
+                      user=user, codes=codes, che_do="tao_lai")

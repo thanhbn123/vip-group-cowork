@@ -1,0 +1,70 @@
+{% import "macros.html" as ui %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Xác thực 2 lớp · {{ APP_NAME }}</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="auth-body">
+<main class="auth-shell">
+  <section class="auth-story" aria-label="Xác thực 2 lớp">
+    <div class="auth-brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VIP GROUP</b><small>COWORK</small></span>
+    </div>
+    <div class="auth-story-body">
+      <p class="eyebrow">BẢO VỆ TÀI KHOẢN</p>
+      <h1>Một lớp nữa.<br>An toàn hơn.</h1>
+      <p class="auth-lead">Tài khoản của bạn đang bật xác thực 2 lớp. Nhập mã từ ứng dụng authenticator để hoàn tất đăng nhập.</p>
+      <ul class="auth-points">
+        <li><span class="pt-ico">{{ ui.icon('shield', 16) }}</span><div><b>Mã đổi mỗi 30 giây</b><small>Dùng Google Authenticator, Authy, 1Password hoặc ứng dụng TOTP tương thích.</small></div></li>
+        <li><span class="pt-ico">{{ ui.icon('key', 16) }}</span><div><b>Mã dự phòng</b><small>Nếu mất thiết bị, dùng một mã dự phòng đã lưu khi bật MFA.</small></div></li>
+      </ul>
+    </div>
+    <div class="auth-story-foot"><span>cowork.vipgroup.com.vn</span><span class="dot-sep">·</span><span>Dữ liệu nội bộ</span></div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-card-head">
+        <p class="eyebrow">BƯỚC 2 / 2</p>
+        <h2>Xác thực 2 lớp</h2>
+        <p class="muted">Nhập mã 6 số hoặc mã dự phòng.</p>
+      </div>
+
+      {% if flash %}
+      <div class="flash flash-{{ flash.k }}" role="alert"><span class="flash-ico">{{ ui.icon('alert', 18) }}</span><span>{{ flash.m }}</span></div>
+      {% endif %}
+
+      <form method="post" action="/dang-nhap/mfa" class="auth-form" autocomplete="off">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <label class="field">
+          <span class="field-label">Mã xác thực</span>
+          <span class="input-wrap">
+            <span class="input-ico">{{ ui.icon('shield', 18) }}</span>
+            <input type="text" name="ma" required autofocus inputmode="numeric"
+                   autocomplete="one-time-code" spellcheck="false" maxlength="12"
+                   placeholder="123456 hoặc ABCDE-12345">
+          </span>
+          <span class="hint">Mã 6 số đổi mỗi 30 giây; mã dự phòng chỉ dùng một lần.</span>
+        </label>
+        <button class="btn btn-primary btn-block btn-lg" type="submit">Xác nhận {{ ui.icon('arrow', 18) }}</button>
+      </form>
+
+      <div class="auth-links">
+        <a href="/dang-nhap">Đăng nhập lại</a>
+        <span class="dot-sep">·</span>
+        <a href="/ho-so">Hồ sơ</a>
+      </div>
+    </div>
+    <p class="auth-copy">© 2026 VIP GROUP · COWORK v{{ APP_VERSION }}</p>
+  </section>
+</main>
+<script src="/static/app.js" defer></script>
+</body>
+</html>

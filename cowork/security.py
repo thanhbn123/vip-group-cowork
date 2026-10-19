@@ -7,9 +7,10 @@ import hmac
 import re
 import secrets
 import string
+import struct
 import time
 import unicodedata
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 from . import config
 
@@ -146,3 +147,68 @@ def xac_thuc_hmac(direction: str, ts: str | None, sig: str | None, body: bytes,
     mong = hmac.new((secret or config.BRAIN_SHARED_SECRET).encode("utf-8"),
                     _canonical(direction, ts, body), hashlib.sha256).hexdigest()
     return hmac.compare_digest(mong, sig)
+
+
+# ----------------------------- MFA TOTP (RFC 6238) -----------------------------
+TOTP_BUOC = 30
+TOTP_DIGITS = 6
+CHU_MA_DU_PHONG = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # bỏ 0/O, 1/I
+
+
+def tao_bi_mat_totp(nbytes: int = 20) -> str:
+    """Sinh secret base32 (160-bit) để đưa vào authenticator."""
+    return base64.b32encode(secrets.token_bytes(nbytes)).decode("ascii").rstrip("=")
+
+
+def _khoa_totp(secret: str) -> bytes:
+    s = re.sub(r"\s+", "", secret or "").upper()
+    if not s:
+        raise ValueError("Secret TOTP rỗng")
+    pad = "=" * ((8 - len(s) % 8) % 8)
+    return base64.b32decode(s + pad, casefold=True)
+
+
+def totp(secret: str, at: float | None = None, buoc: int = TOTP_BUOC,
+         digits: int = TOTP_DIGITS) -> str:
+    """Mã TOTP 6 số tại thời điểm `at` (mặc định hiện tại)."""
+    counter = int((time.time() if at is None else at) // buoc)
+    msg = struct.pack(">Q", counter)
+    h = hmac.new(_khoa_totp(secret), msg, hashlib.sha1).digest()
+    offset = h[-1] & 0x0F
+    code = (struct.unpack(">I", h[offset:offset + 4])[0] & 0x7FFFFFFF) % (10 ** digits)
+    return str(code).zfill(digits)
+
+
+def kiem_totp(secret: str, ma: str, cua_so: int = 1, at: float | None = None) -> bool:
+    """Chấp nhận mã hiện tại ±`cua_so` bước 30 giây; so sánh hằng thời gian."""
+    ma = re.sub(r"\D", "", str(ma or ""))
+    if len(ma) != TOTP_DIGITS or not secret:
+        return False
+    now = time.time() if at is None else at
+    for delta in range(-cua_so, cua_so + 1):
+        try:
+            if hmac.compare_digest(totp(secret, now + delta * TOTP_BUOC), ma):
+                return True
+        except (ValueError, TypeError):
+            return False
+    return False
+
+
+def otpauth_uri(secret: str, user_id: str, issuer: str = "VIP GROUP COWORK") -> str:
+    """URI để nhập thủ công vào Google Authenticator/Authy/1Password."""
+    label = quote(f"{issuer}:{user_id}", safe="")
+    return (f"otpauth://totp/{label}?secret={quote(secret)}&issuer={quote(issuer)}"
+            f"&algorithm=SHA1&digits={TOTP_DIGITS}&period={TOTP_BUOC}")
+
+
+def tao_ma_du_phong(n: int = 10) -> str:
+    raw = "".join(secrets.choice(CHU_MA_DU_PHONG) for _ in range(n))
+    return f"{raw[:5]}-{raw[5:]}"
+
+
+def chuan_ma_du_phong(ma: str) -> str:
+    return re.sub(r"[^A-Za-z0-9]", "", ma or "").upper()
+
+
+def bam_ma_du_phong(ma: str) -> str:
+    return hashlib.sha256(chuan_ma_du_phong(ma).encode("utf-8")).hexdigest()

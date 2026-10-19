@@ -148,6 +148,30 @@ def cmd_backup(args) -> int:
     return 0
 
 
+def cmd_mfa_reset(args) -> int:
+    """Khôi phục khẩn cấp: tắt MFA + xoá mã dự phòng/challenge của một user."""
+    db.init_db()
+    conn = db.connect()
+    try:
+        u = conn.execute("SELECT id, tenant_id, mfa_enabled FROM users WHERE id=?",
+                         (args.id,)).fetchone()
+        if not u:
+            print(f"Không tìm thấy tài khoản: {args.id}")
+            return 2
+        conn.execute("UPDATE users SET mfa_enabled=0, mfa_secret=NULL, updated_at=? WHERE id=?",
+                     (db.now_iso(), args.id))
+        conn.execute("DELETE FROM mfa_backup_codes WHERE user_id=?", (args.id,))
+        conn.execute("DELETE FROM mfa_challenges WHERE user_id=?", (args.id,))
+        conn.commit()
+        audit_mod.ghi(conn, "cli", "mfa.reset", target_type="user", target_id=args.id,
+                      detail={"truocDo": bool(u["mfa_enabled"]), "nguon": "cli"},
+                      tenant_id=u["tenant_id"])
+        print(f"Đã reset MFA cho {args.id} (trước đó {'bật' if u['mfa_enabled'] else 'tắt'}).")
+        return 0
+    finally:
+        conn.close()
+
+
 def cmd_show_user(args) -> int:
     db.init_db()
     conn = db.connect()
@@ -221,6 +245,10 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("show-user", help="Chi tiết một tài khoản")
     s.add_argument("id")
     s.set_defaults(func=cmd_show_user)
+
+    s = sub.add_parser("mfa-reset", help="Khôi phục khẩn cấp: tắt MFA của một tài khoản")
+    s.add_argument("--id", required=True)
+    s.set_defaults(func=cmd_mfa_reset)
 
     s = sub.add_parser("backup", help="Sao lưu DB bằng SQLite backup API")
     s.set_defaults(func=cmd_backup)

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">MÃ DỰ PHÒNG MFA</p>
+    <h1>{{ 'Đã bật xác thực 2 lớp' if che_do == 'bat' else 'Mã dự phòng mới' }}</h1>
+    <p class="muted">Mỗi mã chỉ hiện một lần và chỉ dùng được một lần.</p>
+  </div>
+</section>
+
+<section class="card narrow-card">
+  <div class="success-mark">{{ ui.icon('check-circle', 34) }}</div>
+  <h2>Lưu 10 mã này ở nơi an toàn</h2>
+  <p class="muted">In ra hoặc lưu vào trình quản lý mật khẩu. Không chia sẻ qua chat/email không mã hoá.</p>
+  <pre class="json-box" id="ma-du-phong">{% for c in codes %}{{ c }}
+{% endfor %}</pre>
+  <div class="form-actions left">
+    <button type="button" class="btn btn-ghost" data-copy="#ma-du-phong">{{ ui.icon('key', 16) }} Sao chép tất cả</button>
+    <a class="btn btn-primary" href="/ho-so">Về hồ sơ {{ ui.icon('arrow', 16) }}</a>
+    <a class="btn btn-ghost" href="/ho-so/mfa">Quản lý MFA</a>
+  </div>
+  <div class="callout warn">
+    <b>Chỉ hiện một lần</b>
+    <p>Hệ thống chỉ lưu hash của mã dự phòng; không thể xem lại. Nếu mất, tạo lại bộ mã mới hoặc reset bằng CLI.</p>
+  </div>
+</section>
+{% endblock %}

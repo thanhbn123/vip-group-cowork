@@ -59,12 +59,29 @@ def init_db() -> None:
         conn = connect()
         try:
             conn.executescript(DDL)
+            _migrate(conn)
             conn.execute("INSERT OR REPLACE INTO meta(key, value) VALUES('schema_version', ?)",
                          (str(SCHEMA_VERSION),))
             _seed(conn)
             _initialized = True
         finally:
             conn.close()
+
+
+def _cot(conn: sqlite3.Connection, table: str, col: str) -> bool:
+    return any(r["name"] == col for r in conn.execute(f"PRAGMA table_info({table})").fetchall())
+
+
+def _them_cot(conn: sqlite3.Connection, table: str, col: str, decl: str) -> None:
+    if not _cot(conn, table, col):
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {decl}")
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Nâng DB cũ lên schema hiện tại — CHỈ thêm cột/bảng, không xoá dữ liệu."""
+    _them_cot(conn, "users", "mfa_enabled", "INTEGER NOT NULL DEFAULT 0")
+    _them_cot(conn, "users", "mfa_secret", "TEXT")
+    conn.commit()
 
 
 def _seed(conn: sqlite3.Connection) -> None:

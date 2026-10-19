@@ -1,7 +1,7 @@
 """Schema + dữ liệu nền COWORK. Idempotent: chạy nhiều lần không nhân đôi dữ liệu."""
 from __future__ import annotations
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 DDL = """
 CREATE TABLE IF NOT EXISTS meta(
@@ -84,6 +84,8 @@ CREATE TABLE IF NOT EXISTS users(
     token_version INTEGER NOT NULL DEFAULT 0,
     failed_attempts INTEGER NOT NULL DEFAULT 0,
     locked_until TEXT,
+    mfa_enabled INTEGER NOT NULL DEFAULT 0,
+    mfa_secret TEXT,
     last_login_at TEXT,
     created_by TEXT,
     created_at TEXT NOT NULL,
@@ -133,6 +135,28 @@ CREATE TABLE IF NOT EXISTS sessions(
 );
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id, status);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash);
+
+CREATE TABLE IF NOT EXISTS mfa_challenges(
+    id TEXT PRIMARY KEY,
+    token_hash TEXT NOT NULL UNIQUE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    used_at TEXT,
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mfa_challenges_hash ON mfa_challenges(token_hash);
+
+CREATE TABLE IF NOT EXISTS mfa_backup_codes(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code_hash TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL,
+    UNIQUE(user_id, code_hash)
+);
+CREATE INDEX IF NOT EXISTS idx_mfa_backup_user ON mfa_backup_codes(user_id);
 
 CREATE TABLE IF NOT EXISTS login_attempts(
     id INTEGER PRIMARY KEY AUTOINCREMENT,

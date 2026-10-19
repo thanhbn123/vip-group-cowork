@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urlsplit
 
 from . import config, db, security
-from .errors import AuthRequired, Forbidden
+from .errors import AuthRequired, Forbidden, ValidationError
 
 TEN_COOKIE = config.COOKIE_NAME
 
@@ -262,3 +262,127 @@ def dang_nhap(conn: sqlite3.Connection, user_id: str, mat_khau: str, ip: str) ->
                  "updated_at=? WHERE id=?", (db.now_iso(), db.now_iso(), user_id))
     conn.commit()
     return user
+
+
+# ------------------------------- MFA (TOTP) -------------------------------
+TEN_COOKIE_MFA = "cowork_mfa"
+MFA_PHUT = 5
+MFA_TOI_DA = 5
+MFA_SO_MA_DU_PHONG = 10
+
+
+def _kiem_mat_khau_user(conn: sqlite3.Connection, user_id: str, mat_khau: str) -> bool:
+    row = conn.execute("SELECT password_hash, password_salt FROM users WHERE id=?",
+                       (user_id,)).fetchone()
+    return bool(row) and security.kiem_mat_khau(mat_khau, row["password_hash"], row["password_salt"])
+
+
+def tao_thach_thuc_mfa(conn: sqlite3.Connection, user: dict, request) -> dict:
+    """Tạo challenge 5 phút sau khi mật khẩu đúng; trả token thô (DB chỉ giữ hash)."""
+    token = security.token_moi(32)
+    now = datetime.now(db.TZ).replace(microsecond=0)
+    het = now + timedelta(minutes=MFA_PHUT)
+    conn.execute("DELETE FROM mfa_challenges WHERE expires_at<? OR used_at IS NOT NULL",
+                 (now.isoformat(),))
+    conn.execute(
+        "INSERT INTO mfa_challenges(id, token_hash, user_id, tenant_id, expires_at, attempts, "
+        "created_at) VALUES(?,?,?,?,?,0,?)",
+        (security.token_moi(10), security.sha256(token), user["id"], user["tenant_id"],
+         het.isoformat(), now.isoformat()))
+    conn.commit()
+    return {"token": token, "expires_at": het.isoformat()}
+
+
+def xac_thuc_mfa(conn: sqlite3.Connection, token: str | None, ma: str) -> dict | None:
+    if not token:
+        return None
+    r = conn.execute("SELECT * FROM mfa_challenges WHERE token_hash=?",
+                     (security.sha256(token),)).fetchone()
+    if not r:
+        return None
+    ch = dict(r)
+    try:
+        het = datetime.fromisoformat(ch["expires_at"])
+    except (TypeError, ValueError):
+        return None
+    if ch["used_at"] or datetime.now(db.TZ) >= het or int(ch["attempts"] or 0) >= MFA_TOI_DA:
+        return None
+    user = nguoi_dung_day_du(conn, ch["user_id"])
+    if not user or user["status"] != "active" or not user.get("mfa_enabled"):
+        return None
+    hop_le = False
+    if user.get("mfa_secret"):
+        hop_le = security.kiem_totp(user["mfa_secret"], ma)
+    if not hop_le:
+        h = security.bam_ma_du_phong(ma)
+        code = conn.execute(
+            "SELECT id FROM mfa_backup_codes WHERE user_id=? AND code_hash=? AND used_at IS NULL",
+            (user["id"], h)).fetchone()
+        if code:
+            conn.execute("UPDATE mfa_backup_codes SET used_at=? WHERE id=?",
+                         (db.now_iso(), code["id"]))
+            hop_le = True
+    if not hop_le:
+        conn.execute("UPDATE mfa_challenges SET attempts=attempts+1 WHERE id=?", (ch["id"],))
+        conn.commit()
+        return None
+    now = db.now_iso()
+    conn.execute("UPDATE mfa_challenges SET used_at=? WHERE id=?", (now, ch["id"]))
+    # Một lần xác thực thành công vô hiệu mọi challenge song song còn lại của user.
+    conn.execute("UPDATE mfa_challenges SET used_at=? WHERE user_id=? AND used_at IS NULL",
+                 (now, user["id"]))
+    conn.commit()
+    return user
+
+
+def bat_mfa(conn: sqlite3.Connection, user: dict, secret: str, ma: str,
+            mat_khau: str) -> list[str]:
+    """Bật MFA sau khi xác minh mật khẩu + mã TOTP; trả mã dự phòng dùng một lần."""
+    if not _kiem_mat_khau_user(conn, user["id"], mat_khau):
+        raise ValidationError("Mật khẩu hiện tại không đúng.")
+    if not security.kiem_totp(secret, ma):
+        raise ValidationError("Mã xác thực không đúng hoặc đã hết hạn.")
+    conn.execute("UPDATE users SET mfa_enabled=1, mfa_secret=?, updated_at=? WHERE id=?",
+                 (secret, db.now_iso(), user["id"]))
+    conn.execute("DELETE FROM mfa_backup_codes WHERE user_id=?", (user["id"],))
+    ma_ds = [security.tao_ma_du_phong() for _ in range(MFA_SO_MA_DU_PHONG)]
+    for code in ma_ds:
+        conn.execute("INSERT INTO mfa_backup_codes(user_id, code_hash, created_at) VALUES(?,?,?)",
+                     (user["id"], security.bam_ma_du_phong(code), db.now_iso()))
+    conn.commit()
+    return ma_ds
+
+
+def tat_mfa(conn: sqlite3.Connection, user: dict, mat_khau: str, ma: str) -> None:
+    if not _kiem_mat_khau_user(conn, user["id"], mat_khau):
+        raise ValidationError("Mật khẩu hiện tại không đúng.")
+    row = conn.execute("SELECT mfa_secret FROM users WHERE id=?", (user["id"],)).fetchone()
+    if not row or not row["mfa_secret"] or not security.kiem_totp(row["mfa_secret"], ma):
+        raise ValidationError("Mã xác thực không đúng hoặc đã hết hạn.")
+    conn.execute("UPDATE users SET mfa_enabled=0, mfa_secret=NULL, updated_at=? WHERE id=?",
+                 (db.now_iso(), user["id"]))
+    conn.execute("DELETE FROM mfa_backup_codes WHERE user_id=?", (user["id"],))
+    conn.execute("DELETE FROM mfa_challenges WHERE user_id=?", (user["id"],))
+    conn.commit()
+
+
+def tao_lai_ma_du_phong(conn: sqlite3.Connection, user: dict, mat_khau: str,
+                        ma: str) -> list[str]:
+    if not _kiem_mat_khau_user(conn, user["id"], mat_khau):
+        raise ValidationError("Mật khẩu hiện tại không đúng.")
+    row = conn.execute("SELECT mfa_secret FROM users WHERE id=?", (user["id"],)).fetchone()
+    if not row or not row["mfa_secret"] or not security.kiem_totp(row["mfa_secret"], ma):
+        raise ValidationError("Mã xác thực không đúng hoặc đã hết hạn.")
+    conn.execute("DELETE FROM mfa_backup_codes WHERE user_id=?", (user["id"],))
+    ma_ds = [security.tao_ma_du_phong() for _ in range(MFA_SO_MA_DU_PHONG)]
+    for code in ma_ds:
+        conn.execute("INSERT INTO mfa_backup_codes(user_id, code_hash, created_at) VALUES(?,?,?)",
+                     (user["id"], security.bam_ma_du_phong(code), db.now_iso()))
+    conn.commit()
+    return ma_ds
+
+
+def ma_du_phong_con_lai(conn: sqlite3.Connection, user_id: str) -> int:
+    return int(conn.execute(
+        "SELECT COUNT(*) FROM mfa_backup_codes WHERE user_id=? AND used_at IS NULL",
+        (user_id,)).fetchone()[0])
