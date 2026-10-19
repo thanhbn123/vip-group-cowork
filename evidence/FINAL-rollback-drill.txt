@@ -1,0 +1,14 @@
+# ROLLBACK DRILL — 2026-10-19 17:57:41 +0700
+Backup: /Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/VIP GROUP ID/cowork/data/backups/cowork-20261019-175741.db · 17 users · 275 audit · integrity ok
+backup=data/backups/cowork-20261019-175741.db
+users: live=17 restore=17 OK
+audit_log: live=275 restore=275 OK
+sessions: live=101 restore=101 OK
+role_permissions: live=85 restore=85 OK
+modules: live=15 restore=15 OK
+tenants: live=2 restore=2 OK
+integrity=ok · counts=khớp
+restore_server_pid=18238
+restore_login=PASS user= anh-thanh role= super_admin modules= 15
+Đã xoá DB tạm; backup giữ tại data/backups/cowork-20261019-175741.db
+ROLLBACK DRILL: PASS

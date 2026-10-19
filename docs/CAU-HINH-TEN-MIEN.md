@@ -134,3 +134,25 @@ DNS không đổi nên rollback chỉ gồm Caddyfile + reload.
 - [ ] Chủ dự án phê duyệt.
 
 **Chưa có mục nào trong danh sách trên được tự động áp dụng.**
+
+---
+
+## 6. KẾT QUẢ VALIDATE KHỐI CADDY (19/10/2026)
+
+Đã kiểm tra cú pháp bằng **tệp tạm trong container**, không reload, không sửa Caddyfile sống:
+
+```bash
+# Ghép Caddyfile hiện tại + khối COWORK vào /tmp, rồi:
+docker exec -i vip-staging-caddy sh -c 'cat > /tmp/Caddyfile.cowork-test'
+docker exec vip-staging-caddy caddy validate \
+  --config /tmp/Caddyfile.cowork-test --adapter caddyfile
+```
+
+Kết quả:
+- **`Valid configuration`**
+- `live_before = c2674057…dad3c`
+- `live_after  = c2674057…dad3c` — **không đổi**
+- Cảnh báo không chặn: Caddyfile hiện tại chưa được `caddy fmt` (dòng 53); không ảnh hưởng nạp cấu hình.
+- Bằng chứng: `evidence/FINAL-caddy-validate.txt`
+
+**Chưa reload, chưa thêm block vào Caddyfile sống.**

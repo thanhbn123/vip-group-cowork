@@ -93,3 +93,17 @@
 - Chưa sửa production; ghi nhận để xử lý khi duyệt cổng 3.
 
 **Chưa có câu trả lời nào được mặc định là CÓ.**
+
+---
+
+## 5. DIỄN TẬP ROLLBACK (19/10/2026)
+
+- `./scripts/rollback-drill.sh` — **PASS**:
+  - Backup SQLite: 17 user · 275 audit · integrity `ok`.
+  - Restore ra DB tạm: counts khớp 6 bảng (users/audit/sessions/role_permissions/modules/tenants).
+  - Chạy server trên DB khôi phục cổng 8902: đăng nhập `anh-thanh` PASS, 15 module.
+  - Xoá DB tạm; giữ backup.
+- Bằng chứng: `evidence/FINAL-rollback-drill.txt`.
+- Caddy block đã **validate cú pháp** trên VPS bằng tệp tạm, live hash không đổi: `evidence/FINAL-caddy-validate.txt`.
+
+**Vẫn chưa có thay đổi production nào.**

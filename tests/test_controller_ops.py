@@ -109,3 +109,18 @@ def test_luu_tru_admin_don_admin_scopes(client, owner):
                             ).fetchone()[0] == 0
     finally:
         conn.close()
+
+
+def test_module_khong_co_quyen_use_bi_khoa_trong_ui(client, owner):
+    tao_user("employee", "emp-ui-use", dept="kinh-doanh")
+    conn = db.connect()
+    try:
+        target = auth.nguoi_dung_day_du(conn, "emp-ui-use")
+        states = {m["code"]: m for m in services.trang_thai_quyen_module(conn, target)}
+        assert states["dashboard"]["has_use"] is False
+        assert states["brain"]["has_use"] is True
+    finally:
+        conn.close()
+    dang_nhap(client, "anh-thanh", "Owner!Passw0rd")
+    html = client.get("/tai-khoan/emp-ui-use/phan-quyen").text
+    assert "Module không có mức sử dụng" in html

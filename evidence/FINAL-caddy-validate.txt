@@ -1,0 +1,13 @@
+# Caddy validate COWORK block — 2026-10-19 17:57:26 +0700
+# Chỉ dùng tệp tạm; KHÔNG reload, KHÔNG sửa Caddyfile sống.
+live_before=c267405747b7a7990343568689ee58c061cca846b7c74af2442bc4889a8dad3c
+Valid configuration
+{"level":"info","ts":1792407447.5938895,"msg":"using config from file","file":"/tmp/Caddyfile.cowork-test"}
+{"level":"info","ts":1792407447.5981162,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1792407447.5981398,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/tmp/Caddyfile.cowork-test","line":53}
+{"level":"info","ts":1792407447.5993602,"logger":"http.auto_https","msg":"server is listening only on the HTTPS port but has no TLS connection policies; adding one to enable TLS","server_name":"srv0","https_port":443}
+{"level":"info","ts":1792407447.599664,"logger":"http.auto_https","msg":"enabling automatic HTTP->HTTPS redirects","server_name":"srv0"}
+{"level":"info","ts":1792407447.5996716,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x2c44b44b5500"}
+{"level":"info","ts":1792407447.6020584,"logger":"tls.cache.maintenance","msg":"stopped background certificate maintenance","cache":"0x2c44b44b5500"}
+{"level":"info","ts":1792407447.6020932,"logger":"http","msg":"servers shutting down with eternal grace period"}
+live_after=c267405747b7a7990343568689ee58c061cca846b7c74af2442bc4889a8dad3c

@@ -283,6 +283,7 @@ def trang_thai_quyen_module(conn: sqlite3.Connection, target: dict) -> list[dict
     overrides = {r["permission_code"]: r["effect"] for r in conn.execute(
         "SELECT permission_code, effect FROM user_permissions WHERE user_id=?",
         (target["id"],)).fetchall()}
+    ma_quyen_ton_tai = {r["code"] for r in conn.execute("SELECT code FROM permissions").fetchall()}
     rows = []
     for m in conn.execute("SELECT * FROM modules ORDER BY sort_order").fetchall():
         m = dict(m)
@@ -302,6 +303,9 @@ def trang_thai_quyen_module(conn: sqlite3.Connection, target: dict) -> list[dict
             "default": default, "mode": mode if co_override else "default",
             "effective": "block" if not eff_view else ("use" if eff_use else "view"),
             "view": view, "use": use,
+            # Module không có quyền `<code>.use` (dashboard, accounts, roles…) thì UI
+            # phải khoá lựa chọn "Sử dụng"; service quy đổi an toàn thành "chỉ xem".
+            "has_use": use in ma_quyen_ton_tai,
         })
     return rows
 

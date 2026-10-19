@@ -49,10 +49,13 @@
           {% set nhan_opt = {'default':'Theo vai trò','view':'Chỉ xem','use':'Sử dụng','block':'Chặn'}[opt] %}
           {% set nhan_ngan = {'default':'Mặc định','view':'Xem','use':'Dùng','block':'Chặn'}[opt] %}
           <td class="radio-cell" data-label="{{ nhan_ngan }}">
-            <label class="radio-pill {% if opt == 'block' %}radio-danger{% endif %}">
+            {% set khoa_opt = (not co_cap) or (opt == 'use' and not m.has_use) %}
+            <label class="radio-pill {% if opt == 'block' %}radio-danger{% endif %} {% if opt == 'use' and not m.has_use %}is-disabled{% endif %}"
+                   {% if opt == 'use' and not m.has_use %}title="Module không có mức sử dụng — chỉ xem hoặc chặn"{% endif %}>
               <input type="radio" name="quyen_{{ m.code }}" value="{{ opt }}"
-                     aria-label="{{ m.name }} — {{ nhan_opt }}"
-                     {% if m.mode == opt %}checked{% endif %} {% if not co_cap %}disabled{% endif %}>
+                     aria-label="{{ m.name }} — {{ nhan_opt }}{% if opt == 'use' and not m.has_use %} (không khả dụng){% endif %}"
+                     {% if m.mode == opt and not (opt == 'use' and not m.has_use) %}checked{% endif %}
+                     {% if khoa_opt %}disabled{% endif %}>
               <span aria-hidden="true"></span>
             </label>
           </td>

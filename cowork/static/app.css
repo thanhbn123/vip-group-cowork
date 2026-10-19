@@ -354,6 +354,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .radio-pill input:checked + span{border-color:#16395b;background:#16395b;box-shadow:inset 0 0 0 4px #fff}
 .radio-pill.radio-danger input:checked + span{border-color:var(--red);background:var(--red);box-shadow:inset 0 0 0 4px #fff}
 .radio-pill input:disabled + span{opacity:.45}
+.radio-pill.is-disabled{cursor:not-allowed;opacity:.45}
 .perm-matrix{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
 .matrix-card{padding:17px}
 .matrix-card .card-head{margin-bottom:10px}

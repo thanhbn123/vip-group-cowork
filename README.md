@@ -129,7 +129,7 @@ cowork/
 ```
 
 - Test dùng DB tạm, không đụng `data/cowork.db`.
-- Bộ hiện có: **84 test PASS** (lõi + 5 làn agent + controller): đăng nhập, rate limit, CSRF, RBAC, chống leo thang, tenant, thu hồi quyền/phiên, audit append-only, Brain ticket/HMAC, UI 3 vai trò, E2E 8 bước.
+- Bộ hiện có: **85 test PASS** (lõi + 5 làn agent + controller): đăng nhập, rate limit, CSRF, RBAC, chống leo thang, tenant, thu hồi quyền/phiên, audit append-only, Brain ticket/HMAC, UI 3 vai trò, E2E 8 bước.
 - Bằng chứng nghiệm thu cuối: `evidence/FINAL-acceptance-20261019.json`, `evidence/FINAL-acceptance-report-20261019.md`, `evidence/controller-final-e2e.json`.
 - Không dùng MOCK để kết luận PASS: chat Brain phải `providerId=local`, `nhan=real`.
 
