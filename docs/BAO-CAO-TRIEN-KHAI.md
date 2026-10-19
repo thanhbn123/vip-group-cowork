@@ -164,7 +164,7 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 |---|---|---|
 | COWORK MFA đã có nhưng owner chưa bật | Trung bình | Bật tại `/ho-so/mfa`; CLI `mfa-reset` là break-glass |
 | MFA owner chặn mở Brain qua COWORK | Có chủ đích | Giữ `ALLOW_MFA_USERS=0` tới khi chủ dự án nghiệm thu COWORK |
-| Offsite backup COWORK chưa cài job | Trung bình | Script + test PASS; cài LaunchAgent/Full Disk Access thủ công |
+| Offsite backup COWORK | Thấp | ✅ job 03:40 đã cài; test tạo file `.enc` 224K, retention 14 |
 | Access log ghi ticket query | Thấp | Ticket one-time/TTL 60s; tắt/lọc log hoặc chuyển POST khi lên thật |
 | MFA secret staging thiếu | Thấp | Chỉ ảnh hưởng login trực tiếp staging; bridge vẫn chặn đúng |
 | `sessions.ip` sau proxy | Thấp | Rate limit/audit đã dùng IP thật; cột phiên có thể vẫn 127.0.0.1 |

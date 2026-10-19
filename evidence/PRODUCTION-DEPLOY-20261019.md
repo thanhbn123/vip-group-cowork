@@ -159,10 +159,6 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
 - Chạy thử với đích tạm: **PASS** — `users=5`, `schema=2`, file `.enc` 224K; xoá bản tạm sau test.
 - Bằng chứng: `evidence/FINAL-cowork-offsite-test.txt`.
 - LaunchAgent mẫu: `deploy/com.vipgroup.cowork.offsite.plist` (03:40).
-- **Chưa cài job tự động**: macOS/DSH không cho tạo thư mục trong `SAO LUU VPS` từ tiến trình hiện tại (`Operation not permitted`); cần chủ dự án cài thủ công hoặc cấp Full Disk Access:
-```bash
-mkdir -p "$HOME/Library/CloudStorage/SynologyDrive-Macbook/SAO LUU VPS/VIP-AI-COWORK"
-cp deploy/com.vipgroup.cowork.offsite.plist ~/Library/LaunchAgents/
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.vipgroup.cowork.offsite.plist
-```
+- **Đã cài job tự động** 18:21: `~/Library/LaunchAgents/com.vipgroup.cowork.offsite.plist`, script `~/VIP-AI/bin/backup-cowork-offsite.sh`, lịch 03:40.
+- Chạy thử: `status-cowork.json` ok, `users=5`, `schema=2`, file `cowork-20261019-182146.db.enc` 224K tại `SAO LUU VPS/VIP-AI-COWORK`.
 - Backup local 03:20 trên Studio vẫn đang chạy.
