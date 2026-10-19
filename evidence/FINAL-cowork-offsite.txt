@@ -1,0 +1,1 @@
+mkdir: /Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/SAO LUU VPS/VIP-AI-COWORK: Operation not permitted

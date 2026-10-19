@@ -33,6 +33,7 @@
 | Audit append-only | Trigger chặn UPDATE/DELETE; màn lọc + xuất CSV |
 | Module registry | 15 module, bật/tắt, quyền xem/sử dụng |
 | Màn hình | Dashboard, tài khoản, ban, vai trò, phân quyền, module, nhật ký, cài đặt, Brain, hồ sơ, đối tác |
+| MFA TOTP COWORK | Bật/tắt, login challenge 5 phút, 10 mã dự phòng, CLI reset break-glass |
 | Brain bridge | Ticket one-time 60s, HMAC hai chiều, phiên Brain native, thu hồi tức thời |
 | AI Local | Chat thật qua Ollama trên Mac Studio, không cloud/mock |
 | Tài liệu | README, khảo sát, tên miền, triển khai, rollback, nghiệm thu, ma trận yêu cầu |
@@ -108,8 +109,8 @@ Brain /api/auth/toi trước: 200 → sau: 401
 - `evidence/controller-revocation.json`, `AG04-revoke-nv01.json`.
 
 ### 5.5. MFA
-- `anh-thanh` mở Brain qua COWORK: **403 “Chưa bỏ MFA cho tài khoản này”**, không set cookie, không tạo shadow.
-- `COWORK_BRIDGE_ALLOW_MFA_USERS=0` giữ nguyên.
+- COWORK: TOTP đã triển khai; smoke production bật MFA cho admin tạm, logout, login mật khẩu → `/dang-nhap/mfa`, nhập TOTP → `/`, `/api/me` 200. Owner production chưa bật.
+- Brain: `anh-thanh` mở Brain qua COWORK bị **403 “Chưa bỏ MFA cho tài khoản này”**, không set cookie, không tạo shadow; `COWORK_BRIDGE_ALLOW_MFA_USERS=0` giữ nguyên.
 - `evidence/controller-mfa-guard.html`, `AG04-report.md` mục f.
 
 ### 5.6. Brain production không bị chạm
@@ -163,7 +164,7 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 |---|---|---|
 | COWORK MFA đã có nhưng owner chưa bật | Trung bình | Bật tại `/ho-so/mfa`; CLI `mfa-reset` là break-glass |
 | MFA owner chặn mở Brain qua COWORK | Có chủ đích | Giữ `ALLOW_MFA_USERS=0` tới khi chủ dự án nghiệm thu COWORK |
-| Offsite backup COWORK chưa tự động | Trung bình | Backup local 03:20 đã có; bổ sung mã hoá Synology nếu cần |
+| Offsite backup COWORK chưa cài job | Trung bình | Script + test PASS; cài LaunchAgent/Full Disk Access thủ công |
 | Access log ghi ticket query | Thấp | Ticket one-time/TTL 60s; tắt/lọc log hoặc chuyển POST khi lên thật |
 | MFA secret staging thiếu | Thấp | Chỉ ảnh hưởng login trực tiếp staging; bridge vẫn chặn đúng |
 | `sessions.ip` sau proxy | Thấp | Rate limit/audit đã dùng IP thật; cột phiên có thể vẫn 127.0.0.1 |

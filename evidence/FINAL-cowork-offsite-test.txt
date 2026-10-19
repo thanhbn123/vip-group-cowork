@@ -1,0 +1,1 @@
+COWORK_OFFSITE_OK /tmp/cowork-offsite-test.7C3x7y/dest/cowork-20261019-181421.db.enc users=5 schema=2

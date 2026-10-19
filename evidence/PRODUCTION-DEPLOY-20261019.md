@@ -140,13 +140,29 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
   - `.env`: `~/VIP-AI/backups/cowork-env-before-mfa-20261019-181120`
 - Migration tự động khi restart: schema **1 → 2**, thêm `users.mfa_enabled`, `users.mfa_secret`, bảng `mfa_challenges`, `mfa_backup_codes`; dữ liệu cũ giữ nguyên.
 - Health sau restart: 200; users vẫn 2; 2 user MFA columns; 2 bảng MFA.
-- Smoke production với admin tạm `prod-mfa-181144`:
+- Smoke production với admin tạm `prod-mfa-181256` (bản cuối; bản trước `prod-mfa-181144`):
   - Tạo admin 200 · login trước MFA 303 · bật MFA 200 · logout 303
   - Login mật khẩu → **303 `/dang-nhap/mfa`**
   - Nhập TOTP → **303 `/`**, `/api/me` 200
   - Owner archive admin 303
 - Bằng chứng: `evidence/PRODUCTION-mfa-smoke-20261019.json`.
-- Admin test `prod-mfa-181138` (lần chạy lỗi PYTHONPATH) và `prod-mfa-181144` đã lưu trữ; audit còn.
+- Admin test `prod-mfa-181138` (lần chạy lỗi PYTHONPATH) và `prod-mfa-181256` (bản cuối; bản trước `prod-mfa-181144`) đã lưu trữ; audit còn.
 - **Owner production chưa bật MFA**; bật tại `https://cowork.vipgroup.com.vn/ho-so/mfa`.
 - Break-glass: `ssh vip-ai-studio 'cd ~/VIP-AI/cowork && .venv/bin/python -m cowork.cli mfa-reset --id <id>'`.
 - Test local: `tests/test_mfa_controller.py` 8 test; full suite **94 passed**.
+
+---
+
+## 9. BACKUP OFFSITE COWORK (SCRIPT ĐÃ KIỂM THỬ)
+
+- Script: `scripts/backup-cowork-offsite.sh` — gọi backup SQLite trên Studio, scp, kiểm `integrity_check`, mã hoá AES-256-CBC/PBKDF2 200k bằng `~/VIP-AI/keys/backup.key`, retention 14 bản.
+- Chạy thử với đích tạm: **PASS** — `users=5`, `schema=2`, file `.enc` 224K; xoá bản tạm sau test.
+- Bằng chứng: `evidence/FINAL-cowork-offsite-test.txt`.
+- LaunchAgent mẫu: `deploy/com.vipgroup.cowork.offsite.plist` (03:40).
+- **Chưa cài job tự động**: macOS/DSH không cho tạo thư mục trong `SAO LUU VPS` từ tiến trình hiện tại (`Operation not permitted`); cần chủ dự án cài thủ công hoặc cấp Full Disk Access:
+```bash
+mkdir -p "$HOME/Library/CloudStorage/SynologyDrive-Macbook/SAO LUU VPS/VIP-AI-COWORK"
+cp deploy/com.vipgroup.cowork.offsite.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.vipgroup.cowork.offsite.plist
+```
+- Backup local 03:20 trên Studio vẫn đang chạy.
