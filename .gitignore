@@ -12,3 +12,6 @@ brain-staging/
 
 .env
 *.log
+
+deploy/vps/data/
+deploy/vps/.env.staging
