@@ -118,4 +118,4 @@
 - COWORK LaunchAgent pid 18460; tunnel 18533; Brain pid 18620.
 - Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, owner mở Brain 200 sau MFA, thu hồi 403/401, archive.
 - Biên bản: `evidence/PRODUCTION-DEPLOY-20261019.md`; smoke: `evidence/PRODUCTION-smoke-20261019.json`.
-- **Đã xong:** MFA owner, owner mở Brain qua COWORK, offsite backup. Còn lại: chủ dự án ký nghiệm thu.
+- **Đã xong:** MFA owner, owner mở Brain qua COWORK, offsite backup, nghiệm thu production 8/8. Còn lại: chủ dự án ký nghiệm thu thủ công.

@@ -5,6 +5,8 @@
 **Môi trường production:** đã live từ 19/10/2026 — dùng tên miền chính thức.
 **Nguyên tắc:** chỉ đánh **PASS** khi thao tác thật, AI Local trả lời thật; **không** chấp nhận MOCK.
 
+> **Kết quả kỹ thuật tự động trên production (19/10/2026 18:36): 8/8 PASS**, gồm owner MFA, tạo admin/nhân viên, SSO Brain, chat local thật, thu hồi 403/401. Bằng chứng: `evidence/PRODUCTION-acceptance-20261019.json`. Chủ dự án vẫn ký bảng dưới đây sau khi tự thao tác.
+
 ---
 
 ## 0. CHUẨN BỊ

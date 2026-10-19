@@ -191,3 +191,24 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
   - Logout COWORK → Brain `/api/auth/toi` **401** (thu hồi).
 - Bằng chứng: `evidence/PRODUCTION-owner-brain-20261019.json`.
 - Rollback: đặt `COWORK_BRIDGE_ALLOW_MFA_USERS=0` + restart Brain.
+
+---
+
+## 12. NGHIỆM THU 8 BƯỚC TRÊN PRODUCTION (19/10/2026 18:36)
+
+Chạy tự động qua tên miền chính thức, owner MFA thật, tạo admin → nhân viên → SSO → chat → thu hồi → archive:
+
+| Bước | Kết quả |
+|---|---|
+| B1 Owner đăng nhập COWORK + MFA | PASS |
+| B2 Owner tạo quản trị cấp dưới | PASS |
+| B3 Quản trị tạo nhân viên Ban Kinh doanh | PASS |
+| B4 Nhân viên đăng nhập | PASS |
+| B5 Chỉ 5 module; route admin 403 | PASS |
+| B6 SSO Brain một lần | PASS |
+| B7 Chat local thật | PASS · `local`/`real` · `qwen2.5:7b-instruct` · task `T-G02-000037` · 295 ký tự · chi phí 0 |
+| B8 Thu hồi Brain 403/401, cấp lại 200 | PASS |
+
+- Tài khoản test `prod-accept-admin-183600`, `prod-accept-emp-183600` đã lưu trữ sau test.
+- Bằng chứng: `evidence/PRODUCTION-acceptance-20261019.json`.
+- **Kết luận kỹ thuật: PASS 8/8 trên production.** Chủ dự án vẫn cần ký nghiệm thu thủ công.
