@@ -149,7 +149,7 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
 - Admin test `prod-mfa-181138` (lần chạy lỗi PYTHONPATH) và `prod-mfa-181256` (bản cuối; bản trước `prod-mfa-181144`) đã lưu trữ; audit còn.
 - **Owner production đã bật MFA** lúc 18:25 (xem §10); file secret/mã dự phòng 0600 trên Studio.
 - Break-glass: `ssh vip-ai-studio 'cd ~/VIP-AI/cowork && .venv/bin/python -m cowork.cli mfa-reset --id <id>'`.
-- Test local: `tests/test_mfa_controller.py` 8 test; full suite **95 passed**.
+- Test local: `tests/test_mfa_controller.py` 9 test; full suite **95 passed**.
 
 ---
 

@@ -40,7 +40,7 @@
 
 ## KHOẢNG TRỐNG ĐÃ BIẾT (không được báo PASS production)
 
-3. COWORK đã có MFA TOTP tuỳ chọn; owner production chưa bật.
+3. COWORK đã có MFA TOTP; owner production đã bật 19/10/2026.
 4. ~~IP thật sau proxy Caddy~~ — đã vá (`COWORK_TIN_PROXY=1`, `web.ip_cua`); audit production ghi `14.190.214.49`.
 5. Đăng xuất COWORK chưa thu hồi phiên Brain (nếu chủ dự án yêu cầu).
 6. Brain production còn nợ cũ: `/api/settings` authz gap, header chưa persist — không do COWORK.

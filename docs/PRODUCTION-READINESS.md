@@ -45,8 +45,8 @@
 
 ### 2.3. MFA cho COWORK — ĐÃ TRIỂN KHAI (tuỳ chọn)
 - TOTP 6 số, challenge 5 phút, 10 mã dự phòng dùng một lần, CLI `mfa-reset` break-glass.
-- Bật tại `/ho-so/mfa`; owner production **chưa bật** — nên bật trước khi mở rộng admin.
-- Test: `tests/test_mfa_controller.py` (8 test); smoke production `evidence/PRODUCTION-mfa-smoke-20261019.json`.
+- Owner production **đã bật** 19/10/2026; secret + 10 mã dự phòng tại file 0600 trên Studio.
+- Test: `tests/test_mfa_controller.py` (9 test); smoke production `evidence/PRODUCTION-mfa-smoke-20261019.json`.
 
 ### 2.4. Caddy/Header — ĐÃ KIỂM TRA SAU PUBLIC
 - Caddy block đã áp dụng 19/10/2026; TLS + header đã kiểm tra: CSP, HSTS, X-Frame-Options DENY, nosniff, Referrer-Policy.
