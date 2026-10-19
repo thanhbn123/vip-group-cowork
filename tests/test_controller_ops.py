@@ -124,3 +124,7 @@ def test_module_khong_co_quyen_use_bi_khoa_trong_ui(client, owner):
     dang_nhap(client, "anh-thanh", "Owner!Passw0rd")
     html = client.get("/tai-khoan/emp-ui-use/phan-quyen").text
     assert "Module không có mức sử dụng" in html
+
+
+def test_head_root_tra_200(client):
+    assert client.head("/").status_code == 200

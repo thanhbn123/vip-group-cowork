@@ -147,9 +147,9 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
   - Owner archive admin 303
 - Bằng chứng: `evidence/PRODUCTION-mfa-smoke-20261019.json`.
 - Admin test `prod-mfa-181138` (lần chạy lỗi PYTHONPATH) và `prod-mfa-181256` (bản cuối; bản trước `prod-mfa-181144`) đã lưu trữ; audit còn.
-- **Owner production chưa bật MFA**; bật tại `https://cowork.vipgroup.com.vn/ho-so/mfa`.
+- **Owner production đã bật MFA** lúc 18:25 (xem §10); file secret/mã dự phòng 0600 trên Studio.
 - Break-glass: `ssh vip-ai-studio 'cd ~/VIP-AI/cowork && .venv/bin/python -m cowork.cli mfa-reset --id <id>'`.
-- Test local: `tests/test_mfa_controller.py` 8 test; full suite **94 passed**.
+- Test local: `tests/test_mfa_controller.py` 8 test; full suite **95 passed**.
 
 ---
 
@@ -162,3 +162,18 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
 - **Đã cài job tự động** 18:21: `~/Library/LaunchAgents/com.vipgroup.cowork.offsite.plist`, script `~/VIP-AI/bin/backup-cowork-offsite.sh`, lịch 03:40.
 - Chạy thử: `status-cowork.json` ok, `users=5`, `schema=2`, file `cowork-20261019-182146.db.enc` 224K tại `SAO LUU VPS/VIP-AI-COWORK`.
 - Backup local 03:20 trên Studio vẫn đang chạy.
+
+
+---
+
+## 10. OWNER MFA + HEAD + CADDY FMT (19/10/2026 18:25)
+
+- Owner `anh-thanh` đã bật MFA TOTP:
+  - Secret + 10 mã dự phòng: `~/VIP-AI/cowork/secrets/owner-mfa-anh-thanh.txt` (0600).
+  - Kiểm tra: đăng nhập mật khẩu → `/dang-nhap/mfa` 303; nhập TOTP → `/` 303; `/api/me` 200; logout 303.
+  - `active_mfa=1`; bằng chứng `evidence/PRODUCTION-owner-mfa-20261019.json`.
+- `HEAD /` đã trả **200** (trước 405); health check dùng được HEAD/GET `/api/health`.
+- Caddyfile đã `caddy fmt`:
+  - Backup: `~/Caddyfile.bak-before-fmt-20261019-182534.txt` + `/data/Caddyfile.bak-before-fmt-...`.
+  - Hash trước `be7a8ef8…` → sau `eea7ed56…`; validate/reload OK; cert/health giữ nguyên.
+- Full suite **95 passed**.

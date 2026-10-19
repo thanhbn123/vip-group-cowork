@@ -44,6 +44,13 @@ app.include_router(settings_routes.router, tags=["settings"])
 app.include_router(brain_routes.router, tags=["brain"])
 app.include_router(internal.router, tags=["internal"])
 
+
+@app.head("/")
+async def head_root():
+    """Health check không cần body; tránh 405 khi giám sát dùng HEAD."""
+    return Response(status_code=200, headers={"Cache-Control": "no-store"})
+
+
 _static = config.BASE_DIR / "cowork" / "static"
 _static.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(_static)), name="static")

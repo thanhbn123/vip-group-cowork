@@ -15,7 +15,7 @@ nhật ký quản trị và cầu nối tới **VIP AI Brain** (AI Local trên M
 |---|---|
 | COWORK app (FastAPI + SQLite) | ✅ chạy local `http://127.0.0.1:8899` |
 | Đăng nhập ID, phiên, CSRF, rate limit | ✅ |
-| MFA TOTP (tuỳ chọn) + 10 mã dự phòng + CLI reset | ✅ đã có, bật tại `/ho-so/mfa` |
+| MFA TOTP + 10 mã dự phòng + CLI reset | ✅ owner đã bật; file 0600 trên Studio |
 | 5 vai trò + phân quyền module + tenant + audit | ✅ |
 | 15 màn hình quản trị + dashboard + Brain | ✅ |
 | Brain staging (bản sao DB + bridge) | ✅ `http://127.0.0.1:8892` (khi bật) |
@@ -131,7 +131,7 @@ cowork/
 ```
 
 - Test dùng DB tạm, không đụng `data/cowork.db`.
-- Bộ hiện có: **94 test PASS** (lõi + 5 làn agent + controller): đăng nhập, rate limit, CSRF, RBAC, chống leo thang, tenant, thu hồi quyền/phiên, audit append-only, Brain ticket/HMAC, UI 3 vai trò, E2E 8 bước.
+- Bộ hiện có: **95 test PASS** (lõi + 5 làn agent + controller): đăng nhập, rate limit, CSRF, RBAC, chống leo thang, tenant, thu hồi quyền/phiên, audit append-only, Brain ticket/HMAC, UI 3 vai trò, E2E 8 bước.
 - Bằng chứng nghiệm thu cuối: `evidence/FINAL-acceptance-20261019.json`, `evidence/FINAL-acceptance-report-20261019.md`, `evidence/controller-final-e2e.json`.
 - Không dùng MOCK để kết luận PASS: chat Brain phải `providerId=local`, `nhan=real`.
 

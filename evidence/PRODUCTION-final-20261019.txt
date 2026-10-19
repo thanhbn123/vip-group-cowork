@@ -1,0 +1,10 @@
+# PRODUCTION FINAL — 2026-10-19 18:26:01 +0700
+cowork={"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T18:26:01+07:00"}}
+brain={"ok":true,"data":{"phienBan":"g02","gio":"2026-10-19T18:26:01+07:00","db":"ok"}}
+head=200
+login=200
+schema=2
+owner_mfa=1
+owner_mfa_file=-rw------- 1019 bytes
+cowork_pid=19005
+offsite={"luc":"2026-10-19T18:21:46+07:00","ok":true,"remote":"/Users/macstudio/VIP-AI/cowork/data/backups/cowork-20261019-182146.db","enc":"/Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/SAO LUU VPS/VIP-AI-COWORK/cowork-20261019-182146.db.enc","users":5,"schema":"2"}

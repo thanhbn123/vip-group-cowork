@@ -189,3 +189,11 @@ docker exec vip-staging-caddy caddy reload   --config /etc/caddy/Caddyfile --ada
 ```
 
 Không dùng `docker cp` vào `/etc/caddy` vì mount read-only.
+
+
+### 7.2. Caddy fmt (19/10/2026 18:25)
+
+- Đã chạy `caddy fmt --overwrite` trên Caddyfile sống; validate/reload OK, hết cảnh báo định dạng.
+- Backup trước fmt: `~/Caddyfile.bak-before-fmt-20261019-182534.txt` và `/data/Caddyfile.bak-before-fmt-20261019-182534`.
+- Hash sau fmt: `eea7ed56d9d373f14ec902cb17a8db71b5902fba06efa83cb7eb6aa1da95d86f`.
+- Public health/TLS không đổi.

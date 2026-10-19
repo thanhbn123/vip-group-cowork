@@ -1,6 +1,6 @@
 # MA TRẬN TRUY VẾT YÊU CẦU — COWORK
 
-**Ngày:** 19/10/2026 · **Đã chốt sau khi 5 agent hoàn tất.** Full suite: 94 passed.
+**Ngày:** 19/10/2026 · **Đã chốt sau khi 5 agent hoàn tất.** Full suite: 95 passed.
 
 | # | Yêu cầu | Nơi triển khai | Kiểm chứng | Trạng thái |
 |---|---|---|---|---|

@@ -25,7 +25,7 @@
 | Tunnel 18835 | ✅ đang chạy | khóa riêng, permitlisten 18835 |
 | Bridge Brain production | ✅ đã áp dụng | backup + smoke production PASS |
 | Sao lưu COWORK định kỳ | ✅ LaunchAgent 03:20 | bản test 19/10/2026 |
-| MFA cho COWORK | ✅ đã có TOTP tuỳ chọn | bật `/ho-so/mfa`; owner chưa bật |
+| MFA cho COWORK | ✅ đã bật cho owner | TOTP + 10 mã dự phòng; file 0600 trên Studio |
 | IP thật sau proxy | ✅ đã vá | `COWORK_TIN_PROXY=1` + `web.ip_cua` đọc `X-Real-IP`; `run.sh --no-proxy-headers` |
 | Trusted host / HSTS | ✅ sau Caddy | HSTS bật khi `X-Forwarded-Proto=https` |
 
@@ -118,4 +118,4 @@
 - COWORK LaunchAgent pid 18460; tunnel 18533; Brain pid 18620.
 - Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, MFA owner 403, thu hồi 403/401, archive.
 - Biên bản: `evidence/PRODUCTION-DEPLOY-20261019.md`; smoke: `evidence/PRODUCTION-smoke-20261019.json`.
-- **Còn lại:** owner bật MFA, owner mở Brain qua COWORK (`ALLOW_MFA_USERS=0`). Offsite COWORK đã cài 03:40.
+- **Còn lại:** owner mở Brain qua COWORK (`ALLOW_MFA_USERS=0`). MFA owner + offsite đã xong.
