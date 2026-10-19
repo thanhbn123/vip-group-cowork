@@ -1,0 +1,15 @@
+# PRODUCTION FINAL VPS — 2026-10-19 20:35:58 +0700
+cowork={"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T20:35:59+07:00"}}
+brain={"ok":true,"data":{"phienBan":"g02","gio":"2026-10-19T20:35:59+07:00","db":"ok"}}
+head=200
+cert:
+subject= /CN=cowork.vipgroup.com.vn
+notBefore=Oct 19 10:03:20 2026 GMT
+notAfter=Jan 17 10:03:19 2027 GMT
+container=Up 10 minutes (healthy)
+vps_health={"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T20:35:59+07:00"}}
+caddy=	reverse_proxy 127.0.0.1:8899 {
+caddy_hash=c0ae5314b634782d914ddb35f4fe06eca911faa14b2b0da5b89173253e1c74ad
+backup=/srv/vip-staging/cowork-backups/cowork-20261019-203203.db
+cron=20 3 * * * /srv/vip-staging/cowork/deploy/vps/backup.sh >> /srv/vip-staging/cowork-backups/backup.log 2>&1
+offsite={"luc":"2026-10-19T20:34:23+07:00","ok":true,"remote":"/data/backups/cowork-20261019-203420.db","enc":"/Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/SAO LUU VPS/VIP-AI-COWORK-VPS/cowork-vps-20261019-203422.db.enc","users":11,"schema":"2"}
