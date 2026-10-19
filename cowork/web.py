@@ -5,6 +5,7 @@ import base64
 import ipaddress
 import json
 from datetime import datetime
+from urllib.parse import urlsplit
 
 from fastapi import Request
 from fastapi.responses import RedirectResponse
@@ -123,11 +124,22 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         response.headers.setdefault("Permissions-Policy",
                                     "camera=(), microphone=(), geolocation=()")
+        # form-action kiểm tra CẢ đích redirect: POST /brain/mo trả 303 sang
+        # ai.vipgroup.com.vn, nên chỉ 'self' sẽ bị Chrome/Safari chặn và người dùng
+        # ở lại /brain dù server đã tạo ticket. Chỉ mở đúng origin Brain.
+        brain_origin = ""
+        try:
+            parts = urlsplit(config.BRAIN_PUBLIC_URL)
+            if parts.scheme in ("http", "https") and parts.netloc:
+                brain_origin = f"{parts.scheme}://{parts.netloc}"
+        except ValueError:
+            brain_origin = ""
+        form_action = "'self'" + (f" {brain_origin}" if brain_origin else "")
         response.headers.setdefault(
             "Content-Security-Policy",
             "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; "
-            "font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; "
-            "base-uri 'none'; object-src 'none'")
+            f"font-src 'self'; connect-src 'self'; form-action {form_action}; "
+            "frame-ancestors 'none'; base-uri 'none'; object-src 'none'")
         if auth.la_https(request):
             response.headers.setdefault("Strict-Transport-Security",
                                         "max-age=31536000; includeSubDomains")

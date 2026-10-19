@@ -20,12 +20,8 @@
   - **Local:** `cowork/secrets/owner-anh-thanh.txt`.
 - [ ] Production chỉ có owner + tài khoản QA đã lưu trữ; các tài khoản demo `quan-tri-01`, `nhan-vien-01` chỉ tồn tại ở local.
 - [ ] Không dùng chung cookie giữa các cửa sổ.
-- [ ] **MFA owner đã bật** (19/10/2026). Trước khi đăng nhập, lấy secret + 10 mã dự phòng:
-  ```bash
-  ssh vip-ai-studio 'cat ~/VIP-AI/cowork/secrets/owner-mfa-anh-thanh.txt'
-  ```
-  Thêm tài khoản vào Google Authenticator/Authy/1Password bằng mã bí mật; lưu mã dự phòng.
-- [ ] Nếu muốn tắt MFA trước nghiệm thu: `ssh vip-ai-studio 'cd ~/VIP-AI/cowork && .venv/bin/python -m cowork.cli mfa-reset --id anh-thanh'` (không khuyến nghị).
+- [ ] **MFA owner đang TẠM TẮT** sau lần reset khôi phục 19/10/2026. Đăng nhập bằng mật khẩu mới; sau khi vào, bật lại MFA tại `/ho-so/mfa` (khuyến nghị).
+- [ ] Nếu đã bật lại MFA: lấy secret + 10 mã dự phòng ở `~/VIP-AI/cowork/secrets/owner-mfa-anh-thanh.txt` (file 0600) trên Studio.
 
 ---
 
@@ -33,14 +29,14 @@
 
 **Làm:**
 1. Mở COWORK → `/dang-nhap`.
-2. Nhập ID `anh-thanh` + mật khẩu → trang **Xác thực 2 lớp**.
-3. Nhập mã 6 số từ authenticator (hoặc một mã dự phòng).
-4. Kiểm tra dashboard hiển thị “Chào anh-thanh”, vai trò Super Admin, 15 module.
+2. Nhập ID `anh-thanh` + mật khẩu mới (MFA đang tạm tắt).
+3. Kiểm tra dashboard hiển thị “Chào anh-thanh”, vai trò Super Admin, 15 module.
+4. Sau khi vào, bật lại MFA tại `/ho-so/mfa` nếu muốn (khuyến nghị).
 
 **Kỳ vọng:**
 - Vào được dashboard, sidebar có nhóm Quản trị.
 - `/tai-khoan`, `/ban`, `/vai-tro`, `/nhat-ky`, `/cai-dat` mở được.
-- Audit có dòng `auth.mfa_ok` (và `auth.mfa_challenge` trước đó).
+- Audit có dòng `auth.login` (MFA đang tắt); sau khi bật lại sẽ có `auth.mfa_ok`.
 
 **Bằng chứng:** ảnh dashboard + thời điểm đăng nhập.
 

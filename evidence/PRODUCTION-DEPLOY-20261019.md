@@ -212,3 +212,27 @@ Chạy tự động qua tên miền chính thức, owner MFA thật, tạo admin
 - Tài khoản test `prod-accept-admin-183600`, `prod-accept-emp-183600` đã lưu trữ sau test.
 - Bằng chứng: `evidence/PRODUCTION-acceptance-20261019.json`.
 - **Kết luận kỹ thuật: PASS 8/8 trên production.** Chủ dự án vẫn cần ký nghiệm thu thủ công.
+
+
+---
+
+## 13. KHÔI PHỤC OWNER (19/10/2026 19:00)
+
+- Audit 18:51–18:58 có 4 `auth.login_fail` từ IP owner → mật khẩu nhập không khớp.
+- Đã reset mật khẩu owner, tạm tắt MFA, xoá MFA cũ + login_attempts; file mật khẩu mới 0600 17 bytes.
+- Kiểm tra: login 303 → `/`; `/api/me` 200 super_admin; logout 303.
+- **MFA đang tạm tắt**; bật lại tại `/ho-so/mfa`.
+- Bằng chứng: `evidence/PRODUCTION-owner-recovery-20261019.txt`.
+
+
+---
+
+## 14. SỬA LỖI BẤM MỞ BRAIN KHÔNG CHUYỂN TRANG (19/10/2026 19:48)
+
+- Triệu chứng: bấm **Mở VIP AI Brain** nhiều lần, audit có `brain.launch` nhưng trình duyệt vẫn ở `/brain`; không có `brain.consume`.
+- Nguyên nhân: CSP của COWORK đặt `form-action 'self'`; Chrome/Safari kiểm tra **cả đích redirect** của form. `POST /brain/mo` trả 303 sang `https://ai.vipgroup.com.vn/cowork/vao`, bị CSP chặn, nên browser không đi tiếp dù server đã tạo ticket.
+- Vá: `form-action 'self' https://ai.vipgroup.com.vn` (chỉ mở đúng origin Brain, không wildcard).
+- Kiểm tra bằng Chrome thật (Playwright): bấm nút → `https://ai.vipgroup.com.vn/`, title **VIP AI BRAIN — Dashboard**, body có `👤 anh-thanh`, badge **BACKEND**, cookie `vip_session`.
+- Bằng chứng: `evidence/PRODUCTION-browser-brain-20261019.txt`.
+- CSP public sau vá: `form-action 'self' https://ai.vipgroup.com.vn`.
+- Full suite: **97 passed**.

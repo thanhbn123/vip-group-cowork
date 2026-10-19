@@ -1,0 +1,8 @@
+after_login https://cowork.vipgroup.com.vn/
+brain_page https://cowork.vipgroup.com.vn/brain
+has_button 1
+CONSOLE_ERR Failed to load resource: the server responded with a status of 404 ()
+after_click https://ai.vipgroup.com.vn/
+title VIP AI BRAIN — Dashboard
+body Bỏ qua điều hướng, tới nội dung chính VIP AI BRAIN Workspace: VIP GROUP 👤 anh-thanh Đăng xuất BACKEND ☾ Tối ĐIỀU HÀNH ▦ Dashboard LÀM VIỆC ✎ AI Command Center ⇄ Playground ▤ Knowledge ⚙ Tools & Approvals ❖ Agents ⇄ Nguồn kết nối ⌥ VIP Code Agent ⊞ Liên kết & Điều phối QUẢN TRỊ ◎ Providers ◴ Sẵn sàng provider ☰ Tasks ▥ Usage ◫ Vận hành ✦ Settings G01 HTML-first · Dữ liệu mẫu · Không gọi mạng Dashboard DỮ LIỆU BACKEND Toàn cảnh vận hành VIP AI Brain — 14 ngày gần nhất (30/09 → 13/10/2026), mốc 13
+cookies cowork_csrf@cowork.vipgroup.com.vn,cowork_session@cowork.vipgroup.com.vn,vip_session@ai.vipgroup.com.vn

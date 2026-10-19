@@ -1,0 +1,9 @@
+# OWNER RECOVERY — 2026-10-19 19:00 +07
+# Nguyên nhân: audit ghi 4 lần auth.login_fail (14.190.214.49) 18:51–18:58
+# => mật khẩu nhập không khớp; không phải lỗi MFA/hạ tầng.
+- Đã reset mật khẩu owner bằng CLI create-owner --reset.
+- Đã tạm tắt MFA owner bằng CLI mfa-reset; xoá file MFA cũ (secret cũ không còn hiệu lực).
+- Đã xoá login_attempts sai của owner.
+- Kiểm tra: đăng nhập production 303 → `/`; /api/me 200 super_admin; logout 303.
+- Mật khẩu mới: file 0600 `~/VIP-AI/cowork/secrets/owner-anh-thanh.txt` (17 bytes).
+- MFA hiện TẮT; bật lại tại /ho-so/mfa sau khi vào.

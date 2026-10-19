@@ -128,3 +128,20 @@ def test_module_khong_co_quyen_use_bi_khoa_trong_ui(client, owner):
 
 def test_head_root_tra_200(client):
     assert client.head("/").status_code == 200
+
+
+def test_dashboard_co_nut_mo_brain_truc_tiep(client, owner):
+    dang_nhap(client, "anh-thanh", "Owner!Passw0rd")
+    html = client.get("/").text
+    assert 'action="/brain/mo"' in html
+    assert "Mở VIP AI Brain" in html
+
+
+def test_csp_cho_phep_form_redirect_sang_brain(client):
+    from urllib.parse import urlsplit
+    from cowork import config
+    r = client.get("/dang-nhap")
+    csp = r.headers.get("content-security-policy", "")
+    parts = urlsplit(config.BRAIN_PUBLIC_URL)
+    origin = f"{parts.scheme}://{parts.netloc}"
+    assert "form-action 'self' " + origin in csp

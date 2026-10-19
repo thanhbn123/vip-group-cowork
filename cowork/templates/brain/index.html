@@ -20,9 +20,9 @@
     {% if co_use and suc_khoe.ok %}
     <form method="post" action="/brain/mo">
       <input type="hidden" name="_csrf" value="{{ csrf }}">
-      <button class="btn btn-gold btn-lg btn-block" type="submit">{{ ui.icon('external', 18) }} Mở VIP AI Brain</button>
+      <button class="btn btn-gold btn-lg btn-block" type="submit" autofocus>{{ ui.icon('external', 18) }} Mở VIP AI Brain</button>
     </form>
-    <p class="brain-hint">Ticket một lần · hết hạn sau 60 giây</p>
+    <p class="brain-hint">Bấm nút vàng để mở · ticket một lần · hết hạn sau 60 giây</p>
     {% elif not suc_khoe.ok %}
     <button class="btn btn-ghost btn-lg btn-block" type="button" disabled>Brain chưa sẵn sàng</button>
     <p class="brain-hint">{{ suc_khoe.thongBao or 'Kiểm tra kết nối tới Mac Studio.' }}</p>

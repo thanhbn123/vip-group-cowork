@@ -20,7 +20,10 @@
     <a class="btn btn-primary" href="/tai-khoan/tao-moi">{{ ui.icon('plus', 18) }} Tạo tài khoản</a>
     {% endif %}
     {% if 'brain.use' in perms or is_super %}
-    <a class="btn btn-gold" href="/brain">{{ ui.icon('spark', 18) }} Mở VIP AI Brain</a>
+    <form method="post" action="/brain/mo" class="inline-form">
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <button class="btn btn-gold" type="submit">{{ ui.icon('spark', 18) }} Mở VIP AI Brain</button>
+    </form>
     {% endif %}
     {% if 'departments.create' in perms %}
     <a class="btn btn-ghost" href="/ban/tao-moi">{{ ui.icon('building', 18) }} Tạo ban</a>

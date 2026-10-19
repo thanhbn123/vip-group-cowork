@@ -25,7 +25,7 @@
 | Tunnel 18835 | ✅ đang chạy | khóa riêng, permitlisten 18835 |
 | Bridge Brain production | ✅ đã áp dụng | backup + smoke production PASS |
 | Sao lưu COWORK định kỳ | ✅ LaunchAgent 03:20 | bản test 19/10/2026 |
-| MFA cho COWORK | ✅ đã bật cho owner | TOTP + 10 mã dự phòng; file 0600 trên Studio |
+| MFA cho COWORK | ⏸ tạm tắt sau reset owner | bật lại `/ho-so/mfa`; TOTP + mã dự phòng |
 | IP thật sau proxy | ✅ đã vá | `COWORK_TIN_PROXY=1` + `web.ip_cua` đọc `X-Real-IP`; `run.sh --no-proxy-headers` |
 | Trusted host / HSTS | ✅ sau Caddy | HSTS bật khi `X-Forwarded-Proto=https` |
 
@@ -119,3 +119,8 @@
 - Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, owner mở Brain 200 sau MFA, thu hồi 403/401, archive.
 - Biên bản: `evidence/PRODUCTION-DEPLOY-20261019.md`; smoke: `evidence/PRODUCTION-smoke-20261019.json`.
 - **Đã xong:** MFA owner, owner mở Brain qua COWORK, offsite backup, nghiệm thu production 8/8. Còn lại: chủ dự án ký nghiệm thu thủ công.
+
+
+### 2.8. CSP form-action (bản vá 19/10/2026)
+- CSP cũ `form-action 'self'` chặn redirect form `/brain/mo` sang `ai.vipgroup.com.vn` trên Chrome/Safari.
+- Đã mở đúng origin Brain: `form-action 'self' https://ai.vipgroup.com.vn`; test Chrome thật PASS.
