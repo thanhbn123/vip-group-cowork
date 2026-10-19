@@ -88,14 +88,14 @@ VIP AI BRAIN staging (bản sao DB, 127.0.0.1:8892)
 
 ### 5.2. Nghiệm thu cuối (sau restart, bản tích hợp)
 - AG-05: **8/8 PASS · 6/6 security PASS · 0 FAIL · 0 BLOCKED** lúc 17:53:03–17:53:07.
-- B7: `providerId=local`, `nhan=real`, model `qwen2.5:7b-instruct`, `doTreMs=3682`, token 62/271, `chiPhi=0.0`, task `T-G02-000024`, trả lời 961 ký tự.
+- B7: `providerId=local`, `nhan=real`, model `qwen2.5:7b-instruct`, `doTreMs=3682`, token 62/271, `chiPhi=0.0`, task `T-G02-000026`, trả lời 549 ký tự (metadata local/real là bằng chứng; model tự mô tả là Qwen/Alibaba không đổi bản chất local).
 - Controller độc lập: `nhan-vien-final-01` → SSO 303 → `/api/auth/toi` 200 → chat 200 (`providerId=local`, `nhan=real`, model `qwen2.5:7b-instruct`, task mới) → thu hồi COWORK 403 + Brain 401 → cấp lại 200.
 - Tệp: `evidence/FINAL-acceptance-20261019.json`, `FINAL-acceptance-report-20261019.md`, `controller-final-e2e.json`.
 
 ### 5.3. Chat AI Local thật
 ```
 providerId=local · nhan=real · model=qwen2.5:7b-instruct
-task=T-G02-000024 (nghiệm thu cuối) · token 62/271 · chiPhi=0 · traLoi 961 ký tự
+task=T-G02-000026 (nghiệm thu cuối) · token 62/160 · chiPhi=0 · traLoi 549 ký tự
 ```
 - Task staging: `T-G02-000003`, `T-G02-000021`, `T-G02-000022`, `T-G02-000023` đều `local/real/qwen2.5:7b-instruct`, chi phí 0.
 - Không dùng MOCK/cloud để báo PASS.
