@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="hero">
+  <div class="hero-main">
+    <p class="eyebrow">KHÔNG GIAN LÀM VIỆC</p>
+    <h1>Chào {{ user.display_name }}</h1>
+    <p class="hero-sub">
+      {{ user.role_name }}{% if user.department_name %} · {{ user.department_name }}{% endif %}
+      · {{ user.tenant_name }}
+    </p>
+    <div class="hero-chips">
+      <span class="chip">{{ ui.icon('shield', 14) }} Phiên đã xác thực</span>
+      <span class="chip">{{ ui.icon('grid', 14) }} {{ so_module }} module được cấp</span>
+      {% if user.must_change_password %}<span class="chip chip-warn">{{ ui.icon('alert', 14) }} Cần đổi mật khẩu</span>{% endif %}
+    </div>
+  </div>
+  <div class="hero-actions">
+    {% if 'accounts.create' in perms %}
+    <a class="btn btn-primary" href="/tai-khoan/tao-moi">{{ ui.icon('plus', 18) }} Tạo tài khoản</a>
+    {% endif %}
+    {% if 'brain.use' in perms or is_super %}
+    <a class="btn btn-gold" href="/brain">{{ ui.icon('spark', 18) }} Mở VIP AI Brain</a>
+    {% endif %}
+    {% if 'departments.create' in perms %}
+    <a class="btn btn-ghost" href="/ban/tao-moi">{{ ui.icon('building', 18) }} Tạo ban</a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="stat-grid" aria-label="Chỉ số nhanh">
+  <article class="stat-card">
+    <span class="stat-ico blue">{{ ui.icon('users', 20) }}</span>
+    <div><small>Tài khoản</small><b>{{ tk.tongNguoiDung }}</b><span>trong phạm vi</span></div>
+  </article>
+  <article class="stat-card">
+    <span class="stat-ico green">{{ ui.icon('check-circle', 20) }}</span>
+    <div><small>Đang hoạt động</small><b>{{ tk.dangHoatDong }}</b><span>{{ tk.dangKhoa }} đang khoá</span></div>
+  </article>
+  <article class="stat-card">
+    <span class="stat-ico teal">{{ ui.icon('key', 20) }}</span>
+    <div><small>Phiên đang sống</small><b>{{ tk.phienSong }}</b><span>phiên máy chủ</span></div>
+  </article>
+  <article class="stat-card">
+    <span class="stat-ico gold">{{ ui.icon('list', 20) }}</span>
+    <div><small>Sự kiện hôm nay</small><b>{{ tk.auditHomNay }}</b><span>đã ghi nhật ký</span></div>
+  </article>
+</section>
+
+<div class="dash-grid">
+  <section class="card">
+    <div class="card-head">
+      <div><h2>Module của bạn</h2><p class="muted">Chỉ hiện module được cấp cho ID này.</p></div>
+      <span class="badge status-muted">{{ so_module }} module</span>
+    </div>
+    <div class="module-grid">
+      {% for m in modules if m.code != 'dashboard' %}
+      <a class="module-card" href="{{ m.route }}">
+        <span class="module-ico">{{ ui.icon(m.icon, 22) }}</span>
+        <span class="module-body"><b>{{ m.name }}</b><small>{{ m.description }}</small></span>
+        <span class="module-arrow">{{ ui.icon('arrow', 16) }}</span>
+      </a>
+      {% endfor %}
+      {% if so_module <= 1 %}
+      <div class="empty small">
+        <b>Chưa có module nào ngoài bảng điều khiển.</b>
+        <p>Liên hệ quản trị để được cấp module làm việc.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <aside class="card">
+    <div class="card-head"><div><h2>Phiên &amp; bảo mật</h2><p class="muted">Trạng thái hiện tại</p></div></div>
+    <ul class="secure-list">
+      <li><span class="ok-dot"></span><div><b>Phiên máy chủ</b><small>Cookie HttpOnly · SameSite=Lax</small></div></li>
+      <li><span class="ok-dot"></span><div><b>CSRF được bật</b><small>Mọi thao tác ghi đều kiểm mã</small></div></li>
+      <li><span class="ok-dot"></span><div><b>Nhật ký append-only</b><small>Không sửa, không xoá được</small></div></li>
+      <li><span class="ok-dot"></span><div><b>Phân quyền theo phạm vi</b><small>Kiểm tra lại mỗi request</small></div></li>
+    </ul>
+    <div class="session-box">
+      <div class="session-row"><span>Bắt đầu</span><b>{{ session.created_at|dt if session else '—' }}</b></div>
+      <div class="session-row"><span>Hết hạn</span><b>{{ session.expires_at|dt if session else '—' }}</b></div>
+      <a class="btn btn-ghost btn-sm btn-block" href="/ho-so">Quản lý phiên</a>
+    </div>
+  </aside>
+</div>
+
+<div class="dash-grid">
+  <section class="card">
+    <div class="card-head">
+      <div><h2>{% if gan_day %}Hoạt động gần đây{% else %}Hoạt động của tôi{% endif %}</h2>
+      <p class="muted">Sổ kiểm toán ghi lại mọi thao tác quan trọng.</p></div>
+      {% if 'audit.view' in perms or is_super %}<a class="btn btn-ghost btn-sm" href="/nhat-ky">Xem tất cả</a>{% endif %}
+    </div>
+    {% set ds = gan_day if gan_day else nhat_ky %}
+    {% if ds %}
+    <ul class="activity">
+      {% for r in ds %}
+      <li>
+        <span class="act-ico">{{ ui.icon('check', 15) }}</span>
+        <div class="act-body">
+          <p><b>{{ r.actor_id }}</b> <span class="act-action">{{ r.action }}</span>
+            {% if r.target_id %}<span class="muted">· {{ r.target_id }}</span>{% endif %}</p>
+          <small>{{ r.created_at|dt }}{% if r.ip %} · {{ r.ip }}{% endif %}</small>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    {{ ui.empty('Chưa có hoạt động', 'Các thao tác của bạn sẽ xuất hiện tại đây.') }}
+    {% endif %}
+  </section>
+
+  {% if theo_ban %}
+  <aside class="card">
+    <div class="card-head"><div><h2>Cơ cấu ban</h2><p class="muted">Số nhân sự đang hoạt động</p></div></div>
+    <ul class="dept-bars">
+      {% set maxn = (theo_ban|map(attribute='soNguoi')|max) or 1 %}
+      {% for d in theo_ban %}
+      <li>
+        <div class="dept-bar-label"><span>{{ d.name }}</span><b>{{ d.soNguoi }}</b></div>
+        <progress max="{{ maxn }}" value="{{ d.soNguoi }}" aria-label="{{ d.name }}"></progress>
+      </li>
+      {% endfor %}
+    </ul>
+  </aside>
+  {% else %}
+  <aside class="card">
+    <div class="card-head"><div><h2>Nguyên tắc truy cập</h2><p class="muted">COWORK áp dụng cho mọi người</p></div></div>
+    <ul class="rules-list">
+      <li>{{ ui.icon('check', 14) }} Chỉ thấy module được cấp</li>
+      <li>{{ ui.icon('check', 14) }} Chỉ dùng dữ liệu thuộc quyền</li>
+      <li>{{ ui.icon('check', 14) }} Không tự nâng quyền</li>
+      <li>{{ ui.icon('check', 14) }} Mọi thao tác có nhật ký</li>
+    </ul>
+    <div class="notice">
+      <b>Cần thêm quyền?</b>
+      <p>Gửi yêu cầu tới quản trị viên ban hoặc Super Admin. Quyền được cấp lại sẽ có hiệu lực ngay ở request kế tiếp.</p>
+    </div>
+  </aside>
+  {% endif %}
+</div>
+{% endblock %}

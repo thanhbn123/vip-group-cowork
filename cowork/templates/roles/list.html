@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">PHÂN QUYỀN THEO VAI TRÒ</p>
+    <h1>Vai trò</h1>
+    <p class="muted">Năm vai trò hệ thống. Quyền chi tiết quyết định người dùng làm được gì.</p>
+  </div>
+</section>
+
+<div class="role-grid">
+  {% for r in rows %}
+  <a class="role-card {% if r.code == 'super_admin' %}role-card-super{% endif %}" href="/vai-tro/{{ r.code }}">
+    <div class="role-card-head">
+      {{ ui.role_badge(r.code, r.name) }}
+      {% if r.is_locked %}<span class="badge status-warn">{{ ui.icon('lock', 12) }} Khoá</span>{% endif %}
+    </div>
+    <p class="muted">{{ r.description }}</p>
+    <div class="role-stats">
+      <span><b>{{ r.level }}</b><small>cấp</small></span>
+      <span><b>{{ r.so_nguoi }}</b><small>người</small></span>
+      <span><b>{{ r.so_quyen }}</b><small>quyền</small></span>
+    </div>
+    <span class="role-link">Xem ma trận {{ ui.icon('arrow', 15) }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="callout gold">
+  <b>{{ ui.icon('shield', 16) }} Nguyên tắc bất biến</b>
+  <p>Super Admin luôn có toàn quyền và không thể bị sửa. Không vai trò nào được cấp quyền cao hơn vai trò của người thao tác.</p>
+</div>
+{% endblock %}

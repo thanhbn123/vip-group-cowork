@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="error-page">
+  <div class="error-code">500</div>
+  <h1>Lỗi hệ thống</h1>
+  <p class="muted">{{ thong_bao or 'Đã xảy ra lỗi. Sự việc đã được ghi log để kiểm tra.' }}</p>
+  <div class="error-actions">
+    <a class="btn btn-primary" href="/">Thử lại bảng điều khiển</a>
+  </div>
+  <p class="error-hint">Nếu lỗi lặp lại, gửi thời điểm và thao tác cho quản trị viên hệ thống.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/tai-khoan/{{ target.id }}">{{ ui.icon('back', 16) }} {{ target.display_name }}</a>
+    <h1>Phân quyền module</h1>
+    <p class="muted">Chọn quyền riêng cho <code>{{ target.id }}</code>. Quyền riêng chồng lên quyền vai trò {{ vai_tro.name }}.</p>
+  </div>
+</section>
+
+{% if target.role_code == 'super_admin' %}
+<div class="callout gold">
+  <b>{{ ui.icon('shield', 16) }} Super Admin luôn có toàn quyền</b>
+  <p>Không thể giới hạn hoặc thu hồi quyền của tài khoản Super Admin.</p>
+</div>
+{% elif not co_cap %}
+<div class="callout">
+  <b>{{ ui.icon('lock', 16) }} Chế độ chỉ xem</b>
+  <p>Bạn không có quyền cấp/thu hồi module, hoặc đây là tài khoản của chính bạn.</p>
+</div>
+{% endif %}
+
+<form method="post" action="/tai-khoan/{{ target.id }}/phan-quyen" class="card">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <div class="card-head">
+    <div><h2>Quyền theo module</h2><p class="muted">Bốn mức: theo vai trò · chỉ xem · sử dụng · chặn.</p></div>
+    <span class="badge status-muted">{{ states|length }} module</span>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table perm-table">
+      <thead>
+        <tr><th>Module</th><th>Vai trò mặc định</th><th>Theo vai trò</th><th>Chỉ xem</th><th>Sử dụng</th><th>Chặn</th></tr>
+      </thead>
+      <tbody>
+        {% for m in states %}
+        <tr>
+          <td>
+            <b>{{ m.name }}</b>
+            <small class="block muted">{{ m.code }}{% if m.status != 'active' %} · đang tắt{% endif %}</small>
+          </td>
+          <td>
+            {% if m.default == 'use' %}<span class="badge status-ok">Sử dụng</span>
+            {% elif m.default == 'view' %}<span class="badge status-info">Chỉ xem</span>
+            {% else %}<span class="badge status-muted">Không cấp</span>{% endif %}
+          </td>
+          {% for opt in ['default','view','use','block'] %}
+          <td class="radio-cell">
+            <label class="radio-pill {% if opt == 'block' %}radio-danger{% endif %}">
+              <input type="radio" name="quyen_{{ m.code }}" value="{{ opt }}"
+                     {% if m.mode == opt %}checked{% endif %} {% if not co_cap %}disabled{% endif %}>
+              <span aria-hidden="true"></span>
+            </label>
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if co_cap %}
+  <div class="form-actions">
+    <a class="btn btn-ghost" href="/tai-khoan/{{ target.id }}">Huỷ</a>
+    <button class="btn btn-primary" type="submit">Lưu phân quyền</button>
+  </div>
+  {% endif %}
+</form>
+
+<div class="callout">
+  <b>Vì sao chỉ có bốn mức?</b>
+  <p>Quyền <em>xem</em> và <em>sử dụng</em> quyết định module có hiện với người dùng hay không. Các quyền hành động chi tiết (tạo tài khoản, sửa ban, xem nhật ký…) do vai trò quyết định và được quản lý tại màn <a href="/vai-tro">Vai trò</a>.</p>
+</div>
+{% endblock %}

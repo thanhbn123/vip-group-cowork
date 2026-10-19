@@ -1,0 +1,117 @@
+{% import "macros.html" as ui %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ page_title }} · {{ APP_NAME }}</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+    <a class="brand" href="/" aria-label="VIP GROUP COWORK — trang chủ">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VIP GROUP</b><small>COWORK</small></span>
+    </a>
+
+    {% if user %}
+    <div class="workspace-chip">
+      <span class="ws-dot" aria-hidden="true"></span>
+      <div><b>{{ user.tenant_name }}</b><small>Không gian nội bộ</small></div>
+      <span class="ws-lock" title="Đã xác thực">{{ ui.icon('lock', 14) }}</span>
+    </div>
+
+    <nav class="nav">
+      {% if nav_workspace %}
+      <p class="nav-label">Không gian làm việc</p>
+      {% for m in nav_workspace %}
+      <a class="nav-item {% if active_module == m.code %}is-active{% endif %}" href="{{ m.route }}"
+         {% if active_module == m.code %}aria-current="page"{% endif %}>
+        <span class="nav-icon">{{ ui.icon(m.icon) }}</span>
+        <span class="nav-text">{{ m.name }}</span>
+        {% if m.code == 'brain' %}<span class="nav-tag">AI</span>{% endif %}
+      </a>
+      {% endfor %}
+      {% endif %}
+      {% if nav_admin %}
+      <p class="nav-label">Quản trị</p>
+      {% for m in nav_admin %}
+      <a class="nav-item {% if active_module == m.code %}is-active{% endif %}" href="{{ m.route }}"
+         {% if active_module == m.code %}aria-current="page"{% endif %}>
+        <span class="nav-icon">{{ ui.icon(m.icon) }}</span>
+        <span class="nav-text">{{ m.name }}</span>
+      </a>
+      {% endfor %}
+      {% endif %}
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="sec-note">
+        <span class="sec-ico">{{ ui.icon('shield', 16) }}</span>
+        <p>Mọi thao tác quản trị đều được ghi nhật ký.</p>
+      </div>
+      <div class="sidebar-meta">
+        <span>COWORK v{{ APP_VERSION }}</span>
+        <span class="env-tag">{{ ENV }}</span>
+      </div>
+    </div>
+    {% endif %}
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-toggle" type="button" data-toggle-sidebar
+              aria-label="Mở/đóng menu" aria-controls="sidebar" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="crumb">
+        <span class="crumb-root">COWORK</span>
+        <span class="crumb-sep" aria-hidden="true">/</span>
+        <b>{{ page_title }}</b>
+      </div>
+      <div class="top-actions">
+        {% if user %}
+        <span class="live-pill" title="Hệ thống đang chạy nội bộ">
+          <i class="live-dot" aria-hidden="true"></i> Nội bộ · AI Local
+        </span>
+        <a class="user-chip" href="/ho-so" aria-label="Hồ sơ của {{ user.display_name }}">
+          {{ ui.avatar(user.display_name) }}
+          <span class="user-meta"><b>{{ user.display_name }}</b><small>{{ user.role_name }}</small></span>
+        </a>
+        <form method="post" action="/dang-xuat" class="inline-form">
+          <input type="hidden" name="_csrf" value="{{ csrf }}">
+          <button class="icon-btn" type="submit" title="Đăng xuất" aria-label="Đăng xuất">
+            {{ ui.icon('logout', 18) }}
+          </button>
+        </form>
+        {% else %}
+        <a class="btn btn-primary btn-sm" href="/dang-nhap">Đăng nhập</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="content" id="main-content">
+      {% if flash %}
+      <div class="flash flash-{{ flash.k }}" role="status" data-flash>
+        <span class="flash-ico">{% if flash.k == 'err' %}{{ ui.icon('alert', 18) }}{% else %}{{ ui.icon('check-circle', 18) }}{% endif %}</span>
+        <span>{{ flash.m }}</span>
+        <button type="button" class="flash-x" data-dismiss aria-label="Đóng thông báo">×</button>
+      </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <span>{{ APP_NAME }} · Dữ liệu nội bộ VIP GROUP</span>
+      <span>Máy chủ AI: Mac Studio · Local-first</span>
+    </footer>
+  </div>
+</div>
+<div class="scrim" data-scrim hidden></div>
+<script src="/static/app.js" defer></script>
+</body>
+</html>

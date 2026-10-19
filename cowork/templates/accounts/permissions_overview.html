@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">PHÂN QUYỀN THEO NGƯỜI</p>
+    <h1>Phân quyền module</h1>
+    <p class="muted">{{ total }} nhân sự trong phạm vi. Quyền riêng chồng lên quyền vai trò.</p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-ghost" href="/vai-tro">{{ ui.icon('shield', 16) }} Xem vai trò</a>
+  </div>
+</section>
+
+<section class="card">
+  <form class="filter-bar" method="get" action="/phan-quyen">
+    <label class="search-box grow"><span>{{ ui.icon('search', 18) }}</span>
+      <input type="search" name="q" value="{{ q }}" placeholder="Tìm ID hoặc tên nhân sự…" maxlength="60"></label>
+    <button class="btn btn-primary btn-sm" type="submit">Tìm</button>
+    <a class="btn btn-ghost btn-sm" href="/phan-quyen">Xoá lọc</a>
+  </form>
+
+  {% if rows %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Nhân sự</th><th>Vai trò</th><th>Ban</th><th>Module hiệu lực</th><th>Uỷ quyền riêng</th><th></th></tr></thead>
+      <tbody>
+        {% for u in rows %}
+        <tr>
+          <td><a class="person" href="/tai-khoan/{{ u.id }}">{{ ui.avatar(u.display_name) }}
+            <span><b>{{ u.display_name }}</b><small>{{ u.id }}</small></span></a></td>
+          <td>{{ ui.role_badge(u.role_code, u.role_name) }}</td>
+          <td>{{ u.department_name or '—' }}</td>
+          <td><b>{{ u.so_hieu_luc }}</b><span class="muted"> / {{ u.so_module }} module</span></td>
+          <td>
+            {% if u.so_uy_quyen %}<span class="badge status-warn">{{ u.so_uy_quyen }} module</span>
+            {% else %}<span class="muted">Theo vai trò</span>{% endif %}
+          </td>
+          <td class="row-actions">
+            <a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}/phan-quyen">
+              {{ 'Phân quyền' if co_cap else 'Xem quyền' }}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ ui.pager(page, pages, "/phan-quyen?q=" ~ (q|urlencode)) }}
+  {% else %}
+  {{ ui.empty('Không có nhân sự phù hợp', 'Thử xoá bộ lọc hoặc kiểm tra phạm vi ban được uỷ quyền.') }}
+  {% endif %}
+</section>
+
+<div class="callout">
+  <b>Quyền hiệu lực được tính lại mỗi request</b>
+  <p>Khi bạn thu hồi một module, người dùng mất module đó ngay ở lần tải trang kế tiếp — không cần đăng xuất. Nếu module là VIP AI Brain, COWORK cũng gọi Brain thu hồi phiên tương ứng.</p>
+</div>
+{% endblock %}

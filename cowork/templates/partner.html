@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="partner-hero">
+  <div>
+    <p class="eyebrow light">CỔNG ĐỐI TÁC</p>
+    <h1>{{ user.partner_org or 'Không gian đối tác' }}</h1>
+    <p class="brain-lead">Chỉ module và dữ liệu thuộc hợp đồng được cấp. Mọi truy cập đều được ghi nhật ký.</p>
+    <div class="chips">
+      <span class="chip">{{ ui.icon('handshake', 14) }} {{ user.display_name }}</span>
+      <span class="chip">{{ ui.icon('shield', 14) }} Quyền theo hợp đồng</span>
+    </div>
+  </div>
+  <span class="partner-mark">{{ ui.icon('handshake', 44) }}</span>
+</section>
+
+<div class="dash-grid">
+  <section class="card span-2">
+    <div class="card-head"><div><h2>Phạm vi được cấp</h2><p class="muted">Module bạn có thể sử dụng.</p></div></div>
+    <div class="module-grid">
+      {% for m in modules if m.code != 'dashboard' %}
+      <a class="module-card" href="{{ m.route }}">
+        <span class="module-ico">{{ ui.icon(m.icon, 22) }}</span>
+        <span class="module-body"><b>{{ m.name }}</b><small>{{ m.description }}</small></span>
+        <span class="module-arrow">{{ ui.icon('arrow', 16) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="card">
+    <div class="card-head"><div><h2>Thông tin hợp tác</h2></div></div>
+    <dl class="kv tight">
+      <div><dt>Tổ chức</dt><dd>{{ user.partner_org or '—' }}</dd></div>
+      <div><dt>ID truy cập</dt><dd><code>{{ user.id }}</code></dd></div>
+      <div><dt>Người phụ trách</dt><dd>{{ user.display_name }}</dd></div>
+      <div><dt>Hiệu lực</dt><dd>Theo hợp đồng đang hiệu lực</dd></div>
+    </dl>
+    <div class="notice"><b>Cần hỗ trợ?</b><p>Liên hệ quản trị viên VIP GROUP được ghi trong hợp đồng.</p></div>
+  </aside>
+</div>
+
+<section class="card">
+  <div class="card-head"><div><h2>Nguyên tắc truy cập</h2></div></div>
+  <ul class="rules-list two-col">
+    <li>{{ ui.icon('check', 14) }} Chỉ dùng module được cấp</li>
+    <li>{{ ui.icon('check', 14) }} Chỉ xem dữ liệu thuộc hợp đồng</li>
+    <li>{{ ui.icon('check', 14) }} Không truy cập dữ liệu nội bộ</li>
+    <li>{{ ui.icon('check', 14) }} Phiên bị thu hồi khi hợp đồng kết thúc</li>
+  </ul>
+</section>
+{% endblock %}

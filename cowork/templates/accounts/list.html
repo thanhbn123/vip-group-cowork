@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">QUẢN TRỊ DANH TÍNH</p>
+    <h1>Tài khoản</h1>
+    <p class="muted">{{ total }} tài khoản trong phạm vi bạn quản lý.</p>
+  </div>
+  <div class="page-actions">
+    {% if co_tao %}<a class="btn btn-primary" href="/tai-khoan/tao-moi">{{ ui.icon('plus', 18) }} Tạo tài khoản</a>{% endif %}
+  </div>
+</section>
+
+<section class="card">
+  <form class="filter-bar" method="get" action="/tai-khoan" data-autosubmit>
+    <label class="search-box">
+      <span>{{ ui.icon('search', 18) }}</span>
+      <input type="search" name="q" value="{{ q }}" placeholder="Tìm ID, tên hoặc email…" maxlength="60">
+    </label>
+    <select name="vaiTro" aria-label="Lọc theo vai trò">
+      <option value="">Mọi vai trò</option>
+      {% for r in vai_tro_ds %}<option value="{{ r.code }}" {% if vaiTro == r.code %}selected{% endif %}>{{ r.name }}</option>{% endfor %}
+    </select>
+    <select name="ban" aria-label="Lọc theo ban">
+      <option value="">Mọi ban</option>
+      {% for b in ban_ds %}<option value="{{ b.id }}" {% if ban == b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+    </select>
+    <select name="trangThai" aria-label="Lọc theo trạng thái">
+      <option value="">Đang dùng</option>
+      <option value="active" {% if trangThai == 'active' %}selected{% endif %}>Hoạt động</option>
+      <option value="suspended" {% if trangThai == 'suspended' %}selected{% endif %}>Đã khoá</option>
+      <option value="archived" {% if trangThai == 'archived' %}selected{% endif %}>Đã lưu trữ</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" type="submit">Lọc</button>
+  </form>
+
+  {% if rows %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Tài khoản</th><th>Vai trò</th><th>Ban / Bộ phận</th><th>Trạng thái</th><th>Đăng nhập cuối</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for u in rows %}
+        <tr>
+          <td>
+            <a class="person" href="/tai-khoan/{{ u.id }}">
+              {{ ui.avatar(u.display_name) }}
+              <span><b>{{ u.display_name }}</b><small>{{ u.id }}{% if u.email %} · {{ u.email }}{% endif %}</small></span>
+            </a>
+          </td>
+          <td>{{ ui.role_badge(u.role_code, u.role_name) }}</td>
+          <td>{{ u.department_name or '—' }}</td>
+          <td>{{ ui.status_badge(u.status) }}</td>
+          <td class="muted">{{ u.last_login_at|dt if u.last_login_at else 'Chưa đăng nhập' }}</td>
+          <td class="row-actions">
+            <a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}">Chi tiết</a>
+            {% if 'permissions.grant' in perms or is_super %}
+            <a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}/phan-quyen">Quyền</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ ui.pager(page, pages, "/tai-khoan?q=" ~ q ~ "&vaiTro=" ~ vaiTro ~ "&ban=" ~ ban ~ "&trangThai=" ~ trangThai) }}
+  {% else %}
+  {{ ui.empty('Không có tài khoản phù hợp', 'Thử xoá bộ lọc hoặc tạo tài khoản mới.') }}
+  {% endif %}
+</section>
+{% endblock %}

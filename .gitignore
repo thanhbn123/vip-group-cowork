@@ -1,0 +1,14 @@
+.venv/
+.uv-cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+secrets/
+logs/
+evidence/*.log
+.DS_Store
+brain-staging/
+
+.env
+*.log

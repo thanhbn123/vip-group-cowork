@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/tai-khoan">{{ ui.icon('back', 16) }} Tài khoản</a>
+    <div class="profile-head">
+      {{ ui.avatar(target.display_name, 'avatar-lg') }}
+      <div>
+        <h1>{{ target.display_name }}</h1>
+        <p class="muted"><code>{{ target.id }}</code> · {{ target.role_name }}{% if target.department_name %} · {{ target.department_name }}{% endif %}</p>
+        <div class="chips">
+          {{ ui.role_badge(target.role_code, target.role_name) }}
+          {{ ui.status_badge(target.status) }}
+          {% if target.partner_org %}<span class="badge status-muted">{{ target.partner_org }}</span>{% endif %}
+          {% if target.must_change_password %}<span class="badge status-warn">Phải đổi mật khẩu</span>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-actions">
+    {% if co_dat_mat_khau %}
+    <form method="post" action="/tai-khoan/{{ target.id }}/dat-lai-mat-khau" data-confirm="Đặt lại mật khẩu cho {{ target.display_name }}? Mọi phiên hiện tại sẽ bị thu hồi.">
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <button class="btn btn-ghost" type="submit">{{ ui.icon('key', 16) }} Đặt lại mật khẩu</button>
+    </form>
+    {% endif %}
+    {% if co_khoa and target.role_code != 'super_admin' %}
+      {% if target.status == 'active' %}
+      <form method="post" action="/tai-khoan/{{ target.id }}/khoa" data-confirm="Khoá tài khoản {{ target.display_name }} và thu hồi mọi phiên?">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <button class="btn btn-danger" type="submit">{{ ui.icon('lock', 16) }} Khoá</button>
+      </form>
+      {% else %}
+      <form method="post" action="/tai-khoan/{{ target.id }}/mo-khoa">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <button class="btn btn-primary" type="submit">{{ ui.icon('refresh', 16) }} Mở khoá</button>
+      </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% if target.role_code == 'super_admin' %}
+<div class="callout gold">
+  <b>{{ ui.icon('shield', 16) }} Tài khoản Super Admin được bảo vệ</b>
+  <p>Không ai có thể sửa vai trò, khoá, lưu trữ hoặc thu hồi quyền của tài khoản này. Chỉ chính chủ mới đổi được mật khẩu.</p>
+</div>
+{% endif %}
+
+<div class="detail-grid">
+  <div class="detail-main">
+    <section class="card">
+      <div class="card-head"><div><h2>Thông tin tài khoản</h2><p class="muted">Cập nhật bởi quản trị có quyền.</p></div></div>
+      {% if co_sua %}
+      <form method="post" action="/tai-khoan/{{ target.id }}" class="form-grid">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <label class="field"><span class="field-label">Tên hiển thị</span>
+          <input type="text" name="display_name" value="{{ target.display_name }}" maxlength="120" required></label>
+        <label class="field"><span class="field-label">Email</span>
+          <input type="email" name="email" value="{{ target.email or '' }}" maxlength="190"></label>
+        <label class="field"><span class="field-label">Điện thoại</span>
+          <input type="tel" name="phone" value="{{ target.phone or '' }}" maxlength="40"></label>
+        <label class="field"><span class="field-label">Vai trò</span>
+          <select name="role_code">
+            {% for r in vai_tro %}<option value="{{ r.code }}" {% if target.role_code == r.code %}selected{% endif %}>{{ r.name }} · cấp {{ r.level }}</option>{% endfor %}
+          </select></label>
+        <label class="field"><span class="field-label">Ban / Bộ phận</span>
+          <select name="department_id">
+            <option value="">— Không thuộc ban —</option>
+            {% for b in ban_ds %}<option value="{{ b.id }}" {% if target.department_id == b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+          </select></label>
+        <label class="field"><span class="field-label">Tổ chức / Hợp đồng đối tác</span>
+          <input type="text" name="partner_org" value="{{ target.partner_org or '' }}" maxlength="160"></label>
+        <div class="form-actions span-2">
+          <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
+        </div>
+      </form>
+      {% else %}
+      <dl class="kv">
+        <div><dt>ID đăng nhập</dt><dd><code>{{ target.id }}</code></dd></div>
+        <div><dt>Email</dt><dd>{{ target.email or '—' }}</dd></div>
+        <div><dt>Điện thoại</dt><dd>{{ target.phone or '—' }}</dd></div>
+        <div><dt>Ban</dt><dd>{{ target.department_name or '—' }}</dd></div>
+        <div><dt>Ngày tạo</dt><dd>{{ target.created_at|dt }}</dd></div>
+        <div><dt>Đăng nhập cuối</dt><dd>{{ target.last_login_at|dt if target.last_login_at else 'Chưa đăng nhập' }}</dd></div>
+      </dl>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Quyền module</h2><p class="muted">Quyền hiệu lực = vai trò + uỷ quyền riêng.</p></div>
+        {% if co_cap_quyen %}<a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ target.id }}/phan-quyen">Chỉnh sửa quyền</a>{% endif %}
+      </div>
+      <div class="table-wrap">
+        <table class="table compact">
+          <thead><tr><th>Module</th><th>Mặc định vai trò</th><th>Hiệu lực</th><th></th></tr></thead>
+          <tbody>
+            {% for m in quyen_module %}
+            <tr class="{% if m.effective == 'block' %}row-off{% endif %}">
+              <td><b>{{ m.name }}</b><small class="block muted">{{ m.code }}</small></td>
+              <td>
+                {% if m.default == 'use' %}<span class="badge status-ok">Sử dụng</span>
+                {% elif m.default == 'view' %}<span class="badge status-info">Chỉ xem</span>
+                {% else %}<span class="badge status-muted">Không cấp</span>{% endif %}
+              </td>
+              <td>
+                {% if m.effective == 'use' %}<span class="badge status-ok">Sử dụng</span>
+                {% elif m.effective == 'view' %}<span class="badge status-info">Chỉ xem</span>
+                {% else %}<span class="badge status-danger">Bị chặn</span>{% endif %}
+                {% if m.mode != 'default' %}<span class="badge status-warn">uỷ quyền riêng</span>{% endif %}
+              </td>
+              <td class="row-actions">
+                {% if co_cap_quyen %}<a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ target.id }}/phan-quyen">Sửa</a>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Phiên đang hoạt động</h2><p class="muted">{{ phien|length }} phiên sống.</p></div>
+        {% if co_thu_hoi_phien and phien %}
+        <form method="post" action="/tai-khoan/{{ target.id }}/thu-hoi-phien" data-confirm="Thu hồi toàn bộ phiên của {{ target.display_name }}?">
+          <input type="hidden" name="_csrf" value="{{ csrf }}">
+          <button class="btn btn-danger btn-sm" type="submit">Thu hồi tất cả</button>
+        </form>
+        {% endif %}
+      </div>
+      {% if phien %}
+      <div class="table-wrap">
+        <table class="table compact">
+          <thead><tr><th>Phiên</th><th>Bắt đầu</th><th>Hoạt động cuối</th><th>IP</th><th></th></tr></thead>
+          <tbody>
+            {% for s in phien %}
+            <tr>
+              <td><code>{{ s.id[:10] }}</code><small class="block muted">hết hạn {{ s.expires_at|dt }}</small></td>
+              <td>{{ s.created_at|dt }}</td>
+              <td>{{ s.last_seen_at|dt }}</td>
+              <td class="muted">{{ s.ip or '—' }}</td>
+              <td class="row-actions">
+                {% if co_thu_hoi_phien %}
+                <form method="post" action="/tai-khoan/{{ target.id }}/phien/{{ s.id }}/thu-hoi">
+                  <input type="hidden" name="_csrf" value="{{ csrf }}">
+                  <button class="btn btn-ghost btn-sm" type="submit">Thu hồi</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty-line">Không có phiên nào đang hoạt động.</p>
+      {% endif %}
+    </section>
+
+    {% if co_scope %}
+    <section class="card">
+      <div class="card-head"><div><h2>Phạm vi quản trị</h2><p class="muted">Quản trị cấp dưới chỉ thao tác trong phạm vi này.</p></div></div>
+      {% set has_tenant = scopes|selectattr('department_id','none')|list|length > 0 %}
+      <form method="post" action="/tai-khoan/{{ target.id }}/pham-vi">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <label class="radio-card"><input type="radio" name="scope_mode" value="tenant" {% if has_tenant or not scopes %}checked{% endif %}>
+          <span><b>Toàn tenant</b><small>Mọi ban/bộ phận trong VIP GROUP.</small></span></label>
+        <label class="radio-card"><input type="radio" name="scope_mode" value="departments" {% if scopes and not has_tenant %}checked{% endif %}>
+          <span><b>Một số ban</b><small>Chỉ các ban được chọn bên dưới.</small></span></label>
+        <div class="scope-depts">
+          {% for b in ban_ds %}
+          <label class="check-line"><input type="checkbox" name="scope_departments" value="{{ b.id }}"
+            {% if scopes|selectattr('department_id','equalto', b.id)|list|length > 0 %}checked{% endif %}> {{ b.name }}</label>
+          {% endfor %}
+        </div>
+        <div class="form-actions left"><button class="btn btn-primary btn-sm" type="submit">Lưu phạm vi</button></div>
+      </form>
+    </section>
+    {% endif %}
+  </div>
+
+  <aside class="detail-side">
+    <section class="card">
+      <div class="card-head"><div><h2>Tóm tắt</h2></div></div>
+      <dl class="kv tight">
+        <div><dt>Vai trò</dt><dd>{{ ui.role_badge(target.role_code, target.role_name) }}</dd></div>
+        <div><dt>Cấp</dt><dd>{{ target.role_level }}</dd></div>
+        <div><dt>Ban</dt><dd>{{ target.department_name or '—' }}</dd></div>
+        <div><dt>Phiên sống</dt><dd>{{ phien|length }}</dd></div>
+        <div><dt>Người tạo</dt><dd>{{ target.created_by or '—' }}</dd></div>
+        <div><dt>Cập nhật</dt><dd>{{ target.updated_at|dt }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Nhật ký tài khoản</h2></div></div>
+      {% if nhat_ky %}
+      <ul class="mini-timeline">
+        {% for r in nhat_ky[:8] %}
+        <li><b>{{ r.action }}</b><small>{{ r.created_at|dt }} · {{ r.actor_id }}</small></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="empty-line">Chưa có hoạt động.</p>{% endif %}
+    </section>
+
+    {% if co_luu_tru and target.role_code != 'super_admin' and target.status != 'archived' %}
+    <section class="card danger-card">
+      <div class="card-head"><div><h2>Vùng nguy hiểm</h2></div></div>
+      <p class="muted">Lưu trữ sẽ khoá tài khoản, thu hồi mọi phiên và ẩn khỏi danh sách. Dữ liệu audit được giữ nguyên.</p>
+      <form method="post" action="/tai-khoan/{{ target.id }}/luu-tru" data-confirm="Lưu trữ tài khoản {{ target.display_name }}? Thao tác này thu hồi mọi phiên.">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <button class="btn btn-danger btn-block" type="submit">Lưu trữ tài khoản</button>
+      </form>
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

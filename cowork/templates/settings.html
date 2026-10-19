@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">CẤU HÌNH HỆ THỐNG</p>
+    <h1>Cài đặt</h1>
+    <p class="muted">Tenant, chính sách phiên và kết nối VIP AI Brain.</p>
+  </div>
+  <div class="page-actions">
+    <span class="badge status-muted">{{ APP_NAME }} v{{ APP_VERSION }}</span>
+  </div>
+</section>
+
+{% if not co_sua %}
+<div class="callout"><b>{{ ui.icon('lock', 16) }} Chỉ xem</b><p>Bạn không có quyền sửa cài đặt hệ thống.</p></div>
+{% endif %}
+
+<form method="post" action="/cai-dat" class="settings-grid">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+  <section class="card">
+    <div class="card-head"><div><h2>Tổ chức</h2><p class="muted">Thông tin hiển thị trong COWORK.</p></div></div>
+    <div class="form-grid">
+      <label class="field">
+        <span class="field-label">Tên tổ chức</span>
+        <input type="text" name="tenant.display_name" value="{{ gia_tri['tenant.display_name'] }}" maxlength="120" {% if not co_sua %}disabled{% endif %}>
+      </label>
+      <label class="field span-2">
+        <span class="field-label">Ghi chú hỗ trợ</span>
+        <textarea name="branding.support_note" rows="2" maxlength="500" {% if not co_sua %}disabled{% endif %}>{{ gia_tri['branding.support_note'] }}</textarea>
+      </label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div><h2>Phiên &amp; mật khẩu</h2><p class="muted">Áp dụng cho toàn tenant.</p></div></div>
+    <div class="form-grid">
+      <label class="field"><span class="field-label">Hạn phiên (giờ)</span>
+        <input type="number" name="security.session_hours" value="{{ gia_tri['security.session_hours'] }}" min="1" max="72" {% if not co_sua %}disabled{% endif %}>
+        <span class="hint">1–72 giờ.</span></label>
+      <label class="field"><span class="field-label">Tự đăng xuất sau (phút)</span>
+        <input type="number" name="security.idle_minutes" value="{{ gia_tri['security.idle_minutes'] }}" min="5" max="720" {% if not co_sua %}disabled{% endif %}>
+        <span class="hint">5–720 phút không hoạt động.</span></label>
+      <label class="field"><span class="field-label">Độ dài mật khẩu tối thiểu</span>
+        <input type="number" name="security.password_min" value="{{ gia_tri['security.password_min'] }}" min="8" max="32" {% if not co_sua %}disabled{% endif %}>
+        <span class="hint">8–32 ký tự; luôn yêu cầu ít nhất 2 nhóm ký tự.</span></label>
+    </div>
+  </section>
+
+  <section class="card span-2">
+    <div class="card-head">
+      <div><h2>VIP AI Brain</h2><p class="muted">Backend AI Local chạy độc lập trên Mac Studio.</p></div>
+      <span class="health-pill {% if suc_khoe.ok %}is-ok{% else %}is-off{% endif %}">
+        <i></i>{{ 'Đang kết nối' if suc_khoe.ok else 'Chưa kết nối' }}
+      </span>
+    </div>
+    <div class="brain-config-grid">
+      <div class="form-grid">
+        <label class="field"><span class="field-label">URL nội bộ (COWORK gọi)</span>
+          <input type="url" name="brain.base_url" value="{{ gia_tri['brain.base_url'] }}" placeholder="{{ config_brain_base }}" {% if not co_sua %}disabled{% endif %}>
+          <span class="hint">Mặc định: <code>{{ config_brain_base }}</code></span></label>
+        <label class="field"><span class="field-label">URL công khai (trình duyệt mở)</span>
+          <input type="url" name="brain.public_url" value="{{ gia_tri['brain.public_url'] }}" placeholder="{{ config_brain_public }}" {% if not co_sua %}disabled{% endif %}>
+          <span class="hint">Chính thức: <code>https://ai.vipgroup.com.vn</code></span></label>
+        <label class="field"><span class="field-label">Bật module Brain</span>
+          <select name="brain.enabled" {% if not co_sua %}disabled{% endif %}>
+            <option value="1" {% if brain_bat == '1' %}selected{% endif %}>Bật</option>
+            <option value="0" {% if brain_bat != '1' %}selected{% endif %}>Tắt</option>
+          </select></label>
+        <label class="field"><span class="field-label">Cho phép tài khoản đang MFA mở qua COWORK</span>
+          <select name="brain.allow_mfa_users" {% if not co_sua %}disabled{% endif %}>
+            <option value="0" {% if brain_mfa != '1' %}selected{% endif %}>Không (giữ MFA Brain)</option>
+            <option value="1" {% if brain_mfa == '1' %}selected{% endif %}>Có (chỉ sau nghiệm thu)</option>
+          </select>
+          <span class="hint">Mặc định KHÔNG. Chỉ bật sau khi COWORK được nghiệm thu an toàn.</span></label>
+      </div>
+      <aside class="brain-side">
+        <dl class="kv tight">
+          <div><dt>Trạng thái</dt><dd>{{ suc_khoe.trangThai }}</dd></div>
+          <div><dt>HTTP</dt><dd>{{ suc_khoe.http or '—' }}</dd></div>
+          <div><dt>Đích</dt><dd class="break">{{ suc_khoe.url or config_brain_base }}</dd></div>
+          <div><dt>Bí mật chia sẻ</dt><dd>{{ 'Đã cấu hình' if brain_secret_set else 'Chưa cấu hình' }}</dd></div>
+        </dl>
+        <button type="button" class="btn btn-ghost btn-sm btn-block" data-brain-test="/cai-dat/kiem-tra-brain">
+          {{ ui.icon('refresh', 16) }} Kiểm tra kết nối
+        </button>
+        <div class="brain-test-result" data-brain-result hidden></div>
+        {% if not suc_khoe.ok %}<p class="hint err-hint">{{ suc_khoe.thongBao }}</p>{% endif %}
+      </aside>
+    </div>
+  </section>
+
+  {% if co_sua %}
+  <div class="form-actions span-2">
+    <button class="btn btn-primary" type="submit">Lưu cài đặt</button>
+  </div>
+  {% endif %}
+</form>
+
+<div class="settings-grid">
+  <section class="card">
+    <div class="card-head"><div><h2>Chẩn đoán</h2><p class="muted">Thông tin phục vụ vận hành.</p></div></div>
+    <dl class="kv tight">
+      <div><dt>Ứng dụng</dt><dd>{{ APP_NAME }} v{{ APP_VERSION }}</dd></div>
+      <div><dt>Môi trường</dt><dd>{{ ENV }}</dd></div>
+      <div><dt>Tenant</dt><dd>{{ user.tenant_id }}</dd></div>
+      <div><dt>Tài khoản</dt><dd>{{ so_user }}</dd></div>
+      <div><dt>Phiên đang sống</dt><dd>{{ so_phien }}</dd></div>
+      <div><dt>Tên miền chính thức</dt><dd>cowork.vipgroup.com.vn</dd></div>
+      <div><dt>DNS</dt><dd>Đã trỏ VPS · chưa đổi</dd></div>
+      <div><dt>Caddy</dt><dd>Chưa có site block COWORK</dd></div>
+    </dl>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div><h2>Bảo mật phiên</h2><p class="muted">Dành cho Super Admin.</p></div></div>
+    <p class="muted">Thu hồi mọi phiên đang hoạt động trong tenant, trừ phiên hiện tại của bạn. Người dùng sẽ phải đăng nhập lại.</p>
+    {% if is_super %}
+    <form method="post" action="/cai-dat/thu-hoi-toan-bo" data-confirm="Thu hồi TẤT CẢ phiên của tenant (trừ phiên hiện tại)?">
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <button class="btn btn-danger btn-block" type="submit">{{ ui.icon('lock', 16) }} Thu hồi toàn bộ phiên</button>
+    </form>
+    {% else %}
+    <p class="hint">Chỉ Super Admin thực hiện được thao tác này.</p>
+    {% endif %}
+  </section>
+
+  <section class="card span-2">
+    <div class="card-head"><div><h2>Thay đổi cài đặt gần đây</h2></div><a class="btn btn-ghost btn-sm" href="/nhat-ky?action=settings.">Nhật ký</a></div>
+    {% if nhat_ky %}
+    <ul class="mini-timeline">
+      {% for r in nhat_ky %}<li><b>{{ r.action }}</b><small>{{ r.created_at|dt }} · {{ r.actor_id }}</small></li>{% endfor %}
+    </ul>
+    {% else %}<p class="empty-line">Chưa có thay đổi.</p>{% endif %}
+  </section>
+</div>
+
+<div class="callout">
+  <b>Bảo vệ mặc định</b>
+  <p>MFA của VIP AI Brain vẫn bật cho đăng nhập trực tiếp. COWORK không tự bỏ MFA; chỉ khi chủ dự án nghiệm thu an toàn và bật rõ ràng cờ cho phép.</p>
+</div>
+{% endblock %}

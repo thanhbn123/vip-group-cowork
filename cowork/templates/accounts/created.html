@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/tai-khoan">{{ ui.icon('back', 16) }} Tài khoản</a>
+    <h1>{{ 'Mật khẩu tạm mới' if reset else 'Đã tạo tài khoản' }}</h1>
+    <p class="muted">{{ moi.display_name }} · {{ moi.id }}</p>
+  </div>
+</section>
+
+<section class="card narrow-card">
+  {% if temp %}
+  <div class="success-mark">{{ ui.icon('check-circle', 34) }}</div>
+  <h2>Mật khẩu tạm — chỉ hiện một lần</h2>
+  <p class="muted">Sao chép và gửi cho người dùng qua kênh an toàn. Hệ thống không lưu mật khẩu gốc và không thể đọc lại.</p>
+  <div class="secret-box">
+    <code id="mat-khau-tam">{{ temp }}</code>
+    <button type="button" class="btn btn-ghost btn-sm" data-copy="#mat-khau-tam">{{ ui.icon('key', 16) }} Sao chép</button>
+  </div>
+  <div class="callout warn">
+    <b>Bắt buộc đổi mật khẩu</b>
+    <p>Tài khoản sẽ được yêu cầu đổi mật khẩu ngay sau lần đăng nhập đầu tiên.</p>
+  </div>
+  {% else %}
+  <div class="success-mark">{{ ui.icon('check-circle', 34) }}</div>
+  <h2>Tài khoản đã được tạo</h2>
+  <p class="muted">Mật khẩu do bạn nhập đã được lưu dạng băm. Không có mật khẩu tạm nào được sinh.</p>
+  {% endif %}
+  <div class="form-actions left">
+    <a class="btn btn-primary" href="/tai-khoan/{{ moi.id }}">Xem tài khoản {{ ui.icon('arrow', 16) }}</a>
+    <a class="btn btn-ghost" href="/tai-khoan">Danh sách tài khoản</a>
+  </div>
+</section>
+{% endblock %}

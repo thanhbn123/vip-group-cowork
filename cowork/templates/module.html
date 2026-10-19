@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/">Bảng điều khiển</a>
+    <p class="eyebrow">{{ 'MODULE AI' if module.requires_brain else 'MODULE' }}</p>
+    <h1>{{ module.name }}</h1>
+    <p class="muted">{{ module.description }}</p>
+  </div>
+  <div class="page-actions">
+    {% if module.requires_brain %}<span class="badge status-info">{{ ui.icon('spark', 12) }} AI Local</span>{% endif %}
+    <span class="badge status-muted">cấp {{ module.min_role_level }}+</span>
+  </div>
+</section>
+
+{% if module.requires_brain %}
+<section class="bridge-card">
+  <div class="bridge-main">
+    <span class="module-ico big">{{ ui.icon(module.icon, 28) }}</span>
+    <div>
+      <h2>{{ module.name }} được vận hành trong VIP AI Brain</h2>
+      <p class="muted">COWORK xác thực danh tính và quyền module, sau đó mở một phiên Brain native. Không cần đăng nhập lại, không chia sẻ mật khẩu.</p>
+      <div class="chips">
+        <span class="chip">{{ ui.icon('shield', 14) }} Kiểm quyền hai đầu</span>
+        <span class="chip">{{ ui.icon('clock', 14) }} Ticket 60 giây</span>
+        <span class="chip">{{ ui.icon('lock', 14) }} Thu hồi tức thời</span>
+      </div>
+    </div>
+  </div>
+  <div class="bridge-side">
+    {% if health and health.ok %}
+    <span class="health-pill is-ok"><i></i> Brain sẵn sàng</span>
+    <a class="btn btn-gold btn-block" href="/brain">Mở trong VIP AI Brain {{ ui.icon('external', 16) }}</a>
+    {% else %}
+    <span class="health-pill is-off"><i></i> Brain chưa kết nối</span>
+    <p class="hint">{{ health.thongBao if health else 'Chưa kiểm tra được.' }}</p>
+    {% endif %}
+  </div>
+</section>
+
+<div class="dash-grid">
+  <section class="card span-2">
+    <div class="card-head"><div><h2>Quyền của bạn trên module này</h2></div></div>
+    <dl class="kv">
+      <div><dt>Quyền xem</dt><dd>{{ 'Có' if (module.code ~ '.view') in perms or is_super else 'Không' }}</dd></div>
+      <div><dt>Quyền sử dụng</dt><dd>{{ 'Có' if (module.code ~ '.use') in perms or is_super else 'Không' }}</dd></div>
+      <div><dt>Vai trò</dt><dd>{{ user.role_name }}</dd></div>
+      <div><dt>Ban</dt><dd>{{ user.department_name or '—' }}</dd></div>
+    </dl>
+  </section>
+  <aside class="card">
+    <div class="card-head"><div><h2>Ghi chú</h2></div></div>
+    <p class="muted">Module này chưa có màn hình dữ liệu riêng trong COWORK. Dữ liệu nghiệp vụ vẫn nằm trong VIP AI Brain và tuân theo quyền dự án của Brain.</p>
+  </aside>
+</div>
+{% else %}
+<section class="card">
+  <div class="card-head"><div><h2>{{ module.name }}</h2></div></div>
+  <p class="muted">Module đang được COWORK quản lý. Màn hình chi tiết sẽ được bổ sung theo lộ trình.</p>
+</section>
+{% endif %}
+{% endblock %}

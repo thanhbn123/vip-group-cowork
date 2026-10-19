@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="error-page">
+  <div class="error-code">400</div>
+  <h1>Chưa thực hiện được</h1>
+  <p class="muted">{{ thong_bao or 'Dữ liệu gửi lên chưa hợp lệ.' }}</p>
+  <div class="error-actions">
+    <a class="btn btn-primary" href="/">Về bảng điều khiển</a>
+    <button class="btn btn-ghost" type="button" data-back>Quay lại</button>
+  </div>
+</section>
+{% endblock %}

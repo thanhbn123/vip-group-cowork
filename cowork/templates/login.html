@@ -1,0 +1,97 @@
+{% import "macros.html" as ui %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Đăng nhập · {{ APP_NAME }}</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="auth-body">
+<main class="auth-shell">
+  <section class="auth-story" aria-label="Giới thiệu COWORK">
+    <div class="auth-brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VIP GROUP</b><small>COWORK</small></span>
+    </div>
+    <div class="auth-story-body">
+      <p class="eyebrow">CỔNG LÀM VIỆC TẬP TRUNG</p>
+      <h1>Một danh tính.<br>Đúng quyền.<br>Một nơi làm việc.</h1>
+      <p class="auth-lead">Đăng nhập bằng ID được cấp. Mỗi người chỉ thấy module và dữ liệu thuộc phạm vi của mình.</p>
+      <ul class="auth-points">
+        <li><span class="pt-ico">{{ ui.icon('user', 16) }}</span><div><b>ID &amp; phiên bảo vệ</b><small>Mật khẩu băm scrypt, phiên máy chủ, thu hồi tức thời.</small></div></li>
+        <li><span class="pt-ico">{{ ui.icon('shield', 16) }}</span><div><b>Phân quyền theo vai trò</b><small>Super Admin, quản trị uỷ quyền, trưởng ban, nhân viên, đối tác.</small></div></li>
+        <li><span class="pt-ico">{{ ui.icon('spark', 16) }}</span><div><b>AI Local trên Mac Studio</b><small>Mở VIP AI Brain sau khi xác thực, không đăng nhập lần hai.</small></div></li>
+      </ul>
+    </div>
+    <div class="auth-story-foot">
+      <span>cowork.vipgroup.com.vn</span>
+      <span class="dot-sep">·</span>
+      <span>Dữ liệu nội bộ</span>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-card-head">
+        <p class="eyebrow">VIP GROUP COWORK</p>
+        <h2>Đăng nhập</h2>
+        <p class="muted">Dùng ID và mật khẩu do quản trị cấp.</p>
+      </div>
+
+      {% if flash %}
+      <div class="flash flash-{{ flash.k }}" role="alert">
+        <span class="flash-ico">{{ ui.icon('alert', 18) }}</span>
+        <span>{{ flash.m }}</span>
+      </div>
+      {% endif %}
+
+      <form method="post" action="/dang-nhap" class="auth-form" autocomplete="on">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <input type="hidden" name="next" value="{{ next_url }}">
+
+        <label class="field">
+          <span class="field-label">ID đăng nhập</span>
+          <span class="input-wrap">
+            <span class="input-ico">{{ ui.icon('user', 18) }}</span>
+            <input type="text" name="userId" required autofocus autocapitalize="none"
+                   autocomplete="username" spellcheck="false" placeholder="ví dụ: anh-thanh"
+                   maxlength="40" inputmode="text">
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Mật khẩu</span>
+          <span class="input-wrap">
+            <span class="input-ico">{{ ui.icon('lock', 18) }}</span>
+            <input type="password" name="matKhau" required autocomplete="current-password"
+                   placeholder="Nhập mật khẩu" maxlength="200" id="mat-khau">
+            <button type="button" class="input-action" data-toggle-password="#mat-khau"
+                    aria-label="Hiện/ẩn mật khẩu">{{ ui.icon('eye', 18) }}</button>
+          </span>
+        </label>
+
+        <button class="btn btn-primary btn-block btn-lg" type="submit">
+          Đăng nhập COWORK {{ ui.icon('arrow', 18) }}
+        </button>
+      </form>
+
+      <div class="auth-note">
+        <span class="auth-note-ico">{{ ui.icon('shield', 16) }}</span>
+        <p>Hệ thống ghi nhật ký đăng nhập. Quên mật khẩu? Liên hệ quản trị viên để đặt lại.</p>
+      </div>
+
+      <div class="auth-links">
+        <a href="https://ai.vipgroup.com.vn" target="_blank" rel="noopener">VIP AI Brain {{ ui.icon('external', 14) }}</a>
+        <span class="dot-sep">·</span>
+        <span>Hỗ trợ nội bộ</span>
+      </div>
+    </div>
+    <p class="auth-copy">© 2026 VIP GROUP · COWORK v{{ APP_VERSION }}</p>
+  </section>
+</main>
+<script src="/static/app.js" defer></script>
+</body>
+</html>

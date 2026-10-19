@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="brain-hero">
+  <div class="brain-hero-main">
+    <span class="brain-orb">{{ ui.icon('spark', 30) }}</span>
+    <div>
+      <p class="eyebrow light">VIP AI BRAIN · AI LOCAL</p>
+      <h1>Trợ lý AI của VIP GROUP</h1>
+      <p class="brain-lead">Mô hình chạy trên Mac Studio, dữ liệu ở lại trong hệ thống. Mở từ COWORK bằng danh tính đã xác thực — không đăng nhập lần hai.</p>
+      <div class="brain-chips">
+        <span class="brain-chip"><i class="live-dot"></i> {{ 'Sẵn sàng' if suc_khoe.ok else 'Chưa kết nối' }}</span>
+        <span class="brain-chip">Qwen2.5 7B Instruct</span>
+        <span class="brain-chip">Mac Studio</span>
+        <span class="brain-chip">No cloud</span>
+      </div>
+    </div>
+  </div>
+  <div class="brain-hero-side">
+    {% if co_use and suc_khoe.ok %}
+    <form method="post" action="/brain/mo">
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <button class="btn btn-gold btn-lg btn-block" type="submit">{{ ui.icon('external', 18) }} Mở VIP AI Brain</button>
+    </form>
+    <p class="brain-hint">Ticket một lần · hết hạn sau 60 giây</p>
+    {% elif not suc_khoe.ok %}
+    <button class="btn btn-ghost btn-lg btn-block" type="button" disabled>Brain chưa sẵn sàng</button>
+    <p class="brain-hint">{{ suc_khoe.thongBao or 'Kiểm tra kết nối tới Mac Studio.' }}</p>
+    {% else %}
+    <button class="btn btn-ghost btn-lg btn-block" type="button" disabled>Chưa được cấp quyền sử dụng</button>
+    {% endif %}
+  </div>
+</section>
+
+{% if suc_khoe.ok %}
+<div class="callout green">
+  <b>{{ ui.icon('check-circle', 16) }} Kết nối tới backend Brain đang hoạt động</b>
+  <p>{{ suc_khoe.duLieu if suc_khoe.duLieu is string else (suc_khoe.duLieu|json_pretty) }} · Đích: {{ suc_khoe.url }}</p>
+</div>
+{% else %}
+<div class="callout warn">
+  <b>{{ ui.icon('alert', 16) }} Chưa kết nối được Brain</b>
+  <p>{{ suc_khoe.thongBao }} · Đích: {{ suc_khoe.url }}. COWORK vẫn hoạt động; chỉ module AI tạm thời không mở được.</p>
+</div>
+{% endif %}
+
+<div class="dash-grid">
+  <section class="card span-2">
+    <div class="card-head"><div><h2>Cách COWORK mở Brain</h2><p class="muted">Bốn bước, không chia sẻ mật khẩu Brain.</p></div></div>
+    <ol class="steps">
+      <li><span class="step-num">1</span><div><b>Xác thực tại COWORK</b><small>Phiên COWORK hợp lệ, tài khoản đang hoạt động.</small></div></li>
+      <li><span class="step-num">2</span><div><b>Cấp ticket một lần</b><small>Chỉ phát khi vai trò có quyền module Brain · hết hạn 60 giây · dùng một lần.</small></div></li>
+      <li><span class="step-num">3</span><div><b>Brain kiểm tra và tạo phiên</b><small>Backend Brain xác thực chữ ký HMAC, tạo phiên native cho đúng user.</small></div></li>
+      <li><span class="step-num">4</span><div><b>Thu hồi tức thời</b><small>Khoá tài khoản hoặc bỏ quyền Brain sẽ thu hồi phiên Brain ngay.</small></div></li>
+    </ol>
+  </section>
+
+  <aside class="card">
+    <div class="card-head"><div><h2>Phiên COWORK</h2><p class="muted">Của tài khoản này</p></div></div>
+    <div class="big-number">{{ so_phien_cowork }}</div>
+    <p class="muted">phiên đăng nhập COWORK đang hoạt động. Phiên VIP AI Brain do Brain quản lý riêng; thu hồi quyền Brain sẽ thu hồi cả phiên Brain tương ứng.</p>
+    <dl class="kv tight">
+      <div><dt>Cấu hình</dt><dd class="break">{{ cfg.base_url }}</dd></div>
+      <div><dt>Chính sách MFA</dt><dd>{{ 'Cho phép tài khoản MFA' if cfg.allow_mfa_users else 'Giữ nguyên MFA Brain' }}</dd></div>
+    </dl>
+  </aside>
+</div>
+
+<div class="dash-grid">
+  <section class="card span-2">
+    <div class="card-head"><div><h2>Lần mở gần đây</h2><p class="muted">Ghi nhận từ sổ kiểm toán.</p></div></div>
+    {% if nhat_ky %}
+    <ul class="activity">
+      {% for r in nhat_ky %}
+      <li><span class="act-ico">{{ ui.icon('external', 15) }}</span>
+        <div class="act-body"><p><b>Mở VIP AI Brain</b> <span class="muted">· {{ r.created_at|dt }}</span></p>
+        <small>{{ r.ip or '—' }} · ticket một lần</small></div></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty-line">Chưa có lần mở nào.</p>{% endif %}
+  </section>
+
+  <aside class="card">
+    <div class="card-head"><div><h2>Phạm vi dữ liệu</h2></div></div>
+    <ul class="rules-list">
+      <li>{{ ui.icon('check', 14) }} Danh tính lấy từ COWORK</li>
+      <li>{{ ui.icon('check', 14) }} Brain kiểm tra quyền tại backend</li>
+      <li>{{ ui.icon('check', 14) }} Không gửi dữ liệu ra cloud</li>
+      <li>{{ ui.icon('check', 14) }} Audit ghi cả hai phía</li>
+    </ul>
+    <div class="notice">
+      <b>AI Local, không phải cloud</b>
+      <p>Mô hình Qwen2.5 chạy trên Mac Studio. Khi mất kết nối, COWORK báo lỗi thay vì chuyển sang dịch vụ ngoài.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

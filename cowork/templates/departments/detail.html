@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/ban">{{ ui.icon('back', 16) }} Ban / Bộ phận</a>
+    <h1>{{ dept.name }}</h1>
+    <p class="muted"><code>{{ dept.code }}</code> · {{ thanh_vien|length }} nhân sự{% if dept.manager_name %} · Trưởng ban: {{ dept.manager_name }}{% endif %}</p>
+  </div>
+  <div class="page-actions">
+    {{ ui.status_badge('active' if dept.status == 'active' else 'archived') }}
+  </div>
+</section>
+
+<div class="detail-grid">
+  <div class="detail-main">
+    {% if co_sua %}
+    <section class="card">
+      <div class="card-head"><div><h2>Thông tin ban</h2><p class="muted">Trưởng ban được gán sẽ được chuyển vào ban này.</p></div></div>
+      <form method="post" action="/ban/{{ dept.id }}" class="form-grid">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <label class="field"><span class="field-label">Tên ban</span>
+          <input type="text" name="name" value="{{ dept.name }}" required maxlength="120"></label>
+        <label class="field"><span class="field-label">Trưởng ban</span>
+          <select name="manager_user_id">
+            <option value="">— Chưa gán —</option>
+            {% for u in ung_vien %}<option value="{{ u.id }}" {% if dept.manager_user_id == u.id %}selected{% endif %}>{{ u.display_name }} · {{ u.role_name }}</option>{% endfor %}
+          </select></label>
+        <label class="field span-2"><span class="field-label">Mô tả</span>
+          <textarea name="description" rows="3" maxlength="500">{{ dept.description or '' }}</textarea></label>
+        <div class="form-actions span-2"><button class="btn btn-primary" type="submit">Lưu thay đổi</button></div>
+      </form>
+    </section>
+    {% else %}
+    <section class="card">
+      <div class="card-head"><div><h2>Thông tin ban</h2></div></div>
+      <dl class="kv">
+        <div><dt>Mã ban</dt><dd><code>{{ dept.code }}</code></dd></div>
+        <div><dt>Trưởng ban</dt><dd>{{ dept.manager_name or '—' }}</dd></div>
+        <div><dt>Mô tả</dt><dd>{{ dept.description or '—' }}</dd></div>
+        <div><dt>Ngày tạo</dt><dd>{{ dept.created_at|dt }}</dd></div>
+      </dl>
+    </section>
+    {% endif %}
+
+    <section class="card">
+      <div class="card-head"><div><h2>Nhân sự trong ban</h2><p class="muted">Chỉ tính tài khoản chưa lưu trữ.</p></div></div>
+      {% if thanh_vien %}
+      <div class="table-wrap">
+        <table class="table compact">
+          <thead><tr><th>Nhân sự</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr></thead>
+          <tbody>
+            {% for u in thanh_vien %}
+            <tr>
+              <td><a class="person" href="/tai-khoan/{{ u.id }}">{{ ui.avatar(u.display_name) }}<span><b>{{ u.display_name }}</b><small>{{ u.id }}</small></span></a></td>
+              <td>{{ ui.role_badge(u.role_code, u.role_name) }}</td>
+              <td>{{ ui.status_badge(u.status) }}</td>
+              <td class="row-actions"><a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}">Chi tiết</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty-line">Ban chưa có nhân sự.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <aside class="detail-side">
+    <section class="card">
+      <div class="card-head"><div><h2>Tóm tắt</h2></div></div>
+      <dl class="kv tight">
+        <div><dt>Số nhân sự</dt><dd>{{ thanh_vien|length }}</dd></div>
+        <div><dt>Trưởng ban</dt><dd>{{ dept.manager_name or '—' }}</dd></div>
+        <div><dt>Trạng thái</dt><dd>{{ 'Đang hoạt động' if dept.status == 'active' else 'Đã lưu trữ' }}</dd></div>
+      </dl>
+    </section>
+    {% if co_luu_tru and thanh_vien|length == 0 %}
+    <section class="card danger-card">
+      <div class="card-head"><div><h2>Lưu trữ ban</h2></div></div>
+      <p class="muted">Ban trống có thể lưu trữ. Dữ liệu audit được giữ nguyên.</p>
+      <form method="post" action="/ban/{{ dept.id }}/luu-tru" data-confirm="Lưu trữ ban {{ dept.name }}?">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <button class="btn btn-danger btn-block" type="submit">Lưu trữ ban</button>
+      </form>
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

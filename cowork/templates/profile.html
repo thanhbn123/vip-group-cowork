@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">TÀI KHOẢN CỦA TÔI</p>
+    <div class="profile-head">
+      {{ ui.avatar(user.display_name, 'avatar-lg') }}
+      <div>
+        <h1>{{ user.display_name }}</h1>
+        <p class="muted"><code>{{ user.id }}</code> · {{ user.role_name }}{% if user.department_name %} · {{ user.department_name }}{% endif %}</p>
+        <div class="chips">{{ ui.role_badge(user.role_code, user.role_name) }} {{ ui.status_badge(user.status) }}
+          <span class="chip">{{ ui.icon('grid', 14) }} {{ so_module }} module</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-actions"><a class="btn btn-ghost" href="/doi-mat-khau">{{ ui.icon('lock', 16) }} Đổi mật khẩu</a></div>
+</section>
+
+<div class="detail-grid">
+  <div class="detail-main">
+    <section class="card">
+      <div class="card-head"><div><h2>Thông tin cá nhân</h2><p class="muted">Bạn tự cập nhật được tên, email, điện thoại.</p></div></div>
+      <form method="post" action="/ho-so" class="form-grid">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <label class="field"><span class="field-label">Tên hiển thị</span>
+          <input type="text" name="display_name" value="{{ user.display_name }}" maxlength="120" required></label>
+        <label class="field"><span class="field-label">Email</span>
+          <input type="email" name="email" value="{{ user.email or '' }}" maxlength="190"></label>
+        <label class="field"><span class="field-label">Điện thoại</span>
+          <input type="tel" name="phone" value="{{ user.phone or '' }}" maxlength="40"></label>
+        <div class="form-actions span-2"><button class="btn btn-primary" type="submit">Lưu hồ sơ</button></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Phiên đang hoạt động</h2><p class="muted">{{ sessions|length }} phiên. Thu hồi phiên không cần thiết.</p></div></div>
+      {% if sessions %}
+      <div class="table-wrap">
+        <table class="table compact">
+          <thead><tr><th>Phiên</th><th>Bắt đầu</th><th>Hoạt động cuối</th><th>IP</th><th></th></tr></thead>
+          <tbody>
+            {% for s in sessions %}
+            <tr>
+              <td><code>{{ s.id[:10] }}</code>{% if s.id == current_session %} <span class="badge status-ok">Phiên này</span>{% endif %}
+                <small class="block muted">hết hạn {{ s.expires_at|dt }}</small></td>
+              <td>{{ s.created_at|dt }}</td>
+              <td>{{ s.last_seen_at|dt }}</td>
+              <td class="muted">{{ s.ip or '—' }}</td>
+              <td class="row-actions">
+                <form method="post" action="/ho-so/phien/{{ s.id }}/thu-hoi" {% if s.id == current_session %}data-confirm="Thu hồi phiên hiện tại? Bạn sẽ phải đăng nhập lại."{% endif %}>
+                  <input type="hidden" name="_csrf" value="{{ csrf }}">
+                  <button class="btn btn-ghost btn-sm" type="submit">Thu hồi</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<p class="empty-line">Không có phiên nào.</p>{% endif %}
+    </section>
+  </div>
+
+  <aside class="detail-side">
+    <section class="card">
+      <div class="card-head"><div><h2>Tóm tắt</h2></div></div>
+      <dl class="kv tight">
+        <div><dt>ID</dt><dd><code>{{ user.id }}</code></dd></div>
+        <div><dt>Vai trò</dt><dd>{{ ui.role_badge(user.role_code, user.role_name) }}</dd></div>
+        <div><dt>Ban</dt><dd>{{ user.department_name or '—' }}</dd></div>
+        <div><dt>Đăng nhập cuối</dt><dd>{{ user.last_login_at|dt if user.last_login_at else '—' }}</dd></div>
+        <div><dt>Ngày tạo</dt><dd>{{ user.created_at|dt }}</dd></div>
+      </dl>
+    </section>
+    <section class="card">
+      <div class="card-head"><div><h2>Hoạt động của tôi</h2></div></div>
+      {% if nhat_ky %}
+      <ul class="mini-timeline">{% for r in nhat_ky %}<li><b>{{ r.action }}</b><small>{{ r.created_at|dt }}</small></li>{% endfor %}</ul>
+      {% else %}<p class="empty-line">Chưa có hoạt động.</p>{% endif %}
+    </section>
+  </aside>
+</div>
+{% endblock %}

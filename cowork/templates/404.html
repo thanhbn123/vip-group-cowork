@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="error-page">
+  <div class="error-code">404</div>
+  <h1>Không tìm thấy</h1>
+  <p class="muted">{{ thong_bao or 'Trang hoặc tài nguyên bạn tìm không tồn tại trong phạm vi quyền.' }}</p>
+  <div class="error-actions">
+    <a class="btn btn-primary" href="/">Về bảng điều khiển</a>
+    <a class="btn btn-ghost" href="/tai-khoan">Danh sách tài khoản</a>
+  </div>
+</section>
+{% endblock %}

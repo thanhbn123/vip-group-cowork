@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/ban">{{ ui.icon('back', 16) }} Ban / Bộ phận</a>
+    <h1>Tạo ban / bộ phận</h1>
+    <p class="muted">Mã ban dùng trong ID và báo cáo; có thể để trống để sinh từ tên.</p>
+  </div>
+</section>
+
+{% if error %}
+<div class="flash flash-err" role="alert"><span class="flash-ico">{{ ui.icon('alert', 18) }}</span><span>{{ error }}</span></div>
+{% endif %}
+
+<form method="post" action="/ban/tao-moi" class="card narrow-card">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <div class="form-grid">
+    <label class="field">
+      <span class="field-label">Tên ban <em>*</em></span>
+      <input type="text" name="name" required maxlength="120" placeholder="vd: Ban Kinh doanh"
+             value="{{ form.get('name','') if form else '' }}">
+    </label>
+    <label class="field">
+      <span class="field-label">Mã ban</span>
+      <input type="text" name="code" maxlength="40" placeholder="tu-dong-tu-ten"
+             value="{{ form.get('code','') if form else '' }}">
+      <span class="hint">Chỉ a-z, 0-9, dấu gạch ngang. Không đổi được sau khi tạo.</span>
+    </label>
+    <label class="field span-2">
+      <span class="field-label">Mô tả</span>
+      <textarea name="description" rows="3" maxlength="500" placeholder="Chức năng, phạm vi của ban…">{{ form.get('description','') if form else '' }}</textarea>
+    </label>
+  </div>
+  <div class="form-actions">
+    <a class="btn btn-ghost" href="/ban">Huỷ</a>
+    <button class="btn btn-primary" type="submit">{{ ui.icon('plus', 18) }} Tạo ban</button>
+  </div>
+</form>
+{% endblock %}

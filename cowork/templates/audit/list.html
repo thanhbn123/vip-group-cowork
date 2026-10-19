@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">SỔ KIỂM TOÁN</p>
+    <h1>Nhật ký quản trị</h1>
+    <p class="muted">{{ kq.total }} sự kiện · chỉ ghi thêm, không sửa, không xoá.</p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-ghost" href="/nhat-ky/xuat.csv?actor={{ loc.actor|urlencode }}&action={{ loc.action|urlencode }}&target={{ loc.target|urlencode }}&tu_ngay={{ loc.tu_ngay }}&den_ngay={{ loc.den_ngay }}">
+      {{ ui.icon('download', 16) }} Xuất CSV
+    </a>
+  </div>
+</section>
+
+<section class="card">
+  <form class="filter-bar wrap" method="get" action="/nhat-ky">
+    <select name="actor" aria-label="Lọc theo người">
+      <option value="">Mọi người</option>
+      {% for u in ds_nguoi %}<option value="{{ u }}" {% if loc.actor == u %}selected{% endif %}>{{ u }}</option>{% endfor %}
+    </select>
+    <label class="search-box grow"><span>{{ ui.icon('search', 18) }}</span>
+      <input type="search" name="action" value="{{ loc.action }}" placeholder="Hành động, vd: account.create" maxlength="80"></label>
+    <input type="text" name="target" value="{{ loc.target }}" placeholder="Đối tượng / ID" maxlength="80">
+    <label class="date-field"><span>Từ</span><input type="date" name="tu_ngay" value="{{ loc.tu_ngay }}"></label>
+    <label class="date-field"><span>Đến</span><input type="date" name="den_ngay" value="{{ loc.den_ngay }}"></label>
+    <button class="btn btn-primary btn-sm" type="submit">Lọc</button>
+    <a class="btn btn-ghost btn-sm" href="/nhat-ky">Xoá lọc</a>
+  </form>
+
+  {% if kq.rows %}
+  <div class="table-wrap">
+    <table class="table audit-table">
+      <thead><tr><th>Thời điểm</th><th>Người</th><th>Hành động</th><th>Đối tượng</th><th>Chi tiết</th><th>IP</th></tr></thead>
+      <tbody>
+        {% for r in kq.rows %}
+        <tr>
+          <td class="nowrap muted">{{ r.created_at|dt }}</td>
+          <td><b>{{ r.actor_id }}</b><small class="block muted">{{ r.actor_role or '—' }}</small></td>
+          <td><code class="action-code">{{ r.action }}</code></td>
+          <td>{% if r.target_id %}<b>{{ r.target_id }}</b>{% endif %}<small class="block muted">{{ r.target_type or '' }}</small></td>
+          <td>
+            {% if r.detail %}
+            <details class="detail-toggle"><summary>Xem</summary>
+              <pre class="json-box">{{ r.detail_obj|json_pretty if r.detail_obj else r.detail }}</pre>
+            </details>
+            {% else %}<span class="muted">—</span>{% endif %}
+          </td>
+          <td class="muted nowrap">{{ r.ip or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% set base = "/nhat-ky?actor=" ~ (loc.actor|urlencode) ~ "&action=" ~ (loc.action|urlencode) ~ "&target=" ~ (loc.target|urlencode) ~ "&tu_ngay=" ~ loc.tu_ngay ~ "&den_ngay=" ~ loc.den_ngay %}
+  {{ ui.pager(kq.page, kq.pages, base) }}
+  {% else %}
+  {{ ui.empty('Không có sự kiện phù hợp', 'Thử xoá bộ lọc hoặc chọn khoảng thời gian khác.') }}
+  {% endif %}
+</section>
+
+<div class="callout">
+  <b>Vì sao nhật ký không sửa được?</b>
+  <p>Cơ sở dữ liệu có trigger chặn mọi lệnh UPDATE/DELETE trên bảng audit. Ngay cả quản trị viên cũng không thể xoá dấu vết thao tác.</p>
+</div>
+{% endblock %}

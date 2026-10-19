@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/tai-khoan">{{ ui.icon('back', 16) }} Tài khoản</a>
+    <h1>Tạo tài khoản</h1>
+    <p class="muted">ID là duy nhất toàn hệ thống. Mật khẩu để trống sẽ được hệ thống sinh tự động.</p>
+  </div>
+</section>
+
+{% if error %}
+<div class="flash flash-err" role="alert"><span class="flash-ico">{{ ui.icon('alert', 18) }}</span><span>{{ error }}</span></div>
+{% endif %}
+
+<form method="post" action="/tai-khoan/tao-moi" class="form-layout">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+  <section class="card">
+    <div class="card-head"><div><h2>Danh tính</h2><p class="muted">Thông tin dùng để đăng nhập và hiển thị.</p></div></div>
+    <div class="form-grid">
+      <label class="field">
+        <span class="field-label">ID đăng nhập <em>*</em></span>
+        <input type="text" name="id" required maxlength="40" autocapitalize="none" spellcheck="false"
+               placeholder="vd: nguyen.van.a" value="{{ form.get('id','') if form else '' }}">
+        <span class="hint">3–40 ký tự: a-z, 0-9, dấu chấm, gạch ngang, gạch dưới.</span>
+      </label>
+      <label class="field">
+        <span class="field-label">Tên hiển thị <em>*</em></span>
+        <input type="text" name="display_name" required maxlength="120" placeholder="Nguyễn Văn A"
+               value="{{ form.get('display_name','') if form else '' }}">
+      </label>
+      <label class="field">
+        <span class="field-label">Email</span>
+        <input type="email" name="email" maxlength="190" placeholder="a@vipgroup.com.vn"
+               value="{{ form.get('email','') if form else '' }}">
+      </label>
+      <label class="field">
+        <span class="field-label">Điện thoại</span>
+        <input type="tel" name="phone" maxlength="40" placeholder="09xx xxx xxx"
+               value="{{ form.get('phone','') if form else '' }}">
+      </label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div><h2>Vai trò &amp; phạm vi</h2><p class="muted">Chỉ gán được vai trò thấp hơn cấp của bạn.</p></div></div>
+    <div class="form-grid">
+      <label class="field">
+        <span class="field-label">Vai trò <em>*</em></span>
+        <select name="role_code" required data-role-select>
+          {% for r in vai_tro %}
+          <option value="{{ r.code }}" {% if form and form.get('role_code') == r.code %}selected{% endif %}>
+            {{ r.name }} · cấp {{ r.level }}
+          </option>
+          {% endfor %}
+        </select>
+        <span class="hint">Quản trị cấp dưới không thể tạo Super Admin hoặc vai trò ngang cấp.</span>
+      </label>
+      <label class="field">
+        <span class="field-label">Ban / Bộ phận</span>
+        <select name="department_id" data-dept-select>
+          <option value="">— Không thuộc ban —</option>
+          {% for b in ban_ds %}
+          <option value="{{ b.id }}" {% if form and form.get('department_id') == b.id %}selected{% endif %}>{{ b.name }}</option>
+          {% endfor %}
+        </select>
+        <span class="hint">Trưởng ban và nhân viên bắt buộc thuộc một ban.</span>
+      </label>
+      <label class="field" data-partner-field>
+        <span class="field-label">Tổ chức / Hợp đồng đối tác</span>
+        <input type="text" name="partner_org" maxlength="160" placeholder="Tên đối tác hoặc mã hợp đồng"
+               value="{{ form.get('partner_org','') if form else '' }}">
+      </label>
+    </div>
+
+    {% if co_scope_admin %}
+    <div class="scope-block" data-scope-block>
+      <div class="scope-head"><b>Phạm vi quản trị</b><span class="muted">Chỉ áp dụng cho vai trò Quản trị cấp dưới.</span></div>
+      <label class="radio-card"><input type="radio" name="scope_mode" value="tenant" checked>
+        <span><b>Toàn tenant VIP GROUP</b><small>Quản lý tài khoản và ban trong toàn bộ tenant.</small></span></label>
+      <label class="radio-card"><input type="radio" name="scope_mode" value="departments">
+        <span><b>Một số ban được chọn</b><small>Chỉ quản lý nhân sự thuộc các ban bên dưới.</small></span></label>
+      <div class="scope-depts">
+        {% for b in ban_ds %}
+        <label class="check-line"><input type="checkbox" name="scope_departments" value="{{ b.id }}"> {{ b.name }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div><h2>Bảo mật</h2><p class="muted">Mật khẩu chỉ lưu dạng băm scrypt, không thể đọc lại.</p></div></div>
+    <div class="form-grid">
+      <label class="field">
+        <span class="field-label">Mật khẩu ban đầu</span>
+        <input type="text" name="password" maxlength="200" autocomplete="new-password"
+               placeholder="Để trống — hệ thống sinh mật khẩu tạm">
+        <span class="hint">Nếu tự nhập: tối thiểu 10 ký tự, ít nhất 2 nhóm ký tự.</span>
+      </label>
+      <label class="check-line check-card">
+        <input type="checkbox" name="must_change" value="1" checked>
+        <span><b>Bắt buộc đổi mật khẩu lần đầu</b><small>Áp dụng khi quản trị tự nhập mật khẩu.</small></span>
+      </label>
+    </div>
+  </section>
+
+  <div class="form-actions">
+    <a class="btn btn-ghost" href="/tai-khoan">Huỷ</a>
+    <button class="btn btn-primary" type="submit">{{ ui.icon('plus', 18) }} Tạo tài khoản</button>
+  </div>
+</form>
+{% endblock %}

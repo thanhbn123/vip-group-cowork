@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="error-page">
+  <div class="error-code">403</div>
+  <h1>Không đủ quyền</h1>
+  <p class="muted">{{ thong_bao or 'Bạn không được cấp quyền thực hiện thao tác này.' }}</p>
+  <div class="error-actions">
+    <a class="btn btn-primary" href="/">Về bảng điều khiển</a>
+    <a class="btn btn-ghost" href="/ho-so">Xem quyền của tôi</a>
+  </div>
+  <p class="error-hint">Nếu cần quyền này, gửi yêu cầu tới quản trị viên ban hoặc Super Admin.</p>
+</section>
+{% endblock %}

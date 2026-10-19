@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="back-link" href="/vai-tro">{{ ui.icon('back', 16) }} Vai trò</a>
+    <div class="profile-head">
+      <span class="role-orb">{{ ui.icon('shield', 24) }}</span>
+      <div>
+        <h1>{{ role.name }}</h1>
+        <p class="muted">Cấp {{ role.level }} · {{ so_nguoi }} người đang dùng · {{ selected|length }} quyền</p>
+      </div>
+    </div>
+    <p class="muted">{{ role.description }}</p>
+  </div>
+  <div class="page-actions">
+    {% if role.is_locked %}<span class="badge status-warn">{{ ui.icon('lock', 12) }} Vai trò bị khoá</span>{% endif %}
+  </div>
+</section>
+
+{% if role.code == 'super_admin' %}
+<div class="callout gold">
+  <b>{{ ui.icon('shield', 16) }} Super Admin</b>
+  <p>Vai trò này luôn có đủ mọi quyền, kể cả quyền thêm sau này. Không thể sửa hoặc thu hồi.</p>
+</div>
+{% elif not co_sua %}
+<div class="callout">
+  <b>{{ ui.icon('lock', 16) }} Chỉ xem</b>
+  <p>Bạn không có quyền sửa ma trận vai trò.</p>
+</div>
+{% endif %}
+
+<form method="post" action="/vai-tro/{{ role.code }}">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <div class="perm-matrix">
+    {% for g in theo_module %}
+    <section class="card matrix-card">
+      <div class="card-head">
+        <div>
+          <h2>{{ ui.icon(g.module.icon, 18) }} {{ g.module.name }}</h2>
+          <p class="muted">{{ g.module.description }}</p>
+        </div>
+        <div class="matrix-tools">
+          <span class="badge status-muted">{{ g.so_chon }}/{{ g.perms|length }}</span>
+          {% if co_sua %}
+          <label class="check-line tiny"><input type="checkbox" data-check-all="#grp-{{ g.module.code }}"> Chọn tất cả</label>
+          {% endif %}
+        </div>
+      </div>
+      <div class="perm-checks" id="grp-{{ g.module.code }}">
+        {% for p in g.perms %}
+        <label class="perm-check {% if p.action == 'view' %}perm-view{% endif %}">
+          <input type="checkbox" name="quyen" value="{{ p.code }}" {% if p.code in selected %}checked{% endif %} {% if not co_sua %}disabled{% endif %}>
+          <span><b>{{ p.name }}</b><small>{{ p.code }}</small></span>
+        </label>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+
+  {% if co_sua %}
+  <div class="form-actions sticky-actions">
+    <a class="btn btn-ghost" href="/vai-tro">Huỷ</a>
+    <button class="btn btn-primary" type="submit">Lưu ma trận quyền</button>
+  </div>
+  {% endif %}
+</form>
+
+<div class="callout">
+  <b>Quyền “xem” là bắt buộc</b>
+  <p>Chọn một quyền hành động (tạo, sửa, xoá…) sẽ tự động bật quyền xem module tương ứng. Người dùng chỉ thấy module khi có quyền xem.</p>
+</div>
+{% endblock %}

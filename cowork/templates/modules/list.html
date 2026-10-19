@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">CẤU HÌNH HỆ THỐNG</p>
+    <h1>Module registry</h1>
+    <p class="muted">Bật/tắt module và kiểm soát thứ tự hiển thị trong COWORK.</p>
+  </div>
+  <div class="page-actions"><span class="badge status-muted">{{ rows|length }} module</span></div>
+</section>
+
+<div class="module-reg-list">
+  {% for m in rows %}
+  <section class="card module-reg-card {% if m.status != 'active' %}is-off{% endif %}">
+    <div class="module-reg-head">
+      <span class="module-ico">{{ ui.icon(m.icon, 22) }}</span>
+      <div class="module-reg-title">
+        <h2>{{ m.name }}</h2>
+        <p class="muted"><code>{{ m.code }}</code> · {{ m.route or '—' }} · {{ m.so_quyen }} quyền</p>
+      </div>
+      <div class="module-reg-badges">
+        {% if m.status == 'active' %}<span class="badge status-ok">Đang bật</span>{% else %}<span class="badge status-danger">Đã tắt</span>{% endif %}
+        {% if m.requires_brain %}<span class="badge status-info">{{ ui.icon('spark', 12) }} cần Brain</span>{% endif %}
+        <span class="badge status-muted">cấp {{ m.min_role_level }}+</span>
+      </div>
+      {% if co_sua %}
+      <form method="post" action="/module-registry/{{ m.code }}">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <input type="hidden" name="status" value="{{ 'disabled' if m.status == 'active' else 'active' }}">
+        <input type="hidden" name="name" value="{{ m.name }}">
+        <input type="hidden" name="description" value="{{ m.description or '' }}">
+        <button class="btn {{ 'btn-danger' if m.status == 'active' else 'btn-primary' }} btn-sm" type="submit">
+          {{ 'Tắt module' if m.status == 'active' else 'Bật module' }}
+        </button>
+      </form>
+      {% endif %}
+    </div>
+    <p class="module-reg-desc">{{ m.description }}</p>
+    {% if co_sua and m.code not in ('dashboard','accounts','settings') %}
+    <details class="inline-edit">
+      <summary>Sửa tên / mô tả</summary>
+      <form method="post" action="/module-registry/{{ m.code }}" class="form-grid">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <input type="hidden" name="status" value="{{ m.status }}">
+        <label class="field"><span class="field-label">Tên hiển thị</span>
+          <input type="text" name="name" value="{{ m.name }}" maxlength="120" required></label>
+        <label class="field span-2"><span class="field-label">Mô tả</span>
+          <textarea name="description" rows="2" maxlength="500">{{ m.description or '' }}</textarea></label>
+        <div class="form-actions left span-2"><button class="btn btn-primary btn-sm" type="submit">Lưu</button></div>
+      </form>
+    </details>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+
+<div class="callout">
+  <b>Module nền tảng không thể tắt</b>
+  <p>Bảng điều khiển, Tài khoản và Cài đặt luôn bật để tránh tự khoá hệ thống. Tắt một module sẽ ẩn module đó khỏi mọi người dùng ngay từ request kế tiếp.</p>
+</div>
+{% endblock %}

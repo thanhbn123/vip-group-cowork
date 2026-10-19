@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">CƠ CẤU TỔ CHỨC</p>
+    <h1>Ban / Bộ phận</h1>
+    <p class="muted">{{ rows|length }} ban đang hoạt động trong phạm vi của bạn.</p>
+  </div>
+  <div class="page-actions">
+    {% if co_tao %}<a class="btn btn-primary" href="/ban/tao-moi">{{ ui.icon('plus', 18) }} Tạo ban</a>{% endif %}
+  </div>
+</section>
+
+{% if rows %}
+<div class="dept-grid">
+  {% for d in rows %}
+  <a class="dept-card" href="/ban/{{ d.id }}">
+    <div class="dept-card-top">
+      <span class="module-ico">{{ ui.icon('building', 22) }}</span>
+      <span class="badge status-muted">{{ d.code }}</span>
+    </div>
+    <h2>{{ d.name }}</h2>
+    <p class="muted">{{ d.description or 'Chưa có mô tả.' }}</p>
+    <div class="dept-card-foot">
+      <span>{{ ui.icon('users', 15) }} {{ d.so_nguoi }} nhân sự</span>
+      <span>{{ ui.icon('user', 15) }} {{ d.manager_name or 'Chưa có trưởng ban' }}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">{{ ui.empty('Chưa có ban nào', 'Tạo ban đầu tiên để phân chia nhân sự và phạm vi quản trị.') }}</div>
+{% endif %}
+
+<div class="callout">
+  <b>Phạm vi quản trị</b>
+  <p>Trưởng ban chỉ thấy và quản lý nhân sự trong ban của mình. Quản trị cấp dưới chỉ thấy các ban được Super Admin uỷ quyền.</p>
+</div>
+{% endblock %}
