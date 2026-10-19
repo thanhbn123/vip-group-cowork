@@ -67,3 +67,22 @@ ssh viporder-staging
 cd /srv/vip-staging/cowork
 ./deploy/vps/deploy.sh
 ```
+
+## CUTOVER PRODUCTION — ĐÃ HOÀN TẤT (19/10/2026 20:26)
+
+- Caddy `cowork` → `127.0.0.1:8899` (VPS); đã restart container để nhận file mới.
+- Brain `COWORK_INTERNAL_URL=https://cowork.vipgroup.com.vn`.
+- Nghiệm thu 8/8 PASS; owner SSO/chat local thật; logout thu hồi Brain 401.
+- Backup VPS local cron **03:20**; offsite Synology **03:50**.
+- Backup/offsite Studio cũ đã tắt.
+- Rollback: Caddy về `18835` + restart; Brain internal về `http://127.0.0.1:8899`; bật lại backup Studio.
+- Chi tiết: `evidence/PRODUCTION-CUTOVER-20261019.md`.
+
+### Vận hành
+```bash
+ssh viporder-staging
+cd /srv/vip-staging/cowork
+./deploy/vps/deploy.sh          # cập nhật app
+./deploy/vps/backup.sh          # backup ngay
+crontab -l | grep cowork        # lịch 03:20
+```

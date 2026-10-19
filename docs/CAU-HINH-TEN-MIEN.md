@@ -197,3 +197,14 @@ Không dùng `docker cp` vào `/etc/caddy` vì mount read-only.
 - Backup trước fmt: `~/Caddyfile.bak-before-fmt-20261019-182534.txt` và `/data/Caddyfile.bak-before-fmt-20261019-182534`.
 - Hash sau fmt: `eea7ed56d9d373f14ec902cb17a8db71b5902fba06efa83cb7eb6aa1da95d86f`.
 - Public health/TLS không đổi.
+
+
+---
+
+## 8. CUTOVER UPSTREAM SANG VPS (19/10/2026 20:26)
+
+- `reverse_proxy 127.0.0.1:18835` → `127.0.0.1:8899`.
+- Caddyfile host sửa bằng `docker run ... sed`; do file bind-mount đổi inode, phải **restart container** để nhận nội dung mới (reload đơn thuần vẫn đọc file cũ).
+- Validate OK; public health 200; TLS giữ nguyên.
+- Hash trước `eea7ed56…d86f`; sau `c0ae5314…74ad`.
+- Backup trước cutover: `~/Caddyfile.bak-before-cutover-20261019-202511.txt` và `/data/Caddyfile.bak-before-cutover-20261019-202511`.

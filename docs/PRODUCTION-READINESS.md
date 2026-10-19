@@ -135,3 +135,14 @@
 - DB copy production: 7 user, 110 audit, schema 2, integrity ok; login owner 200.
 - **Chưa cutover**: Caddy vẫn 18835 → Studio; Brain internal vẫn Studio.
 - Cutover/rollback: `deploy/vps/README.md`; bằng chứng `evidence/VPS-staging-20261019.txt`.
+
+
+---
+
+## 8. CUTOVER VPS (19/10/2026 20:26)
+
+- COWORK production chạy VPS `127.0.0.1:8899`; Caddy upstream 8899.
+- Brain `COWORK_INTERNAL_URL=https://cowork.vipgroup.com.vn`.
+- Nghiệm thu 8/8; owner SSO/chat local; logout Brain 401.
+- Backup VPS local 03:20 + offsite Synology 03:50; backup/offsite Studio cũ đã tắt.
+- Chi tiết + rollback: `evidence/PRODUCTION-CUTOVER-20261019.md`.

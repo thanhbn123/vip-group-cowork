@@ -1,0 +1,18 @@
+{
+  "login": 303,
+  "launch": 303,
+  "vao": 303,
+  "brain_toi": 200,
+  "brain_user": "anh-thanh",
+  "chat": {
+    "status": 200,
+    "providerId": "local",
+    "nhan": "real",
+    "model": "qwen2.5:7b-instruct",
+    "taskId": "T-G02-000042",
+    "chiPhi": 0.0,
+    "len": 2
+  },
+  "logout": 303,
+  "brain_after_logout": 401
+}

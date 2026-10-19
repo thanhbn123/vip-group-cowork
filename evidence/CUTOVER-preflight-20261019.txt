@@ -1,0 +1,14 @@
+# CUTOVER PREFLIGHT — 2026-10-19 20:25:01 +0700
+## Production
+{"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T20:25:01+07:00"}}
+{"ok":true,"data":{"phienBan":"g02","gio":"2026-10-19T20:25:02+07:00","db":"ok"}}
+## Studio DB
+Backup: /Users/macstudio/VIP-AI/cowork/data/backups/cowork-20261019-202502.db · 7 users · 109 audit · integrity ok
+7
+109
+## Brain env
+COWORK_BRIDGE_BAT=1
+COWORK_INTERNAL_URL=http://127.0.0.1:8899
+COWORK_BRIDGE_ALLOW_MFA_USERS=1
+## Caddy
+eea7ed56d9d373f14ec902cb17a8db71b5902fba06efa83cb7eb6aa1da95d86f  /etc/caddy/Caddyfile

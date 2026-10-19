@@ -2,7 +2,7 @@
 
 **Ngày:** 19/10/2026 · **Controller:** DeepSeek · **Chủ dự án:** anh-thanh
 **Tên miền chính thức:** COWORK `https://cowork.vipgroup.com.vn` · Brain `https://ai.vipgroup.com.vn`
-**Trạng thái:** LOCAL/STAGING **ĐẠT** · PRODUCTION **ĐÃ GO-LIVE 19/10/2026**
+**Trạng thái:** LOCAL/STAGING **ĐẠT** · PRODUCTION **ĐÃ GO-LIVE 19/10/2026** · **CUTOVER VPS 20:26**
 
 ---
 

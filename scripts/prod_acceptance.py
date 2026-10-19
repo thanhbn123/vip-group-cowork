@@ -37,12 +37,14 @@ def c() -> httpx.Client:
 
 def login_owner(cl: httpx.Client) -> None:
     pw = (ROOT / "secrets" / "owner-anh-thanh.txt").read_text().strip()
-    mfa = (ROOT / "secrets" / "owner-mfa-anh-thanh.txt").read_text()
-    secret = re.search(r"Mã bí mật[^:]*:\s*([A-Z2-7]+)", mfa).group(1)
+    mfa_path = ROOT / "secrets" / "owner-mfa-anh-thanh.txt"
+    mfa = mfa_path.read_text() if mfa_path.exists() else ""
+    secret = re.search(r"Mã bí mật[^:]*:\s*([A-Z2-7]+)", mfa).group(1) if mfa else None
     r = cl.get(BASE + "/dang-nhap")
     r = cl.post(BASE + "/dang-nhap", data={
         "userId": "anh-thanh", "matKhau": pw, "_csrf": csrf(r.text), "next": "/"})
     if r.status_code == 303 and r.headers["location"].startswith("/dang-nhap/mfa"):
+        assert secret, "MFA đang bật nhưng thiếu file secret"
         page = cl.get(BASE + "/dang-nhap/mfa")
         r = cl.post(BASE + "/dang-nhap/mfa", data={
             "_csrf": csrf(page.text), "next": "/", "ma": security.totp(secret)})
@@ -63,7 +65,7 @@ def main() -> int:
                     "base": BASE, "brain": BRAIN, "tag": TAG}, "buoc": {}}
     owner = c()
     login_owner(owner)
-    out["buoc"]["B1"] = {"status": "PASS", "moTa": "Owner đăng nhập COWORK + MFA"}
+    out["buoc"]["B1"] = {"status": "PASS", "moTa": "Owner đăng nhập COWORK"}
 
     admin_id = f"prod-accept-admin-{TAG}"
     admin_pw = "Ad!" + secrets.token_urlsafe(10)

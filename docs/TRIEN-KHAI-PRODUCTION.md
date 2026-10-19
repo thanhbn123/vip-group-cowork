@@ -290,3 +290,14 @@ curl -sI https://cowork.vipgroup.com.vn/ | grep -Ei 'strict-transport|content-se
 - Smoke test production: owner login 303; tạo nhân viên 200; nhân viên 303; SSO Brain 303/200; chat local/real qwen2.5:7b-instruct, task `T-G02-000035`, chi phí 0; MFA owner 403 (trước 18:35); sau đó owner mở Brain 200, thu hồi COWORK 403/Brain 401; archive 303.
 - Backup COWORK: `com.vipgroup.cowork.backup` 03:20; bản `cowork-20261019-180321.db`.
 - Bằng chứng: `evidence/PRODUCTION-DEPLOY-20261019.md`, `evidence/PRODUCTION-smoke-20261019.json`.
+
+
+---
+
+## 9. CUTOVER SANG VPS (19/10/2026 20:26)
+
+- COWORK: VPS `127.0.0.1:8899` (container `cowork-staging`), Caddy `cowork` → 8899.
+- Brain: `COWORK_INTERNAL_URL=https://cowork.vipgroup.com.vn`.
+- Nghiệm thu 8/8; owner smoke PASS.
+- Backup VPS local 03:20; offsite Synology 03:50; Studio backup/offsite tắt.
+- Chi tiết: `evidence/PRODUCTION-CUTOVER-20261019.md`.

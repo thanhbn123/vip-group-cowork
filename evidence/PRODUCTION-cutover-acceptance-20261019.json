@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "batDau": "2026-10-19T20:26:49+07:00",
+    "base": "https://cowork.vipgroup.com.vn",
+    "brain": "https://ai.vipgroup.com.vn",
+    "tag": "202649",
+    "ketThuc": "2026-10-19T20:26:52+07:00",
+    "ketLuan": "PASS 8/8",
+    "daDon": [
+      "prod-accept-emp-202649",
+      "prod-accept-admin-202649"
+    ]
+  },
+  "buoc": {
+    "B1": {
+      "status": "PASS",
+      "moTa": "Owner đăng nhập COWORK + MFA"
+    },
+    "B2": {
+      "status": "PASS",
+      "moTa": "Owner tạo quản trị cấp dưới",
+      "id": "prod-accept-admin-202649"
+    },
+    "B3": {
+      "status": "PASS",
+      "moTa": "Quản trị tạo nhân viên Ban Kinh doanh",
+      "id": "prod-accept-emp-202649"
+    },
+    "B4": {
+      "status": "PASS",
+      "moTa": "Nhân viên đăng nhập"
+    },
+    "B5": {
+      "status": "PASS",
+      "moTa": "Chỉ 5 module; route admin 403",
+      "modules": [
+        "dashboard",
+        "brain",
+        "tasks",
+        "knowledge",
+        "usage"
+      ]
+    },
+    "B6": {
+      "status": "PASS",
+      "moTa": "SSO Brain một lần",
+      "brainUser": "prod-accept-emp-202649"
+    },
+    "B7": {
+      "status": "PASS",
+      "moTa": "Chat local thật",
+      "providerId": "local",
+      "nhan": "real",
+      "model": "qwen2.5:7b-instruct",
+      "chiPhi": 0.0,
+      "taskId": "T-G02-000041",
+      "doDaiTraLoi": 243
+    },
+    "B8": {
+      "status": "PASS",
+      "moTa": "Thu hồi Brain 403/401, cấp lại 200"
+    }
+  }
+}

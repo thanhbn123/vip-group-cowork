@@ -175,3 +175,16 @@ Rollback dữ liệu Brain chỉ dùng bản backup `vip-brain.bak-before-cowork
 | VPS authorized_keys | `~deploy/.ssh/authorized_keys.bak-before-cowork-20261019-180044` |
 
 **Không đổi DNS**, nên rollback không cần thao tác DNS.
+
+
+---
+
+## 9. ROLLBACK CUTOVER VPS (19/10/2026)
+
+- Caddy: sửa `127.0.0.1:8899` → `127.0.0.1:18835` trong block cowork; **restart** container
+  `vip-staging-caddy` (bind-mount inode), validate.
+- Brain: `COWORK_INTERNAL_URL=http://127.0.0.1:8899`; restart `com.vipai.brain.backend`.
+- Dữ liệu: nếu muốn giữ ghi chú sau cutover, copy DB VPS (`/data/cowork.db`) về Studio trước khi đổi Caddy.
+- Bật lại backup/offsite Studio nếu rollback lâu dài.
+- Backup Caddy: `~/Caddyfile.bak-before-cutover-20261019-202511.txt` + `/data/...`.
+- Backup Brain: `~/VIP-AI/backups/brain-env-before-cutover-20261019-202512`.
