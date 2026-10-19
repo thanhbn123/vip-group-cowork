@@ -36,7 +36,7 @@
 | Brain bridge | Ticket one-time 60s, HMAC hai chiều, phiên Brain native, thu hồi tức thời |
 | AI Local | Chat thật qua Ollama trên Mac Studio, không cloud/mock |
 | Tài liệu | README, khảo sát, tên miền, triển khai, rollback, nghiệm thu, ma trận yêu cầu |
-| Bộ test | **85 test PASS** (lõi + 5 làn agent + controller), full suite xanh |
+| Bộ test | **94 test PASS** (lõi + 5 làn agent + controller), full suite xanh |
 
 ---
 
@@ -74,7 +74,7 @@ VIP AI BRAIN staging (bản sao DB, 127.0.0.1:8892)
 | **AG-03 Admin/RBAC** | Vá 11 lỗ hổng (IDOR thu hồi phiên, di chuyển Super Admin qua ban, scope cho mọi non-super, fail-open scope, leo thang ma trận quyền, FK `.use`, archived hồi sinh, cross-tenant ban, rò audit…) | 20 test, `tests/test_admin_ag03.py`, `evidence/AG03-report.md` |
 | **AG-04 Brain** | Fix `.env` quote, bridge tự cấp `tong-hop/doc` cho shadow, backfill có điều kiện, mapping fail-closed, E2E thật first-time/backfill/revoke/MFA | 14 test, `tests/test_brain_ag04.py`, `evidence/AG04-report.md`, `AG04-e2e.json` |
 | **AG-05 QA** | Script nghiệm thu HTTP thật; **8/8 bước PASS, 6/6 bảo mật PASS, 0 FAIL, 0 BLOCKED** | 7 test, `scripts/acceptance.py`, `tests/test_e2e_ag05.py`, `evidence/AG05-report.md` |
-| **Controller** | IP sau proxy, logout thu hồi Brain, handler 404 HTML, chặn tenant B sửa cấu hình toàn cục, dọn scope khi lưu trữ, khoá lựa chọn `.use` không tồn tại, test controller, chạy lại SSO/chat/revoke/MFA độc lập | 9 test, `tests/test_controller_ops.py`, `evidence/controller-*` |
+| **Controller + MFA** | IP sau proxy, logout thu hồi Brain, handler 404 HTML, chặn tenant B sửa cấu hình toàn cục, dọn scope khi lưu trữ, khoá lựa chọn `.use` không tồn tại, test controller, chạy lại SSO/chat/revoke/MFA độc lập | 18 test, `tests/test_controller_ops.py`, `tests/test_mfa_controller.py`, `evidence/controller-*` |
 
 **Không làn nào sửa Brain production, Caddy/DNS, hay push/deploy.**
 
@@ -161,7 +161,7 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 
 | Rủi ro | Mức | Xử lý |
 |---|---|---|
-| COWORK chưa có MFA | Trung bình | Cân nhắc bổ sung TOTP cho Super Admin; hiện mật khẩu + rate limit |
+| COWORK MFA đã có nhưng owner chưa bật | Trung bình | Bật tại `/ho-so/mfa`; CLI `mfa-reset` là break-glass |
 | MFA owner chặn mở Brain qua COWORK | Có chủ đích | Giữ `ALLOW_MFA_USERS=0` tới khi chủ dự án nghiệm thu COWORK |
 | Offsite backup COWORK chưa tự động | Trung bình | Backup local 03:20 đã có; bổ sung mã hoá Synology nếu cần |
 | Access log ghi ticket query | Thấp | Ticket one-time/TTL 60s; tắt/lọc log hoặc chuyển POST khi lên thật |

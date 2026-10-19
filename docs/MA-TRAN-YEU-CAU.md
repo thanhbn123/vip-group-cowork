@@ -1,6 +1,6 @@
 # MA TRẬN TRUY VẾT YÊU CẦU — COWORK
 
-**Ngày:** 19/10/2026 · **Đã chốt sau khi 5 agent hoàn tất.** Full suite: 85 passed.
+**Ngày:** 19/10/2026 · **Đã chốt sau khi 5 agent hoàn tất.** Full suite: 94 passed.
 
 | # | Yêu cầu | Nơi triển khai | Kiểm chứng | Trạng thái |
 |---|---|---|---|---|
@@ -28,6 +28,7 @@
 | 22 | Không xây lại AI Brain | Không sửa DB/schema; bridge feature-flag | Snapshot production 7 users, DB ok | ✅ |
 | 23 | Không tắt bảo vệ cũ sớm | `MFA_BAT=1`; `ALLOW_MFA_USERS=0` | MFA 403 evidence | ✅ |
 | 24 | Không đụng DNS/public URL | DNS giữ nguyên; Caddy block thêm 19/10/2026, không đổi DNS | `docs/CAU-HINH-TEN-MIEN.md` | ✅ |
+| 26 | MFA TOTP cho COWORK | Enroll + login challenge + 10 mã dự phòng + CLI reset | `tests/test_mfa_controller.py`, `evidence/PRODUCTION-mfa-smoke-20261019.json` | ✅ |
 | 25 | Tên miền chính thức | `https://cowork.vipgroup.com.vn` live HTTPS + TLS | `evidence/PRODUCTION-DEPLOY-20261019.md` | ✅ |
 | 26 | Không tự deploy/push | Không chạy deploy; Git local baseline | `git log` local | ✅ |
 | 27 | Không kết nối dự án khác | Chỉ Brain; không thêm connector | Rà soát code | ✅ |
@@ -39,7 +40,7 @@
 
 ## KHOẢNG TRỐNG ĐÃ BIẾT (không được báo PASS production)
 
-3. COWORK chưa có MFA; chỉ mật khẩu.
+3. COWORK đã có MFA TOTP tuỳ chọn; owner production chưa bật.
 4. ~~IP thật sau proxy Caddy~~ — đã vá (`COWORK_TIN_PROXY=1`, `web.ip_cua`); audit production ghi `14.190.214.49`.
 5. Đăng xuất COWORK chưa thu hồi phiên Brain (nếu chủ dự án yêu cầu).
 6. Brain production còn nợ cũ: `/api/settings` authz gap, header chưa persist — không do COWORK.

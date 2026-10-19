@@ -18,6 +18,7 @@
   - **Local:** `cowork/secrets/owner-anh-thanh.txt`.
 - [ ] Production chỉ có owner + tài khoản QA đã lưu trữ; các tài khoản demo `quan-tri-01`, `nhan-vien-01` chỉ tồn tại ở local.
 - [ ] Không dùng chung cookie giữa các cửa sổ.
+- [ ] *(Khuyến nghị, không bắt buộc)* Bật MFA cho `anh-thanh` tại `/ho-so/mfa` sau khi đăng nhập; lưu 10 mã dự phòng. Nếu bật, lần đăng nhập sau cần mã TOTP; mất thiết bị dùng CLI `mfa-reset`.
 
 ---
 

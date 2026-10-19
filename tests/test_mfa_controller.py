@@ -136,3 +136,21 @@ def test_bat_mfa_qua_giao_dien(client, owner):
     finally:
         conn.close()
     assert client.get("/ho-so/mfa").status_code == 200
+
+
+def test_luu_tru_xoa_mfa_va_ma_du_phong(client, owner):
+    tao_user("employee", "mfa-arch", dept="kinh-doanh")
+    _bat_mfa("mfa-arch")
+    from cowork import rbac, services
+    conn = db.connect()
+    try:
+        actor = auth.nguoi_dung_day_du(conn, "anh-thanh")
+        perms = rbac.quyen_hieu_luc(conn, actor)
+        target = auth.nguoi_dung_day_du(conn, "mfa-arch")
+        services.luu_tru_nguoi_dung(conn, actor, perms, target)
+        target = auth.nguoi_dung_day_du(conn, "mfa-arch")
+        assert target["status"] == "archived"
+        assert target["mfa_enabled"] == 0 and not target["mfa_secret"]
+        assert auth.ma_du_phong_con_lai(conn, "mfa-arch") == 0
+    finally:
+        conn.close()

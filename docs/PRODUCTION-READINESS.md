@@ -25,7 +25,7 @@
 | Tunnel 18835 | ✅ đang chạy | khóa riêng, permitlisten 18835 |
 | Bridge Brain production | ✅ đã áp dụng | backup + smoke production PASS |
 | Sao lưu COWORK định kỳ | ✅ LaunchAgent 03:20 | bản test 19/10/2026 |
-| MFA cho COWORK | ❌ chưa có | chỉ mật khẩu; Super Admin nên cân nhắc bổ sung |
+| MFA cho COWORK | ✅ đã có TOTP tuỳ chọn | bật `/ho-so/mfa`; owner chưa bật |
 | IP thật sau proxy | ✅ đã vá | `COWORK_TIN_PROXY=1` + `web.ip_cua` đọc `X-Real-IP`; `run.sh --no-proxy-headers` |
 | Trusted host / HSTS | ✅ sau Caddy | HSTS bật khi `X-Forwarded-Proto=https` |
 
@@ -43,21 +43,22 @@
 - `auth_routes.dang_xuat` gọi `brain.thu_hoi_phien()` khi user có `brain.view`; phiên Brain native bị thu hồi ngay, audit ghi `brainRevoke`.
 - Test: `tests/test_controller_ops.py::test_dang_xuat_thu_hoi_phien_brain`.
 
-### 2.3. MFA cho Super Admin COWORK (khuyến nghị)
-- COWORK hiện chỉ mật khẩu. Nếu public Internet, nên thêm TOTP cho `super_admin`/`admin` hoặc giới hạn IP quản trị.
-- Không bắt buộc cho nghiệm thu hiện tại, nhưng là rủi ro còn lại.
+### 2.3. MFA cho COWORK — ĐÃ TRIỂN KHAI (tuỳ chọn)
+- TOTP 6 số, challenge 5 phút, 10 mã dự phòng dùng một lần, CLI `mfa-reset` break-glass.
+- Bật tại `/ho-so/mfa`; owner production **chưa bật** — nên bật trước khi mở rộng admin.
+- Test: `tests/test_mfa_controller.py` (8 test); smoke production `evidence/PRODUCTION-mfa-smoke-20261019.json`.
 
-### 2.4. Caddy/Header
-- Caddy block đã soạn; cần kiểm tra `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` sau khi public.
-- Caddyfile root-owned; luôn sao lưu trước khi sửa.
+### 2.4. Caddy/Header — ĐÃ KIỂM TRA SAU PUBLIC
+- Caddy block đã áp dụng 19/10/2026; TLS + header đã kiểm tra: CSP, HSTS, X-Frame-Options DENY, nosniff, Referrer-Policy.
+- Caddyfile root-owned + mount read-only; luôn sao lưu và dùng `docker run -v` để sửa.
 
 ### 2.5. Brain production
 - Bridge mặc định `COWORK_BRIDGE_ALLOW_MFA_USERS=0`; giữ nguyên tới nghiệm thu.
 - Brain `/api/settings` authz gap và header chưa persist là nợ cũ của Brain, không do COWORK; ghi nhận để chủ dự án xử lý riêng.
 - Không xoá dữ liệu test Brain nếu chưa có phê duyệt.
 
-### 2.6. Vận hành
-- LaunchAgent COWORK + backup + tunnel cần cài theo `docs/TRIEN-KHAI-PRODUCTION.md`.
+### 2.6. Vận hành — ĐÃ CÀI
+- LaunchAgent COWORK + backup 03:20 + tunnel đã cài; health public 200.
 - Giám sát `/api/health` và dung lượng DB.
 - Log COWORK/uvicorn không chứa mật khẩu/token; audit không chứa bí mật.
 
@@ -117,4 +118,4 @@
 - COWORK LaunchAgent pid 18460; tunnel 18533; Brain pid 18620.
 - Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, MFA owner 403, thu hồi 403/401, archive.
 - Biên bản: `evidence/PRODUCTION-DEPLOY-20261019.md`; smoke: `evidence/PRODUCTION-smoke-20261019.json`.
-- **Còn lại:** MFA COWORK, offsite backup COWORK, owner mở Brain qua COWORK (`ALLOW_MFA_USERS=0`).
+- **Còn lại:** owner bật MFA, offsite backup COWORK, owner mở Brain qua COWORK (`ALLOW_MFA_USERS=0`).

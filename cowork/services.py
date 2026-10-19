@@ -260,10 +260,12 @@ def luu_tru_nguoi_dung(conn: sqlite3.Connection, actor: dict, perms: set[str], t
     rbac.kiem_tra_quan_ly(conn, actor, perms, target, "accounts.archive")
     if target["role_code"] == rbac.SUPER:
         raise Forbidden("Không thể lưu trữ Super Admin.")
-    conn.execute("UPDATE users SET status='archived', updated_at=? WHERE id=?",
-                 (db.now_iso(), target["id"]))
-    # Scope quản trị của tài khoản đã lưu trữ không còn giá trị.
+    conn.execute("UPDATE users SET status='archived', mfa_enabled=0, mfa_secret=NULL, "
+                 "updated_at=? WHERE id=?", (db.now_iso(), target["id"]))
+    # Scope/MFA của tài khoản đã lưu trữ không còn giá trị.
     conn.execute("DELETE FROM admin_scopes WHERE user_id=?", (target["id"],))
+    conn.execute("DELETE FROM mfa_backup_codes WHERE user_id=?", (target["id"],))
+    conn.execute("DELETE FROM mfa_challenges WHERE user_id=?", (target["id"],))
     conn.commit()
     auth.thu_hoi_cua_user(conn, target["id"], actor["id"], "Tài khoản bị lưu trữ")
     brain.thu_hoi_phien(conn, target["id"], "COWORK lưu trữ tài khoản")

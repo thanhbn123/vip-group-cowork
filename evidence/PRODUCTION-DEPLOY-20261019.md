@@ -129,3 +129,24 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
 5. **HEAD `/` trả 405** (FastAPI chỉ có GET); health check dùng `/api/health`.
 6. **Nhân viên QA `prod-qa-180302`** đã lưu trữ, audit còn; không xoá cứng.
 7. **Caddy backup `/data`** đã có; host backup ở `/home/deploy/`.
+
+---
+
+## 8. BỔ SUNG MFA TOTP (19/10/2026 18:11)
+
+- Backup trước khi deploy:
+  - Code: `~/VIP-AI/backups/cowork-code-before-mfa-20261019-181120.tar.gz`
+  - DB: `data/backups/cowork-20261019-181120.db` (schema 1, 2 user, 11 audit)
+  - `.env`: `~/VIP-AI/backups/cowork-env-before-mfa-20261019-181120`
+- Migration tự động khi restart: schema **1 → 2**, thêm `users.mfa_enabled`, `users.mfa_secret`, bảng `mfa_challenges`, `mfa_backup_codes`; dữ liệu cũ giữ nguyên.
+- Health sau restart: 200; users vẫn 2; 2 user MFA columns; 2 bảng MFA.
+- Smoke production với admin tạm `prod-mfa-181144`:
+  - Tạo admin 200 · login trước MFA 303 · bật MFA 200 · logout 303
+  - Login mật khẩu → **303 `/dang-nhap/mfa`**
+  - Nhập TOTP → **303 `/`**, `/api/me` 200
+  - Owner archive admin 303
+- Bằng chứng: `evidence/PRODUCTION-mfa-smoke-20261019.json`.
+- Admin test `prod-mfa-181138` (lần chạy lỗi PYTHONPATH) và `prod-mfa-181144` đã lưu trữ; audit còn.
+- **Owner production chưa bật MFA**; bật tại `https://cowork.vipgroup.com.vn/ho-so/mfa`.
+- Break-glass: `ssh vip-ai-studio 'cd ~/VIP-AI/cowork && .venv/bin/python -m cowork.cli mfa-reset --id <id>'`.
+- Test local: `tests/test_mfa_controller.py` 8 test; full suite **94 passed**.

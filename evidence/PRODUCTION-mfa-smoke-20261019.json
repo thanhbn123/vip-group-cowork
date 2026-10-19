@@ -1,0 +1,13 @@
+{
+  "tag": "181144",
+  "steps": {
+    "create_admin": 200,
+    "login_before_mfa": 303,
+    "enable_mfa": 200,
+    "logout": 303,
+    "password_only_redirect": "/dang-nhap/mfa?next=/",
+    "login_with_totp": 303,
+    "archive": 303
+  },
+  "secret_len": 32
+}

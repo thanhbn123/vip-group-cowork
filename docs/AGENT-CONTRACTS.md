@@ -126,8 +126,8 @@ Bridge đã import OK sau khi vá `apply_bridge.py`.
 | AG-03 Admin/RBAC | 20 | `evidence/AG03-report.md` |
 | AG-04 Brain | 14 | `evidence/AG04-report.md` |
 | AG-05 QA | 7 | `evidence/AG05-report.md` |
-| Controller | 9 | `tests/test_controller_ops.py` |
-| **Tổng** | **85 passed** | `evidence/FINAL-pytest.log` |
+| Controller + MFA | 18 | `tests/test_controller_ops.py` |
+| **Tổng** | **94 passed** | `evidence/FINAL-pytest.log` |
 
 - Nghiệm thu cuối: **8/8 bước PASS · 6/6 bảo mật PASS · 0 FAIL · 0 BLOCKED**.
 - Không làn nào sửa Brain production/Caddy/DNS; không push/deploy/commit.
