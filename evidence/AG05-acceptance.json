@@ -2,9 +2,9 @@
   "meta": {
     "agent": "AG-05 QA & SECURITY",
     "duAn": "VIP GROUP COWORK",
-    "batDau": "2026-10-19T17:53:03+07:00",
-    "ketThuc": "2026-10-19T17:53:07+07:00",
-    "runTag": "20261019-175303",
+    "batDau": "2026-10-19T17:55:31+07:00",
+    "ketThuc": "2026-10-19T17:55:34+07:00",
+    "runTag": "20261019-175531",
     "cowork": "http://127.0.0.1:8899",
     "brain": "http://127.0.0.1:8892",
     "brainProductionGuard": "không chạm 127.0.0.1:8891 / ai.vipgroup.com.vn",
@@ -16,14 +16,14 @@
         "version": "1.0.0",
         "db": "ok",
         "brain": "bat",
-        "gio": "2026-10-19T17:53:03+07:00"
+        "gio": "2026-10-19T17:55:31+07:00"
       }
     },
     "brainHealth": {
       "http": 200,
       "data": {
         "phienBan": "g02",
-        "gio": "2026-10-19T17:53:03+07:00",
+        "gio": "2026-10-19T17:55:31+07:00",
         "db": "ok"
       },
       "ok": true
@@ -44,8 +44,8 @@
       "id": "B1",
       "name": "Chủ sở hữu đăng nhập COWORK",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "startedAt": "2026-10-19T17:55:31+07:00",
+      "finishedAt": "2026-10-19T17:55:31+07:00",
       "http": [
         {
           "method": "GET",
@@ -81,8 +81,8 @@
       "id": "B2",
       "name": "Tạo quản trị cấp dưới mới (qa-admin-*)",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "startedAt": "2026-10-19T17:55:31+07:00",
+      "finishedAt": "2026-10-19T17:55:31+07:00",
       "http": [
         {
           "method": "GET",
@@ -96,12 +96,12 @@
         },
         {
           "method": "GET",
-          "url": "/tai-khoan/qa-admin-20261019-175303",
+          "url": "/tai-khoan/qa-admin-20261019-175531",
           "status": 200
         }
       ],
       "details": {
-        "id": "qa-admin-20261019-175303",
+        "id": "qa-admin-20261019-175531",
         "vaiTro": "admin",
         "ban": "ban-dieu-hanh",
         "trangThai": "active",
@@ -119,8 +119,8 @@
       "id": "B3",
       "name": "Quản trị tạo nhân viên Ban Kinh doanh (qa-emp-*)",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "startedAt": "2026-10-19T17:55:31+07:00",
+      "finishedAt": "2026-10-19T17:55:31+07:00",
       "http": [
         {
           "method": "GET",
@@ -154,15 +154,15 @@
         },
         {
           "method": "GET",
-          "url": "/tai-khoan/qa-emp-20261019-175303",
+          "url": "/tai-khoan/qa-emp-20261019-175531",
           "status": 200
         }
       ],
       "details": {
-        "id": "qa-emp-20261019-175303",
+        "id": "qa-emp-20261019-175531",
         "vaiTro": "employee",
         "ban": "kinh-doanh",
-        "nguoiTao": "qa-admin-20261019-175303",
+        "nguoiTao": "qa-admin-20261019-175531",
         "trangThai": "active",
         "xacMinhDb": true,
         "xacMinhHttp": 200,
@@ -176,8 +176,8 @@
       "id": "B4",
       "name": "Nhân viên đăng nhập",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "startedAt": "2026-10-19T17:55:31+07:00",
+      "finishedAt": "2026-10-19T17:55:32+07:00",
       "http": [
         {
           "method": "GET",
@@ -201,7 +201,7 @@
         }
       ],
       "details": {
-        "nguoiDung": "qa-emp-20261019-175303",
+        "nguoiDung": "qa-emp-20261019-175531",
         "vaiTro": "employee",
         "ban": "Ban Kinh doanh",
         "modules": [
@@ -218,8 +218,8 @@
       "id": "B5",
       "name": "Nhân viên chỉ thấy module được cấp",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "startedAt": "2026-10-19T17:55:32+07:00",
+      "finishedAt": "2026-10-19T17:55:32+07:00",
       "http": [
         {
           "method": "GET",
@@ -316,8 +316,8 @@
       "id": "B6",
       "name": "Mở VIP AI Brain từ COWORK (SSO ticket)",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "startedAt": "2026-10-19T17:55:32+07:00",
+      "finishedAt": "2026-10-19T17:55:32+07:00",
       "http": [
         {
           "method": "GET",
@@ -352,7 +352,7 @@
         "bridgeVao": 303,
         "brainToi": {
           "http": 200,
-          "userId": "qa-emp-20261019-175303",
+          "userId": "qa-emp-20261019-175531",
           "vaiTro": "thanh-vien",
           "tenantId": "vip-group"
         },
@@ -372,8 +372,8 @@
       "id": "B7",
       "name": "Chat thật với AI Local (local/real)",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:03+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:32+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "POST",
@@ -388,9 +388,9 @@
         "meta": {
           "provider": "local",
           "model": "qwen2.5:7b-instruct",
-          "doTreMs": 3682,
+          "doTreMs": 1796,
           "tokenVao": 62,
-          "tokenRa": 271,
+          "tokenRa": 160,
           "chiPhi": 0.0,
           "giaCo": false
         },
@@ -399,9 +399,9 @@
           "luat": null,
           "lyDo": "Người dùng ép chọn"
         },
-        "taskId": "T-G02-000024",
-        "doDaiTraLoi": 961,
-        "traLoiTrich": "Xin chào! Tôi xin được giới thiệu rằng tôi là Qwen, một trợ lý AI do Alibaba Cloud phát triển. Tôi có thể hỗ trợ bạn với nhiều chức năng khác nhau. Tuy nhiên, về mặt kỹ thuật, tôi không xác định được liệu yêu cầu của bạn có được xử lý bởi mô hình AI Local hay không, vì thông tin này không nằm trong phạm vi tôi có thể truy cập.\n\nTuy nhiên, tôi có thể hỗ trợ bạn với các chức năng sau:\n\n1. **Trả lời ",
+        "taskId": "T-G02-000026",
+        "doDaiTraLoi": 549,
+        "traLoiTrich": "Xin chào! Tôi là Qwen, một trợ lý AI do Alibaba Cloud tạo ra. Dù tên gọi có thể khiến bạn nghĩ tôi hoạt động như một hệ thống AI cục bộ, nhưng thực tế, tôi là một mô hình AI dựa trên đám mây và có khả năng xử lý yêu cầu của bạn một cách hiệu quả. \n\nTôi có thể giúp bạn với nhiều chức năng khác nhau, bao gồm nhưng không giới hạn ở việc:\n- Trả lời câu hỏi thông tin\n- Trợ lý cuộc trò chuyện tự nhiên\n-",
         "biChan": 0
       }
     },
@@ -409,8 +409,8 @@
       "id": "B8",
       "name": "Thu hồi quyền Brain + phiên Brain cũ",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "GET",
@@ -419,7 +419,7 @@
         },
         {
           "method": "POST",
-          "url": "/tai-khoan/qa-emp-20261019-175303/phan-quyen",
+          "url": "/tai-khoan/qa-emp-20261019-175531/phan-quyen",
           "status": 303
         },
         {
@@ -444,7 +444,7 @@
         }
       ],
       "details": {
-        "thoiDiemThuHoi": "2026-10-19T17:53:07+07:00",
+        "thoiDiemThuHoi": "2026-10-19T17:55:34+07:00",
         "nguoiThucHien": "anh-thanh (super_admin)",
         "hinhThuc": "thu hồi quyền module brain (user_permissions deny)",
         "dbQuyen": [
@@ -469,8 +469,8 @@
       "id": "S1",
       "name": "Không cookie → 303/401",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "GET",
@@ -499,8 +499,8 @@
       "id": "S2",
       "name": "Thiếu/sai CSRF → 403",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "POST",
@@ -534,8 +534,8 @@
       "id": "S3",
       "name": "Nhân viên gọi route quản trị → 403",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "GET",
@@ -579,7 +579,7 @@
         },
         {
           "method": "POST",
-          "url": "/tai-khoan/qa-admin-20261019-175303/khoa",
+          "url": "/tai-khoan/qa-admin-20261019-175531/khoa",
           "status": 303
         }
       ],
@@ -604,8 +604,8 @@
       "id": "S4",
       "name": "Cross-tenant: b-admin không đọc được anh-thanh → 404",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "GET",
@@ -660,8 +660,8 @@
       "id": "S5",
       "name": "Phiên bị thu hồi → 303 /dang-nhap",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "GET",
@@ -670,7 +670,7 @@
         },
         {
           "method": "POST",
-          "url": "/tai-khoan/qa-admin-20261019-175303/thu-hoi-phien",
+          "url": "/tai-khoan/qa-admin-20261019-175531/thu-hoi-phien",
           "status": 303
         },
         {
@@ -696,8 +696,8 @@
       "id": "S6",
       "name": "Cổng bridge Brain fail-closed",
       "status": "PASS",
-      "startedAt": "2026-10-19T17:53:07+07:00",
-      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "startedAt": "2026-10-19T17:55:34+07:00",
+      "finishedAt": "2026-10-19T17:55:34+07:00",
       "http": [
         {
           "method": "GET",
@@ -717,10 +717,10 @@
     }
   ],
   "donDep": {
-    "batDau": "2026-10-19T17:53:07+07:00",
+    "batDau": "2026-10-19T17:55:34+07:00",
     "taiKhoan": {
       "admin": {
-        "id": "qa-admin-20261019-175303",
+        "id": "qa-admin-20261019-175531",
         "hanhDong": [
           {
             "thuHoiPhien": 303
@@ -733,7 +733,7 @@
         "ketQua": "PASS"
       },
       "employee": {
-        "id": "qa-emp-20261019-175303",
+        "id": "qa-emp-20261019-175531",
         "hanhDong": [
           {
             "thuHoiPhien": 303
@@ -746,7 +746,7 @@
         "ketQua": "PASS"
       }
     },
-    "ketThuc": "2026-10-19T17:53:07+07:00",
+    "ketThuc": "2026-10-19T17:55:34+07:00",
     "ghiChu": "Tài khoản QA đã lưu trữ (archived), không xoá cứng; bản ghi audit còn nguyên."
   },
   "tongHop": {
