@@ -4,7 +4,7 @@
   <key>Label</key><string>com.vipgroup.cowork.offsite</string>
   <key>ProgramArguments</key><array>
     <string>/bin/sh</string>
-    <string>/Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/VIP GROUP ID/cowork/scripts/backup-cowork-offsite.sh</string>
+    <string>/Users/viporder/VIP-AI/bin/backup-cowork-offsite.sh</string>
   </array>
   <key>StartCalendarInterval</key><dict>
     <key>Hour</key><integer>3</integer>

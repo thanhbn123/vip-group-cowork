@@ -42,3 +42,11 @@ cp /srv/vip-staging-proxy/Caddyfile \
   (sao lưu trước; validate + reload sau).
 - Tunnel COWORK dùng khóa riêng `id_ed25519_cowork_vps_tunnel`, đã thêm `permitlisten="127.0.0.1:18835"` vào
   `~deploy/.ssh/authorized_keys`.
+
+## Offsite COWORK
+
+- `com.vipgroup.cowork.offsite.plist` chạy 03:40, gọi `~/VIP-AI/bin/backup-cowork-offsite.sh`.
+- Script nguồn: `scripts/backup-cowork-offsite.sh`; cài:
+  `cp scripts/backup-cowork-offsite.sh ~/VIP-AI/bin/ && cp deploy/com.vipgroup.cowork.offsite.plist ~/Library/LaunchAgents/`
+  rồi `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.vipgroup.cowork.offsite.plist`.
+- Đích: `SAO LUU VPS/VIP-AI-COWORK`, mã hoá AES-256, retention 14.
