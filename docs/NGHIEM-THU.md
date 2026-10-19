@@ -1,19 +1,22 @@
 # NGHIỆM THU COWORK — 8 BƯỚC DÀNH CHO CHỦ DỰ ÁN
 
 **Người nghiệm thu:** anh-thanh (Super Admin)
-**Môi trường hiện tại:** local/staging — `http://127.0.0.1:8899` + Brain staging `http://127.0.0.1:8892`
-**Môi trường production (sau phê duyệt):** `https://cowork.vipgroup.com.vn` + `https://ai.vipgroup.com.vn`
+**Môi trường hiện tại:** ✅ production — `https://cowork.vipgroup.com.vn` + Brain `https://ai.vipgroup.com.vn` (local vẫn dùng được: `127.0.0.1:8899` / `8892`)
+**Môi trường production:** đã live từ 19/10/2026 — dùng tên miền chính thức.
 **Nguyên tắc:** chỉ đánh **PASS** khi thao tác thật, AI Local trả lời thật; **không** chấp nhận MOCK.
 
 ---
 
 ## 0. CHUẨN BỊ
 
-- [ ] COWORK đang chạy (`/api/health` trả `ok`).
-- [ ] Brain staging đang chạy (`127.0.0.1:8892/api/health` trả `ok`) và bridge bật.
-- [ ] Ollama tunnel `127.0.0.1:11434` hoạt động; model `qwen2.5:7b-instruct` có thật.
+- [ ] COWORK production: `https://cowork.vipgroup.com.vn/api/health` trả `ok`.
+- [ ] Brain production: `https://ai.vipgroup.com.vn/api/health` trả `ok`; bridge `https://ai.vipgroup.com.vn/api/cowork/suc-khoe` bật.
+- [ ] AI Local trên Mac Studio hoạt động; model `qwen2.5:7b-instruct` có thật (không cần tunnel khi nghiệm thu production).
 - [ ] Có 3 cửa sổ trình duyệt riêng (hoặc 3 profile/incognito) cho Super Admin, Quản trị, Nhân viên.
-- [ ] Mật khẩu `anh-thanh` đọc từ `secrets/owner-anh-thanh.txt` (local) hoặc bàn giao bảo mật (production).
+- [ ] Mật khẩu `anh-thanh`:
+  - **Production:** `ssh vip-ai-studio 'cat ~/VIP-AI/cowork/secrets/owner-anh-thanh.txt'` (file 0600).
+  - **Local:** `cowork/secrets/owner-anh-thanh.txt`.
+- [ ] Production chỉ có owner + tài khoản QA đã lưu trữ; các tài khoản demo `quan-tri-01`, `nhan-vien-01` chỉ tồn tại ở local.
 - [ ] Không dùng chung cookie giữa các cửa sổ.
 
 ---

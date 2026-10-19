@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.vipgroup.cowork.backup</string>
+  <key>ProgramArguments</key><array>
+    <string>/bin/sh</string>
+    <string>-lc</string>
+    <string>cd /Users/macstudio/VIP-AI/cowork &amp;&amp; .venv/bin/python -m cowork.cli backup &gt;&gt; logs/backup.log 2&gt;&amp;1</string>
+  </array>
+  <key>StartCalendarInterval</key><dict>
+    <key>Hour</key><integer>3</integer>
+    <key>Minute</key><integer>20</integer>
+  </dict>
+  <key>RunAtLoad</key><false/>
+  <key>ProcessType</key><string>Background</string>
+  <key>StandardOutPath</key><string>/Users/macstudio/Library/Logs/VIPAI/cowork-backup.log</string>
+  <key>StandardErrorPath</key><string>/Users/macstudio/Library/Logs/VIPAI/cowork-backup.err.log</string>
+</dict></plist>

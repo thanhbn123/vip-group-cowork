@@ -1,0 +1,35 @@
+{
+  "tag": "180302",
+  "steps": {
+    "owner_login": 303,
+    "create_employee": 200,
+    "employee_login": 303,
+    "brain_sso": 303,
+    "chat": 200,
+    "owner_mfa_guard": 403,
+    "revoke": 303,
+    "revoke_verified": {
+      "cowork": 403,
+      "brain_toi": 401
+    },
+    "restore": 303,
+    "archive": 303
+  },
+  "employee": "prod-qa-180302",
+  "modules": [
+    "dashboard",
+    "brain",
+    "tasks",
+    "knowledge",
+    "usage"
+  ],
+  "brain_user": "prod-qa-180302",
+  "chat": {
+    "providerId": "local",
+    "nhan": "real",
+    "model": "qwen2.5:7b-instruct",
+    "chiPhi": 0.0,
+    "taskId": "T-G02-000035",
+    "doDaiTraLoi": 901
+  }
+}

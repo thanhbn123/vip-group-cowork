@@ -2,7 +2,7 @@
 
 **Ngày:** 19/10/2026 · **Controller:** DeepSeek · **Chủ dự án:** anh-thanh
 **Tên miền chính thức:** COWORK `https://cowork.vipgroup.com.vn` · Brain `https://ai.vipgroup.com.vn`
-**Trạng thái:** LOCAL/STAGING **ĐẠT** · PRODUCTION **CHƯA TRIỂN KHAI** (chờ phê duyệt)
+**Trạng thái:** LOCAL/STAGING **ĐẠT** · PRODUCTION **ĐÃ GO-LIVE 19/10/2026**
 
 ---
 
@@ -13,7 +13,7 @@
 3. **COWORK đã được xây dựng mới**, tách biệt Brain: FastAPI + SQLite riêng, 5 vai trò, module registry, tenant, audit, phiên, phân quyền, 15 màn hình.
 4. **Cầu nối COWORK ↔ Brain đã chạy thật trên staging**: ticket one-time + HMAC → phiên Brain native → chat AI Local `qwen2.5:7b-instruct`, `providerId=local`, `nhan=real`, chi phí 0; thu hồi quyền chặn ngay cả COWORK và phiên Brain.
 5. **Nghiệm thu kỹ thuật 8/8 bước + 6/6 bảo mật E2E đạt** (AG-05), có bằng chứng HTTP/JSON; controller cũng tự chạy lại độc lập.
-6. **Tên miền `cowork.vipgroup.com.vn` đã có DNS đúng nhưng chưa có site block Caddy/TLS.** Không thay đổi gì; khối Caddy soạn sẵn, chờ duyệt.
+6. **Tên miền `cowork.vipgroup.com.vn` đã live HTTPS/TLS** từ 19/10/2026; chủ dự án đã duyệt cả 3 cổng.
 7. **MFA Brain vẫn bật**: `anh-thanh` mở Brain qua COWORK bị chặn 403 có chủ ý cho tới khi COWORK được nghiệm thu an toàn. Nhân viên không MFA mở bình thường.
 
 > **Một câu:** COWORK đã sẵn sàng để chủ dự án nghiệm thu tại local/staging; production là 3 cổng có phê duyệt, không tự deploy.
@@ -118,16 +118,22 @@ Brain /api/auth/toi trước: 200 → sau: 401
 
 ---
 
+### 5.7. Diễn tập rollback & validate Caddy (19/10/2026)
+- `./scripts/rollback-drill.sh`: **PASS** — backup 17 user/275 audit integrity `ok`; restore counts khớp; server trên DB khôi phục cổng 8902 đăng nhập `anh-thanh` PASS, 15 module; xoá DB tạm.
+- Caddy block `cowork`: **đã áp dụng**, `caddy validate` **Valid configuration**, reload OK; cert Let’s Encrypt hạn 17/01/2027; hash `be7a8ef8…5434`.
+
+---
+
 ## 6. TÊN MIỀN & TRIỂN KHAI
 
 | Hạng mục | Trạng thái |
 |---|---|
 | DNS `cowork.vipgroup.com.vn` | ✅ A → `160.22.170.20`; không cần đổi |
 | DNS `ai.vipgroup.com.vn` | ✅ giữ nguyên |
-| Caddy block `cowork` | ⏳ **chưa áp dụng**; khối soạn sẵn `deploy/Caddyfile.cowork` |
-| TLS `cowork` | ⏳ chưa có cert; hiện HTTPS lỗi (đúng trạng thái trước triển khai) |
-| Tunnel COWORK `18835` | ⏳ chưa bật; tách khỏi `18834` của Brain |
-| Brain bridge production | ⏳ chưa áp dụng; đang staging |
+| Caddy block `cowork` | ✅ đã áp dụng 19/10/2026; validate/reload OK; backup đã lưu |
+| TLS `cowork` | ✅ Let’s Encrypt `CN=cowork.vipgroup.com.vn`, hạn 17/01/2027 |
+| Tunnel COWORK `18835` | ✅ đang chạy, tách khỏi `18834` của Brain |
+| Brain bridge production | ✅ đã áp dụng; bridge bật, MFA giữ nguyên |
 
 **Ba cổng cần chủ dự án duyệt:**
 1. COWORK lên Mac Studio (LaunchAgent, DB riêng).
@@ -140,13 +146,14 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 
 ## 7. VIỆC CHỦ DỰ ÁN CẦN LÀM
 
-1. Mở local/staging:
-   - COWORK `http://127.0.0.1:8899`
-   - Brain staging `http://127.0.0.1:8892`
-2. Làm 8 bước theo `docs/NGHIEM-THU.md` (3 cửa sổ riêng cho Super Admin / Quản trị / Nhân viên).
+1. Mở production:
+   - COWORK `https://cowork.vipgroup.com.vn`
+   - Brain `https://ai.vipgroup.com.vn`
+   - Mật khẩu owner: `ssh vip-ai-studio 'cat ~/VIP-AI/cowork/secrets/owner-anh-thanh.txt'` (file 0600).
+2. Làm 8 bước theo `docs/NGHIEM-THU.md` trên production (3 cửa sổ riêng cho Super Admin / Quản trị / Nhân viên).
 3. Ký bảng PASS/FAIL trong `docs/NGHIEM-THU.md`.
-4. Quyết định 3 cổng production và MFA COWORK (nếu muốn).
-5. Chỉ sau khi PASS mới bật `COWORK_BRIDGE_ALLOW_MFA_USERS=1` hoặc bàn giao production.
+4. Quyết định MFA COWORK và việc bật `COWORK_BRIDGE_ALLOW_MFA_USERS=1` cho tài khoản owner đang MFA.
+5. Theo dõi backup 03:20 hằng ngày; xem xét offsite backup COWORK.
 
 ---
 
@@ -154,9 +161,9 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 
 | Rủi ro | Mức | Xử lý |
 |---|---|---|
-| Chưa có site block Caddy/TLS cho cowork | Cao nếu public | Chờ duyệt cổng 2; khối + rollback đã soạn |
-| Bridge chưa lên Brain production | Cao nếu muốn SSO thật | Chờ duyệt cổng 3; staging đã chứng minh |
-| COWORK chưa có MFA | Trung bình | Cân nhắc trước public; hiện chỉ mật khẩu + rate limit |
+| COWORK chưa có MFA | Trung bình | Cân nhắc bổ sung TOTP cho Super Admin; hiện mật khẩu + rate limit |
+| MFA owner chặn mở Brain qua COWORK | Có chủ đích | Giữ `ALLOW_MFA_USERS=0` tới khi chủ dự án nghiệm thu COWORK |
+| Offsite backup COWORK chưa tự động | Trung bình | Backup local 03:20 đã có; bổ sung mã hoá Synology nếu cần |
 | Access log ghi ticket query | Thấp | Ticket one-time/TTL 60s; tắt/lọc log hoặc chuyển POST khi lên thật |
 | MFA secret staging thiếu | Thấp | Chỉ ảnh hưởng login trực tiếp staging; bridge vẫn chặn đúng |
 | `sessions.ip` sau proxy | Thấp | Rate limit/audit đã dùng IP thật; cột phiên có thể vẫn 127.0.0.1 |
@@ -179,11 +186,8 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 | `docs/PRODUCTION-READINESS.md` | Checklist & khoảng trống |
 | `docs/AGENT-CONTRACTS.md` | Hợp đồng 5 làn, API contract |
 | `evidence/` | Ảnh, JSON, log, báo cáo 5 agent + controller |
-| `deploy/` | LaunchAgent, tunnel, Caddy block (chưa chạy) |
+| `deploy/` | LaunchAgent, tunnel, Caddy block (đã dùng cho go-live) |
 
-**Không có thay đổi production nào được thực hiện trong toàn bộ quá trình.**
+**Production đã được triển khai ngày 19/10/2026 theo phê duyệt “cả 3 cổng” của chủ dự án; biên bản tại `evidence/PRODUCTION-DEPLOY-20261019.md`.**
 
-### 5.7. Diễn tập rollback & validate Caddy (19/10/2026)
-- `./scripts/rollback-drill.sh`: **PASS** — backup 17 user/275 audit integrity `ok`; restore counts khớp; server trên DB khôi phục cổng 8902 đăng nhập `anh-thanh` PASS, 15 module; xoá DB tạm.
-- Caddy block `cowork`: `caddy validate` trên VPS bằng tệp tạm → **Valid configuration**; hash Caddyfile sống trước/sau **không đổi**; chưa reload.
 - Bằng chứng: `evidence/FINAL-rollback-drill.txt`, `evidence/FINAL-caddy-validate.txt`.

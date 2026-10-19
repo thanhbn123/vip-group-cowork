@@ -1,6 +1,6 @@
 # KẾ HOẠCH TRIỂN KHAI PRODUCTION — VIP GROUP COWORK
 
-**Trạng thái:** SOẠN SẴN · **CHƯA ÁP DỤNG** · Cần chủ dự án phê duyệt từng cổng.
+**Trạng thái:** ✅ **ĐÃ ÁP DỤNG 19/10/2026** — chủ dự án duyệt cả 3 cổng.
 **Tên miền chính thức:** `https://cowork.vipgroup.com.vn` · Brain: `https://ai.vipgroup.com.vn`
 
 ---
@@ -147,10 +147,10 @@ exec ssh -N \
   -o ServerAliveInterval=20 -o ServerAliveCountMax=3 \
   -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
   -o UserKnownHostsFile=/Users/macstudio/.ssh/vipai_vps_known_hosts \
-  -i /Users/macstudio/.ssh/id_ed25519_vipai_vps_tunnel_studio \
+  -i /Users/macstudio/.ssh/id_ed25519_cowork_vps_tunnel \
   -R 127.0.0.1:18835:127.0.0.1:8899 deploy@160.22.170.20
 ```
-`chmod 700`; LaunchAgent `com.vipgroup.cowork.tunnel-vps` tương tự Brain.
+`chmod 700`; LaunchAgent `com.vipgroup.cowork.tunnel-vps`. Khóa này đã được thêm vào `~deploy/.ssh/authorized_keys` với `permitlisten="127.0.0.1:18835"` (backup `authorized_keys.bak-before-cowork-20261019-180044`).
 
 Kiểm tra từ VPS:
 ```bash
@@ -277,3 +277,16 @@ curl -sI https://cowork.vipgroup.com.vn/ | grep -Ei 'strict-transport|content-se
 6. Sau nghiệm thu mới xem xét bỏ MFA/allow MFA users.
 
 **Không có bước nào ở trên được tự động chạy bởi agent.**
+
+
+---
+
+## 8. KẾT QUẢ ÁP DỤNG THỰC TẾ (19/10/2026)
+
+- COWORK: `/Users/macstudio/VIP-AI/cowork`, LaunchAgent `com.vipgroup.cowork`, pid 18460, health 200.
+- Tunnel: `com.vipgroup.cowork.tunnel-vps`, pid 18533, khóa riêng `id_ed25519_cowork_vps_tunnel`, VPS `127.0.0.1:18835` 200.
+- Caddy: block đã thêm, validate/reload OK; cert `CN=cowork.vipgroup.com.vn` hạn 17/01/2027; hash `be7a8ef8…5434`.
+- Brain bridge: thêm file + 2 dòng main.py; `.env` bật cờ; backup `~/VIP-AI/brain/backups/cowork-20261019-180225/`; health 200, bridge bật.
+- Smoke test production: owner login 303; tạo nhân viên 200; nhân viên 303; SSO Brain 303/200; chat local/real qwen2.5:7b-instruct, task `T-G02-000035`, chi phí 0; MFA owner 403; thu hồi COWORK 403/Brain 401; archive 303.
+- Backup COWORK: `com.vipgroup.cowork.backup` 03:20; bản `cowork-20261019-180321.db`.
+- Bằng chứng: `evidence/PRODUCTION-DEPLOY-20261019.md`, `evidence/PRODUCTION-smoke-20261019.json`.

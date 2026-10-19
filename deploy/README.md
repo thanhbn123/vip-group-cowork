@@ -1,7 +1,7 @@
-# DEPLOY ARTIFACTS — CHƯA ÁP DỤNG
+# DEPLOY ARTIFACTS — ĐÃ DÙNG CHO GO-LIVE 19/10/2026
 
-Bộ tệp này là **bản soạn sẵn** cho production, không phải lệnh đã chạy.
-Chỉ dùng sau khi chủ dự án phê duyệt và đã đọc `docs/TRIEN-KHAI-PRODUCTION.md`, `docs/ROLLBACK.md`.
+Bộ tệp này đã được dùng để go-live 3 cổng ngày 19/10/2026 (chủ dự án phê duyệt).
+Xem biên bản `evidence/PRODUCTION-DEPLOY-20261019.md`; rollback `docs/ROLLBACK.md`.
 
 ## Tệp
 
@@ -9,7 +9,7 @@ Chỉ dùng sau khi chủ dự án phê duyệt và đã đọc `docs/TRIEN-KHAI
 |---|---|
 | `com.vipgroup.cowork.plist` | `~/Library/LaunchAgents/com.vipgroup.cowork.plist` |
 | `com.vipgroup.cowork.tunnel-vps.plist` | `~/Library/LaunchAgents/com.vipgroup.cowork.tunnel-vps.plist` |
-| `tunnel-vps.sh` | `~/VIP-AI/cowork/bin/tunnel-vps.sh` (chmod 700) |
+| `tunnel-vps.sh` | `~/VIP-AI/cowork/bin/tunnel-vps.sh` (chmod 700; khóa `id_ed25519_cowork_vps_tunnel`) |
 | `Caddyfile.cowork` | dán vào `/srv/vip-staging-proxy/Caddyfile`, reload Caddy |
 
 ## Thứ tự
@@ -34,3 +34,11 @@ Xem `docs/ROLLBACK.md`; Caddy luôn sao lưu trước khi sửa:
 cp /srv/vip-staging-proxy/Caddyfile \
    /srv/vip-staging-proxy/Caddyfile.bak-before-cowork-$(date +%Y%m%d-%H%M)
 ```
+
+## Ghi chú thực tế
+
+- `/etc/caddy/Caddyfile` là bind mount **read-only**; sửa host file qua:
+  `docker run --rm -i -v /srv/vip-staging-proxy:/work caddy:2-alpine sh -c 'cat >> /work/Caddyfile'`
+  (sao lưu trước; validate + reload sau).
+- Tunnel COWORK dùng khóa riêng `id_ed25519_cowork_vps_tunnel`, đã thêm `permitlisten="127.0.0.1:18835"` vào
+  `~deploy/.ssh/authorized_keys`.

@@ -1,6 +1,6 @@
 # KIỂM TRA CẤU HÌNH TÊN MIỀN — COWORK & AI BRAIN
 
-**Ngày:** 19/10/2026 · **Trạng thái:** ĐÃ KIỂM TRA, CHƯA THAY ĐỔI CẤU HÌNH
+**Ngày:** 19/10/2026 · **Trạng thái:** ĐÃ KIỂM TRA VÀ **ĐÃ ÁP DỤNG** 19/10/2026
 **Quyết định chính thức:** COWORK = `https://cowork.vipgroup.com.vn` · Brain = `https://ai.vipgroup.com.vn`
 
 ---
@@ -63,7 +63,7 @@ ai.vipgroup.com.vn {
 
 ---
 
-## 3. KHỐI CADDY SOẠN SẴN CHO COWORK — CHƯA ÁP DỤNG
+## 3. KHỐI CADDY CHO COWORK — ĐÃ ÁP DỤNG 19/10/2026
 
 ```caddy
 # VIP GROUP COWORK — cổng đăng nhập và làm việc tập trung.
@@ -156,3 +156,36 @@ Kết quả:
 - Bằng chứng: `evidence/FINAL-caddy-validate.txt`
 
 **Chưa reload, chưa thêm block vào Caddyfile sống.**
+
+
+---
+
+## 7. TRẠNG THÁI ÁP DỤNG THỰC TẾ (19/10/2026)
+
+- Đã thêm block vào Caddyfile sống, `caddy validate` **Valid configuration**, `caddy reload` exit 0.
+- Hash trước: `c2674057…dad3c` · sau: `be7a8ef8…5434`.
+- Backup: `/home/deploy/Caddyfile.bak-before-cowork-20261019-180126.txt` và `/data/Caddyfile.bak-before-cowork-20261019-180126`.
+- TLS Let's Encrypt cấp thành công: `CN=cowork.vipgroup.com.vn`, hạn 17/01/2027.
+- Public: `https://cowork.vipgroup.com.vn` → trang đăng nhập 200; `/api/health` 200.
+- DNS **không đổi**.
+- Biên bản đầy đủ: `evidence/PRODUCTION-DEPLOY-20261019.md`.
+
+### 7.1. Lưu ý vận hành Caddyfile (đã gặp thực tế)
+
+`/etc/caddy/Caddyfile` trong container là **bind mount read-only**, nên `docker exec ... cat > /etc/caddy/Caddyfile` báo
+`Read-only file system`. Cách đã dùng để sửa an toàn:
+
+```bash
+# Sao lưu trước
+docker exec vip-staging-caddy cat /etc/caddy/Caddyfile > ~/Caddyfile.bak-$(date +%Y%m%d-%H%M%S).txt
+docker exec vip-staging-caddy cp /etc/caddy/Caddyfile /data/Caddyfile.bak-$(date +%Y%m%d-%H%M%S)
+
+# Ghi qua volume host (container tạm, không reload)
+docker run --rm -i -v /srv/vip-staging-proxy:/work caddy:2-alpine sh -c 'cat >> /work/Caddyfile'
+
+# Validate + reload
+docker exec vip-staging-caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+docker exec vip-staging-caddy caddy reload   --config /etc/caddy/Caddyfile --adapter caddyfile
+```
+
+Không dùng `docker cp` vào `/etc/caddy` vì mount read-only.

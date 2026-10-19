@@ -6,5 +6,5 @@ exec ssh -N \
   -o ServerAliveInterval=20 -o ServerAliveCountMax=3 \
   -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
   -o UserKnownHostsFile=/Users/macstudio/.ssh/vipai_vps_known_hosts \
-  -i /Users/macstudio/.ssh/id_ed25519_vipai_vps_tunnel_studio \
+  -i /Users/macstudio/.ssh/id_ed25519_cowork_vps_tunnel \
   -R 127.0.0.1:18835:127.0.0.1:8899 deploy@160.22.170.20

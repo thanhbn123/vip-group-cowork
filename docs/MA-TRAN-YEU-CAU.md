@@ -27,21 +27,19 @@
 | 21 | Giữ AI Local trên Mac Studio | Ollama `qwen2.5:7b-instruct`; `providerId=local`, `nhan=real` | Task `T-G02-000003`; `localOnly` | ✅ staging |
 | 22 | Không xây lại AI Brain | Không sửa DB/schema; bridge feature-flag | Snapshot production 7 users, DB ok | ✅ |
 | 23 | Không tắt bảo vệ cũ sớm | `MFA_BAT=1`; `ALLOW_MFA_USERS=0` | MFA 403 evidence | ✅ |
-| 24 | Không đụng DNS/public URL | DNS giữ nguyên; Caddy chưa thêm block | `docs/CAU-HINH-TEN-MIEN.md` | ✅ |
-| 25 | Tên miền chính thức | `cowork.vipgroup.com.vn`; config production mẫu | `docs/TRIEN-KHAI-PRODUCTION.md` | ⏳ chờ deploy |
+| 24 | Không đụng DNS/public URL | DNS giữ nguyên; Caddy block thêm 19/10/2026, không đổi DNS | `docs/CAU-HINH-TEN-MIEN.md` | ✅ |
+| 25 | Tên miền chính thức | `https://cowork.vipgroup.com.vn` live HTTPS + TLS | `evidence/PRODUCTION-DEPLOY-20261019.md` | ✅ |
 | 26 | Không tự deploy/push | Không chạy deploy; Git local baseline | `git log` local | ✅ |
 | 27 | Không kết nối dự án khác | Chỉ Brain; không thêm connector | Rà soát code | ✅ |
 
-**Chú thích:** ✅ local/staging = đã chạy và có bằng chứng trên máy; ⏳ = chờ phê duyệt production.
+**Chú thích:** ✅ = đã chạy và có bằng chứng (local/staging hoặc production); ⏳ = còn lại.
 **Bằng chứng cuối:** `evidence/FINAL-acceptance-20261019.json` · `evidence/FINAL-acceptance-report-20261019.md` · `evidence/controller-final-e2e.json`.
 
 ---
 
 ## KHOẢNG TRỐNG ĐÃ BIẾT (không được báo PASS production)
 
-1. `cowork.vipgroup.com.vn` chưa có site block Caddy/TLS.
-2. Bridge Brain chưa áp lên production; chỉ staging bản sao.
 3. COWORK chưa có MFA; chỉ mật khẩu.
-4. IP thật sau proxy Caddy chưa được xử lý (`request.client.host`).
+4. ~~IP thật sau proxy Caddy~~ — đã vá (`COWORK_TIN_PROXY=1`, `web.ip_cua`); audit production ghi `14.190.214.49`.
 5. Đăng xuất COWORK chưa thu hồi phiên Brain (nếu chủ dự án yêu cầu).
 6. Brain production còn nợ cũ: `/api/settings` authz gap, header chưa persist — không do COWORK.

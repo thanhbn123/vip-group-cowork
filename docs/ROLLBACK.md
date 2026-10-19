@@ -157,3 +157,21 @@ Rollback dữ liệu Brain chỉ dùng bản backup `vip-brain.bak-before-cowork
 | Chứng chỉ không cấp được | gỡ block Caddy, kiểm tra DNS/port 80; không ảnh hưởng Brain |
 
 **Người có quyền quyết định rollback production:** chủ dự án `anh-thanh`; controller thực hiện khi được lệnh.
+
+
+---
+
+## 7. ĐIỂM QUAY LUI PRODUCTION THỰC TẾ (19/10/2026)
+
+| Lớp | Điểm quay lui |
+|---|---|
+| COWORK | `launchctl bootout gui/$(id -u)/com.vipgroup.cowork`; code/DB giữ nguyên |
+| COWORK DB | `~/VIP-AI/cowork/data/backups/cowork-20261019-180321.db` |
+| Tunnel | `launchctl bootout gui/$(id -u)/com.vipgroup.cowork.tunnel-vps`; key `id_ed25519_cowork_vps_tunnel` |
+| Caddy | `/home/deploy/Caddyfile.bak-before-cowork-20261019-180126.txt` hoặc `/data/Caddyfile.bak-before-cowork-20261019-180126` |
+| Brain code | `~/VIP-AI/brain/backups/cowork-20261019-180225/main.py.bak` + `env.bak` |
+| Brain DB | `~/VIP-AI/brain/backups/cowork-20261019-180225/vip-brain-before-cowork.db` |
+| Brain bridge tắt nhanh | `COWORK_BRIDGE_BAT=0` trong `~/VIP-AI/brain/.env` + restart backend |
+| VPS authorized_keys | `~deploy/.ssh/authorized_keys.bak-before-cowork-20261019-180044` |
+
+**Không đổi DNS**, nên rollback không cần thao tác DNS.

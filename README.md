@@ -18,9 +18,10 @@ nhật ký quản trị và cầu nối tới **VIP AI Brain** (AI Local trên M
 | 5 vai trò + phân quyền module + tenant + audit | ✅ |
 | 15 màn hình quản trị + dashboard + Brain | ✅ |
 | Brain staging (bản sao DB + bridge) | ✅ `http://127.0.0.1:8892` (khi bật) |
-| Brain production | ✅ giữ nguyên `Mac Studio:8891`, **không sửa** |
-| Caddy `cowork.vipgroup.com.vn` | ⏳ chưa thêm site block — chờ phê duyệt |
-| Nghiệm thu 8 bước | ✅ 8/8 PASS local/staging (AG-05, 19/10/2026); chờ chủ dự án ký |
+| Brain production | ✅ `Mac Studio:8891`, dữ liệu/auth gốc giữ nguyên; bridge COWORK có cờ, đã backup |
+| Production COWORK | ✅ `https://cowork.vipgroup.com.vn` live 19/10/2026 |
+| Caddy `cowork.vipgroup.com.vn` | ✅ đã live HTTPS + TLS (19/10/2026) |
+| Nghiệm thu 8 bước | ✅ 8/8 PASS local/staging + smoke production 19/10/2026 |
 
 ---
 
@@ -140,7 +141,7 @@ cowork/
 | Tệp | Nội dung |
 |---|---|
 | `docs/BAO-CAO-KHAO-SAT.md` | khảo sát COWORK/Brain hiện có, đối chiếu kiến trúc |
-| `docs/CAU-HINH-TEN-MIEN.md` | DNS/TLS/Caddy, khối Caddy soạn sẵn, quy trình |
+| `docs/CAU-HINH-TEN-MIEN.md` | DNS/TLS/Caddy, khối Caddy, trạng thái áp dụng |
 | `docs/TRIEN-KHAI-PRODUCTION.md` | kế hoạch đưa COWORK + Brain bridge lên production |
 | `docs/ROLLBACK.md` | quy trình quay lui từng lớp |
 | `docs/AGENT-CONTRACTS.md` | phân vùng 5 agent, API contract, quy tắc phối hợp |

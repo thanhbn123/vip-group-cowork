@@ -1,6 +1,6 @@
 # PRODUCTION READINESS — COWORK
 
-**Ngày:** 19/10/2026 · **Trạng thái:** LOCAL/STAGING READY · **PRODUCTION: CHƯA TRIỂN KHAI**
+**Ngày:** 19/10/2026 · **Trạng thái:** ✅ **PRODUCTION ĐÃ GO-LIVE** (COWORK + Caddy/TLS + Brain bridge)
 **Tên miền:** `https://cowork.vipgroup.com.vn` (DNS đúng, chưa có site block Caddy)
 
 ---
@@ -21,10 +21,10 @@
 | Màn hình quản trị | ✅ | dashboard, tài khoản, ban, vai trò, quyền, module, nhật ký, cài đặt |
 | Brain ticket one-time + HMAC | ✅ | TTL 60s, chống replay |
 | Brain staging + AI Local | ✅/đang nghiệm thu | DB bản sao, `qwen2.5:7b-instruct` |
-| Caddy block cowork | ⏳ chưa áp dụng | chờ phê duyệt cổng 2 |
-| Tunnel 18835 | ⏳ chưa áp dụng | chờ phê duyệt cổng 2 |
-| Bridge Brain production | ⏳ chưa áp dụng | chờ phê duyệt cổng 3 |
-| Sao lưu COWORK định kỳ | ⏳ local có CLI; production cần LaunchAgent | theo kế hoạch |
+| Caddy block cowork | ✅ đã áp dụng | cert Let’s Encrypt hạn 17/01/2027 |
+| Tunnel 18835 | ✅ đang chạy | khóa riêng, permitlisten 18835 |
+| Bridge Brain production | ✅ đã áp dụng | backup + smoke production PASS |
+| Sao lưu COWORK định kỳ | ✅ LaunchAgent 03:20 | bản test 19/10/2026 |
 | MFA cho COWORK | ❌ chưa có | chỉ mật khẩu; Super Admin nên cân nhắc bổ sung |
 | IP thật sau proxy | ✅ đã vá | `COWORK_TIN_PROXY=1` + `web.ip_cua` đọc `X-Real-IP`; `run.sh --no-proxy-headers` |
 | Trusted host / HSTS | ✅ sau Caddy | HSTS bật khi `X-Forwarded-Proto=https` |
@@ -92,7 +92,7 @@
   - chuyển ticket sang POST/fragment.
 - Chưa sửa production; ghi nhận để xử lý khi duyệt cổng 3.
 
-**Chưa có câu trả lời nào được mặc định là CÓ.**
+**Chủ dự án đã duyệt cả 3 cổng ngày 19/10/2026.**
 
 ---
 
@@ -107,3 +107,14 @@
 - Caddy block đã **validate cú pháp** trên VPS bằng tệp tạm, live hash không đổi: `evidence/FINAL-caddy-validate.txt`.
 
 **Vẫn chưa có thay đổi production nào.**
+
+
+---
+
+## 6. SAU GO-LIVE (19/10/2026)
+
+- Public: `https://cowork.vipgroup.com.vn` · `https://ai.vipgroup.com.vn`
+- COWORK LaunchAgent pid 18460; tunnel 18533; Brain pid 18620.
+- Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, MFA owner 403, thu hồi 403/401, archive.
+- Biên bản: `evidence/PRODUCTION-DEPLOY-20261019.md`; smoke: `evidence/PRODUCTION-smoke-20261019.json`.
+- **Còn lại:** MFA COWORK, offsite backup COWORK, owner mở Brain qua COWORK (`ALLOW_MFA_USERS=0`).

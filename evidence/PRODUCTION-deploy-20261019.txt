@@ -1,0 +1,37 @@
+# PRODUCTION DEPLOY EVIDENCE — 2026-10-19 18:03:36 +0700
+## Public endpoints
+cowork_health={"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T18:03:36+07:00"}}
+brain_health={"ok":true,"data":{"phienBan":"g02","gio":"2026-10-19T18:03:36+07:00","db":"ok"}}
+cowork_login_title=<title>Đăng nhập · VIP GROUP COWORK</title>
+cowork_cert:
+subject= /CN=cowork.vipgroup.com.vn
+issuer= /C=US/O=Let's Encrypt/CN=YE1
+notBefore=Oct 19 10:03:20 2026 GMT
+notAfter=Jan 17 10:03:19 2027 GMT
+## Headers
+HTTP/2 200 
+content-security-policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: DENY
+## VPS Caddy
+live_hash=be7a8ef8e7cf885f53c0fe59d9fa5088e46634432ad46708bf9c0438245c5434
+-rw-rw-r-- 1 deploy deploy 4789 Oct 19 18:01 /home/deploy/Caddyfile.bak-before-cowork-20261019-180126.txt
+## Studio services
+cowork_health={"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T18:03:37+07:00"}}
+cowork_pid=18460
+tunnel_pid=18533
+brain_pid=18620
+bridge={"ok":true,"data":{"bridge":"bat","cookieSecure":true,"choMfa":false,"coBiMat":true}}
+backups=/Users/macstudio/VIP-AI/cowork/data/backups/cowork-20261019-180321.db
+brain_backup=/Users/macstudio/VIP-AI/brain/backups/cowork-20261019-180225
+users=2
+audit=11
+## Audit IP gần nhất
+anh-thanh|account.archive|14.190.214.49
+anh-thanh|permissions.update|14.190.214.49
+anh-thanh|permissions.update|14.190.214.49
+anh-thanh|brain.consume|127.0.0.1
+anh-thanh|brain.launch|14.190.214.49
