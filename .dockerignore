@@ -1,0 +1,12 @@
+.git
+.venv
+.uv-cache
+__pycache__
+.pytest_cache
+data
+secrets
+logs
+evidence
+brain-staging
+.env
+*.log
