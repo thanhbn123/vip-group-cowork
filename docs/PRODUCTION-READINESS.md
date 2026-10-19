@@ -124,3 +124,14 @@
 ### 2.8. CSP form-action (bản vá 19/10/2026)
 - CSP cũ `form-action 'self'` chặn redirect form `/brain/mo` sang `ai.vipgroup.com.vn` trên Chrome/Safari.
 - Đã mở đúng origin Brain: `form-action 'self' https://ai.vipgroup.com.vn`; test Chrome thật PASS.
+
+
+---
+
+## 7. VPS STAGING (19/10/2026 20:18)
+
+- GitHub public: `https://github.com/thanhbn123/vip-group-cowork`.
+- VPS `CIITNRVPlinux`: `/srv/vip-staging/cowork`, container `cowork-staging` healthy, `127.0.0.1:8899`.
+- DB copy production: 7 user, 110 audit, schema 2, integrity ok; login owner 200.
+- **Chưa cutover**: Caddy vẫn 18835 → Studio; Brain internal vẫn Studio.
+- Cutover/rollback: `deploy/vps/README.md`; bằng chứng `evidence/VPS-staging-20261019.txt`.

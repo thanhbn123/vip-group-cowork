@@ -33,3 +33,21 @@ Chỉ sau khi chủ dự án duyệt:
 1. Caddy đổi upstream `cowork` từ `127.0.0.1:18835` sang `127.0.0.1:8899`.
 2. Brain `.env` đổi `COWORK_INTERNAL_URL=https://cowork.vipgroup.com.vn`.
 3. Chuyển backup/offsite sang VPS hoặc giữ Studio làm bản dự phòng.
+
+## Trạng thái đã chạy (19/10/2026 20:18)
+
+- Repo GitHub: `https://github.com/thanhbn123/vip-group-cowork` (public, branch `main`).
+- VPS: `/srv/vip-staging/cowork`, container `cowork-staging` healthy, `127.0.0.1:8899`.
+- DB copy production: integrity ok, 7 user, 110 audit, schema 2.
+- Login owner staging: 200 `/`, `/api/me` 200 Super Admin.
+- **Chưa cutover**: Caddy vẫn `reverse_proxy 127.0.0.1:18835` (Studio); Brain vẫn gọi
+  `COWORK_INTERNAL_URL=http://127.0.0.1:8899` (Studio).
+- Bằng chứng: `evidence/VPS-staging-20261019.txt`.
+
+### Cutover cần duyệt
+1. Đổi Caddy `cowork` sang `127.0.0.1:8899`; reload; kiểm TLS/health.
+2. Đổi Brain `.env` `COWORK_INTERNAL_URL=https://cowork.vipgroup.com.vn`; restart backend.
+3. Đổi `.env.staging` thành production (`COOKIE_SECURE=1`, `TIN_PROXY=1`, public URL thật,
+   `BRAIN_ENABLED=1`, Brain base/public URL thật), restart container.
+4. Chuyển backup/offsite sang VPS; giữ bản Studio làm dự phòng đến khi ổn định.
+5. Rollback: Caddy về 18835; Brain internal về `http://127.0.0.1:8899`; restart.

@@ -1,0 +1,29 @@
+# VPS STAGING EVIDENCE — 2026-10-19 20:18 +07
+
+## GitHub
+- Repo: https://github.com/thanhbn123/vip-group-cowork
+- Visibility: PUBLIC
+- Branch: main
+- Commit staging: 0aa4223
+
+## VPS staging
+- Host: CIITNRVPlinux (deploy)
+- Path: /srv/vip-staging/cowork
+- Container: cowork-staging — Up (healthy)
+- Port: 127.0.0.1:8899 (không public)
+- Health: {"ok":true,"data":{"app":"cowork","db":"ok","brain":"tat"}}
+- DB: /data/cowork.db — integrity ok — 7 users / 110 audit — schema 2
+- Login owner staging: HTTP 200 → `/`; `/api/me` 200 Super Admin.
+- Caddy upstream cowork: reverse_proxy 127.0.0.1:18835 (vẫn về Studio)
+- Caddy hash: eea7ed56d9d373f14ec902cb17a8db71b5902fba06efa83cb7eb6aa1da95d86f (không đổi)
+
+## Production (không đổi)
+- COWORK: https://cowork.vipgroup.com.vn/api/health 200 (Studio)
+- Brain: https://ai.vipgroup.com.vn/api/health 200
+- Brain `COWORK_INTERNAL_URL=http://127.0.0.1:8899` (Studio)
+- `COWORK_BRIDGE_ALLOW_MFA_USERS=1`
+
+## Chưa cutover
+- Caddy vẫn trỏ 18835 → Studio.
+- Chưa đổi Brain internal URL.
+- Chưa chuyển backup/offsite sang VPS.

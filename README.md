@@ -21,6 +21,8 @@ nhật ký quản trị và cầu nối tới **VIP AI Brain** (AI Local trên M
 | Brain staging (bản sao DB + bridge) | ✅ `http://127.0.0.1:8892` (khi bật) |
 | Brain production | ✅ `Mac Studio:8891`; bridge COWORK bật; owner mở Brain qua COWORK không hỏi MFA lần hai |
 | Production COWORK | ✅ `https://cowork.vipgroup.com.vn` live 19/10/2026 |
+| GitHub | ✅ `https://github.com/thanhbn123/vip-group-cowork` |
+| VPS staging | ✅ container `cowork-staging` tại `/srv/vip-staging/cowork`, cổng nội bộ 8899 |
 | Caddy `cowork.vipgroup.com.vn` | ✅ đã live HTTPS + TLS (19/10/2026) |
 | Nghiệm thu 8 bước | ✅ 8/8 PASS local/staging + smoke production 19/10/2026 |
 
