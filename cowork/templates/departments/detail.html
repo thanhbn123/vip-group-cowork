@@ -48,14 +48,14 @@
       {% if thanh_vien %}
       <div class="table-wrap">
         <table class="table compact">
-          <thead><tr><th>Nhân sự</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr></thead>
+          <thead><tr><th scope="col">Nhân sự</th><th scope="col">Vai trò</th><th scope="col">Trạng thái</th><th scope="col"><span class="visually-hidden">Thao tác</span></th></tr></thead>
           <tbody>
             {% for u in thanh_vien %}
             <tr>
-              <td><a class="person" href="/tai-khoan/{{ u.id }}">{{ ui.avatar(u.display_name) }}<span><b>{{ u.display_name }}</b><small>{{ u.id }}</small></span></a></td>
-              <td>{{ ui.role_badge(u.role_code, u.role_name) }}</td>
-              <td>{{ ui.status_badge(u.status) }}</td>
-              <td class="row-actions"><a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}">Chi tiết</a></td>
+              <td data-label="Nhân sự"><a class="person" href="/tai-khoan/{{ u.id }}">{{ ui.avatar(u.display_name) }}<span><b>{{ u.display_name }}</b><small>{{ u.id }}</small></span></a></td>
+              <td data-label="Vai trò">{{ ui.role_badge(u.role_code, u.role_name) }}</td>
+              <td data-label="Trạng thái">{{ ui.status_badge(u.status) }}</td>
+              <td class="row-actions" data-label="Thao tác"><a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}">Chi tiết</a></td>
             </tr>
             {% endfor %}
           </tbody>

@@ -9,4 +9,6 @@ set -a
 . ./.env
 set +a
 exec .venv/bin/python -m uvicorn cowork.main:app \
-  --host "${COWORK_HOST:-127.0.0.1}" --port "${COWORK_PORT:-8899}" --no-access-log
+  --host "${COWORK_HOST:-127.0.0.1}" --port "${COWORK_PORT:-8899}" --no-access-log \
+  --no-proxy-headers \
+  --no-proxy-headers

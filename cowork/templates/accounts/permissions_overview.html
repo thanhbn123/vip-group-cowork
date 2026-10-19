@@ -15,7 +15,7 @@
 <section class="card">
   <form class="filter-bar" method="get" action="/phan-quyen">
     <label class="search-box grow"><span>{{ ui.icon('search', 18) }}</span>
-      <input type="search" name="q" value="{{ q }}" placeholder="Tìm ID hoặc tên nhân sự…" maxlength="60"></label>
+      <input type="search" name="q" value="{{ q }}" placeholder="Tìm ID hoặc tên nhân sự…" maxlength="60" aria-label="Tìm theo ID hoặc tên nhân sự"></label>
     <button class="btn btn-primary btn-sm" type="submit">Tìm</button>
     <a class="btn btn-ghost btn-sm" href="/phan-quyen">Xoá lọc</a>
   </form>
@@ -23,20 +23,20 @@
   {% if rows %}
   <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>Nhân sự</th><th>Vai trò</th><th>Ban</th><th>Module hiệu lực</th><th>Uỷ quyền riêng</th><th></th></tr></thead>
+      <thead><tr><th scope="col">Nhân sự</th><th scope="col">Vai trò</th><th scope="col">Ban</th><th scope="col">Module hiệu lực</th><th scope="col">Uỷ quyền riêng</th><th scope="col"><span class="visually-hidden">Thao tác</span></th></tr></thead>
       <tbody>
         {% for u in rows %}
         <tr>
-          <td><a class="person" href="/tai-khoan/{{ u.id }}">{{ ui.avatar(u.display_name) }}
+          <td data-label="Nhân sự"><a class="person" href="/tai-khoan/{{ u.id }}">{{ ui.avatar(u.display_name) }}
             <span><b>{{ u.display_name }}</b><small>{{ u.id }}</small></span></a></td>
-          <td>{{ ui.role_badge(u.role_code, u.role_name) }}</td>
-          <td>{{ u.department_name or '—' }}</td>
-          <td><b>{{ u.so_hieu_luc }}</b><span class="muted"> / {{ u.so_module }} module</span></td>
-          <td>
+          <td data-label="Vai trò">{{ ui.role_badge(u.role_code, u.role_name) }}</td>
+          <td data-label="Ban">{{ u.department_name or '—' }}</td>
+          <td data-label="Module hiệu lực"><b>{{ u.so_hieu_luc }}</b><span class="muted"> / {{ u.so_module }} module</span></td>
+          <td data-label="Uỷ quyền riêng">
             {% if u.so_uy_quyen %}<span class="badge status-warn">{{ u.so_uy_quyen }} module</span>
             {% else %}<span class="muted">Theo vai trò</span>{% endif %}
           </td>
-          <td class="row-actions">
+          <td class="row-actions" data-label="Thao tác">
             <a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}/phan-quyen">
               {{ 'Phân quyền' if co_cap else 'Xem quyền' }}
             </a>

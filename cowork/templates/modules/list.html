@@ -22,9 +22,10 @@
       <div class="module-reg-badges">
         {% if m.status == 'active' %}<span class="badge status-ok">Đang bật</span>{% else %}<span class="badge status-danger">Đã tắt</span>{% endif %}
         {% if m.requires_brain %}<span class="badge status-info">{{ ui.icon('spark', 12) }} cần Brain</span>{% endif %}
+        {% if m.code in ('dashboard','accounts','settings') %}<span class="badge status-muted">{{ ui.icon('lock', 12) }} nền tảng</span>{% endif %}
         <span class="badge status-muted">cấp {{ m.min_role_level }}+</span>
       </div>
-      {% if co_sua %}
+      {% if co_sua and m.code not in ('dashboard','accounts','settings') %}
       <form method="post" action="/module-registry/{{ m.code }}">
         <input type="hidden" name="_csrf" value="{{ csrf }}">
         <input type="hidden" name="status" value="{{ 'disabled' if m.status == 'active' else 'active' }}">

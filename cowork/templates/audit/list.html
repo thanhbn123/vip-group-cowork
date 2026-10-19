@@ -21,8 +21,8 @@
       {% for u in ds_nguoi %}<option value="{{ u }}" {% if loc.actor == u %}selected{% endif %}>{{ u }}</option>{% endfor %}
     </select>
     <label class="search-box grow"><span>{{ ui.icon('search', 18) }}</span>
-      <input type="search" name="action" value="{{ loc.action }}" placeholder="Hành động, vd: account.create" maxlength="80"></label>
-    <input type="text" name="target" value="{{ loc.target }}" placeholder="Đối tượng / ID" maxlength="80">
+      <input type="search" name="action" value="{{ loc.action }}" placeholder="Hành động, vd: account.create" maxlength="80" aria-label="Lọc theo hành động"></label>
+    <input type="text" name="target" value="{{ loc.target }}" placeholder="Đối tượng / ID" maxlength="80" aria-label="Lọc theo đối tượng hoặc ID">
     <label class="date-field"><span>Từ</span><input type="date" name="tu_ngay" value="{{ loc.tu_ngay }}"></label>
     <label class="date-field"><span>Đến</span><input type="date" name="den_ngay" value="{{ loc.den_ngay }}"></label>
     <button class="btn btn-primary btn-sm" type="submit">Lọc</button>
@@ -32,22 +32,22 @@
   {% if kq.rows %}
   <div class="table-wrap">
     <table class="table audit-table">
-      <thead><tr><th>Thời điểm</th><th>Người</th><th>Hành động</th><th>Đối tượng</th><th>Chi tiết</th><th>IP</th></tr></thead>
+      <thead><tr><th scope="col">Thời điểm</th><th scope="col">Người</th><th scope="col">Hành động</th><th scope="col">Đối tượng</th><th scope="col">Chi tiết</th><th scope="col">IP</th></tr></thead>
       <tbody>
         {% for r in kq.rows %}
         <tr>
-          <td class="nowrap muted">{{ r.created_at|dt }}</td>
-          <td><b>{{ r.actor_id }}</b><small class="block muted">{{ r.actor_role or '—' }}</small></td>
-          <td><code class="action-code">{{ r.action }}</code></td>
-          <td>{% if r.target_id %}<b>{{ r.target_id }}</b>{% endif %}<small class="block muted">{{ r.target_type or '' }}</small></td>
-          <td>
+          <td class="nowrap muted" data-label="Thời điểm">{{ r.created_at|dt }}</td>
+          <td data-label="Người"><b>{{ r.actor_id }}</b><small class="block muted">{{ r.actor_role or '—' }}</small></td>
+          <td data-label="Hành động"><code class="action-code">{{ r.action }}</code></td>
+          <td data-label="Đối tượng">{% if r.target_id %}<b>{{ r.target_id }}</b>{% endif %}<small class="block muted">{{ r.target_type or '' }}</small></td>
+          <td data-label="Chi tiết">
             {% if r.detail %}
             <details class="detail-toggle"><summary>Xem</summary>
               <pre class="json-box">{{ r.detail_obj|json_pretty if r.detail_obj else r.detail }}</pre>
             </details>
             {% else %}<span class="muted">—</span>{% endif %}
           </td>
-          <td class="muted nowrap">{{ r.ip or '—' }}</td>
+          <td class="muted nowrap" data-label="IP">{{ r.ip or '—' }}</td>
         </tr>
         {% endfor %}
       </tbody>

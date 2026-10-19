@@ -84,9 +84,7 @@ async def danh_sach(request: Request, q: str = "", vaiTro: str = "", ban: str = 
             f"WHERE {sql_where} ORDER BY r.level DESC, u.id LIMIT ? OFFSET ?",
             (*params, page_size, offset)).fetchall()]
         vai_tro_ds = [dict(r) for r in conn.execute("SELECT * FROM roles ORDER BY level DESC").fetchall()]
-        ban_ds = [dict(r) for r in conn.execute(
-            "SELECT * FROM departments WHERE tenant_id=? AND status='active' ORDER BY name",
-            (user["tenant_id"],)).fetchall()]
+        ban_ds = _ds_ban(conn, user)
     finally:
         conn.close()
     return web.render(request, "accounts/list.html", page_title="Tài khoản", user=user,
@@ -204,16 +202,21 @@ async def chi_tiet(request: Request, user_id: str):
             "SELECT s.*, d.name AS department_name FROM admin_scopes s "
             "LEFT JOIN departments d ON d.id=s.department_id WHERE s.user_id=?",
             (user_id,)).fetchall()]
-        ban_ds = [dict(r) for r in conn.execute(
-            "SELECT * FROM departments WHERE tenant_id=? AND status='active' ORDER BY name",
-            (user["tenant_id"],)).fetchall()]
+        ban_ds = _ds_ban(conn, user)
         vai_tro = _ds_vai_tro(conn, user)
         co_sua = _co_the_sua(conn, user, request.state.perms, target)
-        co_cap_quyen = rbac.co_quyen(user, request.state.perms, "permissions.grant")
-        co_thu_hoi_phien = rbac.co_quyen(user, request.state.perms, "accounts.revoke_sessions")
-        co_dat_mat_khau = rbac.co_quyen(user, request.state.perms, "accounts.reset_password")
-        co_khoa = rbac.co_quyen(user, request.state.perms, "accounts.suspend")
-        co_luu_tru = rbac.co_quyen(user, request.state.perms, "accounts.archive")
+        # Nút hành động chỉ hiện khi service tương ứng thực sự cho phép thao tác
+        # (đúng cấp, đúng phạm vi, không phải Super Admin/tài khoản đã lưu trữ).
+        co_cap_quyen = rbac.co_the_quan_ly(conn, user, request.state.perms, target,
+                                          "permissions.grant")
+        co_thu_hoi_phien = rbac.co_the_quan_ly(conn, user, request.state.perms, target,
+                                              "accounts.revoke_sessions")
+        co_dat_mat_khau = rbac.co_the_quan_ly(conn, user, request.state.perms, target,
+                                             "accounts.reset_password")
+        co_khoa = rbac.co_the_quan_ly(conn, user, request.state.perms, target,
+                                      "accounts.suspend")
+        co_luu_tru = rbac.co_the_quan_ly(conn, user, request.state.perms, target,
+                                         "accounts.archive")
         co_scope = user["role_code"] == rbac.SUPER and target["role_code"] == rbac.ADMIN
     finally:
         conn.close()
@@ -327,9 +330,19 @@ async def thu_hoi_mot_phien(request: Request, user_id: str, session_id: str):
     try:
         target = _target(conn, user, user_id)
         rbac.kiem_tra_quan_ly(conn, user, request.state.perms, target, "accounts.revoke_sessions")
-        ok = auth.thu_hoi_phien(conn, session_id, user["id"], "Quản trị thu hồi phiên")
-        audit.ghi(conn, user, "account.revoke_session", target_type="session",
-                  target_id=session_id, detail={"user": user_id, "ok": ok}, request=request)
+        # Phiên phải thuộc đúng tài khoản/tenant đang thao tác; nếu không, một
+        # session_id của người khác (VD Super Admin) có thể bị thu hồi qua URL.
+        row = conn.execute(
+            "SELECT 1 FROM sessions WHERE id=? AND user_id=? AND tenant_id=? AND status='active'",
+            (session_id, user_id, user["tenant_id"])).fetchone()
+        if row:
+            ok = auth.thu_hoi_phien(conn, session_id, user["id"], "Quản trị thu hồi phiên")
+            audit.ghi(conn, user, "account.revoke_session", target_type="session",
+                      target_id=session_id, detail={"user": user_id, "ok": ok}, request=request)
+        else:
+            ok = False
+            audit.ghi(conn, user, "account.revoke_session", target_type="user",
+                      target_id=user_id, detail={"ok": False}, request=request)
     finally:
         conn.close()
     return web.chuyen_huong(f"/tai-khoan/{user_id}",
@@ -348,9 +361,12 @@ async def trang_phan_quyen(request: Request, user_id: str):
         if not (rbac.co_quyen(user, request.state.perms, "permissions.view")
                 or rbac.co_quyen(user, request.state.perms, "permissions.grant")):
             raise Forbidden("Bạn không có quyền xem phân quyền module.")
+        if target["id"] != user["id"] and not rbac.trong_pham_vi(
+                conn, user, target.get("department_id")):
+            raise Forbidden("Tài khoản này nằm ngoài phạm vi bạn được uỷ quyền.")
         states = services.trang_thai_quyen_module(conn, target)
-        co_cap = (rbac.co_quyen(user, request.state.perms, "permissions.grant")
-                  and target["role_code"] != rbac.SUPER and target["id"] != user["id"])
+        co_cap = rbac.co_the_quan_ly(conn, user, request.state.perms, target,
+                                    "permissions.grant")
         vai_tro = rbac.lay_vai_tro(conn, target["role_code"])
     finally:
         conn.close()

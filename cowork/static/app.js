@@ -12,38 +12,61 @@
     var sidebar = document.getElementById("sidebar");
     var scrim = document.querySelector("[data-scrim]");
     var toggle = document.querySelector("[data-toggle-sidebar]");
+    var mobileNav = window.matchMedia("(max-width: 960px)");
 
-    function closeSidebar() {
+    /* Menu off-canvas không được nhận focus khi đang đóng (tránh tab vào vùng khuất). */
+    function syncSidebarInert() {
       if (!sidebar) return;
+      var hidden = mobileNav.matches && !sidebar.classList.contains("open");
+      sidebar.toggleAttribute("inert", hidden);
+    }
+
+    function closeSidebar(restoreFocus) {
+      if (!sidebar) return;
+      var hadFocus = sidebar.contains(document.activeElement);
       sidebar.classList.remove("open");
       if (scrim) scrim.hidden = true;
       if (toggle) toggle.setAttribute("aria-expanded", "false");
       document.body.classList.remove("nav-open");
+      syncSidebarInert();
+      if (restoreFocus && hadFocus && toggle) toggle.focus();
     }
     function openSidebar() {
       if (!sidebar) return;
       sidebar.classList.add("open");
+      sidebar.removeAttribute("inert");
       if (scrim) scrim.hidden = false;
       if (toggle) toggle.setAttribute("aria-expanded", "true");
       document.body.classList.add("nav-open");
+      var first = sidebar.querySelector(".nav-item, .brand");
+      if (first) first.focus();
     }
     if (toggle) {
       toggle.addEventListener("click", function () {
-        if (sidebar && sidebar.classList.contains("open")) closeSidebar();
+        if (sidebar && sidebar.classList.contains("open")) closeSidebar(true);
         else openSidebar();
       });
     }
-    if (scrim) scrim.addEventListener("click", closeSidebar);
+    if (scrim) scrim.addEventListener("click", function () { closeSidebar(true); });
+    var closeBtn = document.querySelector("[data-close-sidebar]");
+    if (closeBtn) closeBtn.addEventListener("click", function () { closeSidebar(true); });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeSidebar();
+      if (e.key === "Escape" && sidebar && sidebar.classList.contains("open")) closeSidebar(true);
     });
     if (sidebar) {
       sidebar.querySelectorAll("a.nav-item").forEach(function (a) {
         a.addEventListener("click", function () {
-          if (window.matchMedia("(max-width: 960px)").matches) closeSidebar();
+          if (mobileNav.matches) closeSidebar(false);
         });
       });
     }
+    function syncViewport() {
+      if (!mobileNav.matches) closeSidebar(false);
+      syncSidebarInert();
+    }
+    if (mobileNav.addEventListener) mobileNav.addEventListener("change", syncViewport);
+    else if (mobileNav.addListener) mobileNav.addListener(syncViewport);
+    syncSidebarInert();
 
     /* ---------- flash ---------- */
     document.querySelectorAll("[data-flash]").forEach(function (el) {
@@ -109,6 +132,7 @@
         var show = input.type === "password";
         input.type = show ? "text" : "password";
         btn.setAttribute("aria-pressed", show ? "true" : "false");
+        btn.setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
       });
     });
 

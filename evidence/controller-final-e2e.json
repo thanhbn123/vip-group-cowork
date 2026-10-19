@@ -1,0 +1,23 @@
+{
+  "sso": 200,
+  "brain_toi": 200,
+  "chat_ok": true,
+  "providerId": "local",
+  "nhan": "real",
+  "meta": {
+    "provider": "local",
+    "model": "qwen2.5:7b-instruct",
+    "doTreMs": 2239,
+    "tokenVao": 62,
+    "tokenRa": 185,
+    "chiPhi": 0.0,
+    "giaCo": false
+  },
+  "taskId": "T-G02-000025",
+  "traLoi": "Xin chào! Tôi là Qwen, trợ lý AI do Alibaba Cloud phát triển. Dù không phải là AI Local, tôi có thể hỗ trợ bạn với nhiều chức năng khác nhau. Dưới đây là một số chức năng mà bạn có thể sử dụng:\n\n1. **Trả lời câu hỏi**: Tôi có thể giúp bạn tìm kiếm thông tin từ các nguồn đáng tin cậy trên internet.\n2. **Tạo nội dung**: Bạn có thể yêu cầu tôi viết email, báo cáo, kịch bản, v.v.\n3. **Phân tích dữ liệu**: Tôi có thể hỗ trợ bạn trong việc phân tích và giải thích dữ liệu.\n4. **Học hỏi và cải thiện**: Qua mỗi câu hỏi và tương tác, tôi sẽ học hỏi và cải thiện khả năng của mình.\n\nNếu bạn cần hỗ trợ về một chức năng cụ thể, hãy cho tôi biết nhé!",
+  "revoke": {
+    "cowork": 403,
+    "brain_toi": 401
+  },
+  "restore": 200
+}

@@ -1,0 +1,61 @@
+AG-04 — KIỂM TRA CẤU HÌNH VÀ BẰNG CHỨNG PHỤ
+Thời điểm: 2026-10-19 17:46:18 +0700
+
+## 1. Dòng đã quote trong provision script
+78:VIP_BRAIN_DB="$STG/data/vip-brain-staging.db"
+90:MFA_SECRET_FILE="$HOME/VIP-AI/brain/mfa_secret.txt"
+92:PYTHONPYCACHEPREFIX="$STG/pycache"
+
+## 2. Source thử brain-staging/.env (không in bí mật)
+VIP_BRAIN_DB=/Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/VIP GROUP ID/cowork/brain-staging/data/vip-brain-staging.db
+MFA_SECRET_FILE=/Users/viporder/VIP-AI/brain/mfa_secret.txt
+PYTHONPYCACHEPREFIX=/Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/VIP GROUP ID/cowork/brain-staging/pycache
+COWORK_INTERNAL_URL=http://127.0.0.1:8899
+COWORK_BRIDGE_BAT=1
+COWORK_BRIDGE_ALLOW_MFA_USERS=0
+SOURCE_OK
+
+## 3. Cổng và tiến trình
+COMMAND     PID     USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+python3.1 76205 viporder    6u  IPv4 0x973276a185e66ed9      0t0  TCP 127.0.0.1:8892 (LISTEN)
+COMMAND     PID     USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+python3.1 33094 viporder    6u  IPv4 0x982de78abbf928fd      0t0  TCP 127.0.0.1:8899 (LISTEN)
+
+## 4. Health
+{"ok":true,"data":{"phienBan":"g02","gio":"2026-10-19T17:46:18+07:00","db":"ok"}}
+{"ok":true,"data":{"bridge":"bat","cookieSecure":false,"choMfa":false,"coBiMat":true}}
+{"ok":true,"data":{"app":"cowork","version":"1.0.0","db":"ok","brain":"bat","gio":"2026-10-19T17:46:18+07:00"}}
+
+## 5. DB staging
+ls: brain-staging/backend/vip-brain.db: No such file or directory
+-rw-------@ 1 viporder  staff  737280 Oct 19 17:46 brain-staging/data/vip-brain-staging.db
+ok
+76
+
+## 6. Hash bridge nguồn và bản copy staging
+0c25b8aceac76c1118ce0f9cc9fbca829d309e174b78e618b83ecea4843be301  brain-bridge/cowork_bridge.py
+0c25b8aceac76c1118ce0f9cc9fbca829d309e174b78e618b83ecea4843be301  brain-staging/backend/app/api/cowork_bridge.py
+
+## 7. Cấu hình model local trong DB staging
+[{"providerId": "local", "bat": true, "modelId": "qwen2.5:7b-instruct", "vaiTro": null, "giaPer1kVao": 0, "giaPer1kRa": 0, "giaPer1kCacheTao": 0, "giaPer1kCacheDoc": 0, "timeoutS": 180}]
+
+## 8. Quota staging (đã nâng để chạy lặp E2E)
+tong-hop|100
+
+## 9. Không có DB rác backend/vip-brain.db hay DB kiểm tra import
+backend/vip-brain.db: absent
+import-check.db: absent
+
+## 10. DB đang dùng là bản sao staging, không phải production
+Production path không được mở/đọc trong đợt này. DB đang dùng:
+brain-staging/data/vip-brain-staging.db
+tenants=1
+users=7
+tasks=23
+
+## 11. Quyền chat chung của shadow user (do bridge tạo/backfill)
+nhan-vien-01|tong-hop|doc
+nhan-vien-ctrl-01|tong-hop|doc
+nhan-vien-ctrl-02|tong-hop|doc
+qa-emp-first-173939|tong-hop|doc
+qa-emp-run-174014|tong-hop|doc

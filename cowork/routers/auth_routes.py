@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import RedirectResponse
 
-from .. import audit, auth, config, db, security, services, web
+from .. import audit, auth, brain, config, db, security, services, web
 from ..errors import AuthRequired, Forbidden, ValidationError
 
 router = APIRouter(dependencies=[Depends(web.nap_danh_tinh)])
@@ -27,7 +27,7 @@ async def xu_ly_dang_nhap(request: Request, userId: str = Form(""),
                           tiep: str = Form("/", alias="next")):
     if request.state.user:
         return RedirectResponse("/", status_code=303)
-    ip = request.client.host if request.client else "?"
+    ip = web.ip_cua(request)
     conn = db.connect()
     try:
         try:
@@ -44,7 +44,7 @@ async def xu_ly_dang_nhap(request: Request, userId: str = Form(""),
                 f"/dang-nhap?next={security.safe_next(tiep)}",
                 getattr(e, "message", "Sai ID hoặc mật khẩu."), "err")
             return resp
-        phien, token = auth.tao_phien(conn, user, request)
+        phien, token = auth.tao_phien(conn, user, request, ip=web.ip_cua(request))
         audit.ghi(conn, user, "auth.login", target_type="session", target_id=phien["id"],
                   detail={"ip": ip}, request=request)
         conn.commit()
@@ -64,7 +64,12 @@ async def dang_xuat(request: Request):
         conn = db.connect()
         try:
             auth.thu_hoi_phien(conn, session["id"], user["id"], "Người dùng đăng xuất")
+            # Đăng xuất COWORK cũng thu hồi phiên Brain native của cùng danh tính (nếu có).
+            kq_brain = {"ok": None}
+            if "brain.view" in getattr(request.state, "perms", set()):
+                kq_brain = brain.thu_hoi_phien(conn, user["id"], "COWORK đăng xuất")
             audit.ghi(conn, user, "auth.logout", target_type="session", target_id=session["id"],
+                      detail={"brainRevoke": kq_brain.get("ok")},
                       request=request)
         finally:
             conn.close()
@@ -96,7 +101,7 @@ async def xu_ly_doi_mat_khau(request: Request):
         except (ValidationError, Forbidden) as e:
             return web.chuyen_huong("/doi-mat-khau", e.message, "err")
         user_moi = auth.nguoi_dung_day_du(conn, user["id"])
-        phien, token = auth.tao_phien(conn, user_moi, request)
+        phien, token = auth.tao_phien(conn, user_moi, request, ip=web.ip_cua(request))
     finally:
         conn.close()
     resp = RedirectResponse("/", status_code=303)

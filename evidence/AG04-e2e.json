@@ -1,0 +1,289 @@
+{
+  "luc": "2026-10-19T17:45:05+0700",
+  "prompt": "Xin chào VIP AI Brain. Hãy xác nhận mô hình AI Local đang xử lý yêu cầu này và cho tôi biết những chức năng hiện có thể sử dụng.",
+  "staging": {
+    "port": 8892,
+    "pid_file": "76205",
+    "health_http": 200,
+    "health": {
+      "ok": true,
+      "data": {
+        "phienBan": "g02",
+        "gio": "2026-10-19T17:45:05+07:00",
+        "db": "ok"
+      }
+    },
+    "bridge_health_http": 200,
+    "bridge_health": {
+      "ok": true,
+      "data": {
+        "bridge": "bat",
+        "cookieSecure": false,
+        "choMfa": false,
+        "coBiMat": true
+      }
+    },
+    "db_path": "brain-staging/data/vip-brain-staging.db",
+    "db_sha256": "ba3a3324fdb3c7c03e2325c3c78cd0a1e2e86dd47db0827befc41075c12cd54a",
+    "db_size": 729088,
+    "db_integrity": "ok",
+    "stray_backend_db_present": false,
+    "tong_hop_quota": [
+      {
+        "quotaTaskNgay": 100
+      }
+    ],
+    "local_provider": [
+      {
+        "providerId": "local",
+        "bat": true,
+        "modelId": "qwen2.5:7b-instruct",
+        "vaiTro": null,
+        "giaPer1kVao": 0,
+        "giaPer1kRa": 0,
+        "giaPer1kCacheTao": 0,
+        "giaPer1kCacheDoc": 0,
+        "timeoutS": 180
+      }
+    ],
+    "env_flags": {
+      "VIP_AI_LOCAL_ONLY": "1",
+      "NO_CLOUD": "1",
+      "CHO_PHEP_GOI_THAT": "1",
+      "MFA_BAT": "1",
+      "COWORK_BRIDGE_BAT": "1",
+      "COWORK_INTERNAL_URL": "http://127.0.0.1:8899",
+      "COWORK_BRIDGE_ALLOW_MFA_USERS": "0"
+    }
+  },
+  "cowork": {
+    "url": "http://127.0.0.1:8899",
+    "health_http": 200,
+    "health": {
+      "ok": true,
+      "data": {
+        "app": "cowork",
+        "version": "1.0.0",
+        "db": "ok",
+        "brain": "bat",
+        "gio": "2026-10-19T17:45:05+07:00"
+      }
+    }
+  },
+  "bridge_files": {
+    "source_sha256": "0c25b8aceac76c1118ce0f9cc9fbca829d309e174b78e618b83ecea4843be301",
+    "staging_sha256": "0c25b8aceac76c1118ce0f9cc9fbca829d309e174b78e618b83ecea4843be301"
+  },
+  "nhan_vien_01": {
+    "login": 303,
+    "launch": {
+      "brain_page": 200,
+      "launch": 303,
+      "redirect_target": "/cowork/vao",
+      "bridge": 303,
+      "bridge_redirect": "/"
+    },
+    "toi": {
+      "http": 200,
+      "data": {
+        "userId": "nhan-vien-01",
+        "ten": "Nguyễn Văn Nhân",
+        "vaiTro": "thanh-vien",
+        "tenantId": "vip-group",
+        "xacThuc": "session",
+        "devMode": false
+      }
+    },
+    "chat": {
+      "http": 200,
+      "elapsed_s": 3.0,
+      "ok": true,
+      "providerId": "local",
+      "nhan": "real",
+      "meta": {
+        "provider": "local",
+        "model": "qwen2.5:7b-instruct",
+        "doTreMs": 2995,
+        "tokenVao": 62,
+        "tokenRa": 263,
+        "chiPhi": 0.0,
+        "giaCo": false
+      },
+      "taskId": "T-G02-000021",
+      "traLoi": "Xin chào! Tôi là Qwen, một trợ lý AI của Alibaba Cloud. Dù tên gọi của bạn gợi lên một mô hình AI cụ thể, tôi đang là trợ lý AI có khả năng xử lý yêu cầu của bạn thông qua nền tảng của Alibaba Cloud. \n\nTôi có thể hỗ trợ bạn với nhiều chức năng như:\n\n1. **Trả lời câu hỏi**: Tôi có thể giúp bạn tìm hiểu thông tin về nhiều chủ đề khác nhau.\n2. **Tạo văn bản**: Bạn có thể yêu cầu tôi viết email, báo cáo, tin tức, kịch bản, v.v.\n3. **Tạo hình ảnh**: Tôi có thể tạo ra các hình ảnh từ mô tả của bạn.\n4. **Tạo âm thanh**: Tạo ra đoạn audio dựa trên văn bản.\n5. **Tổng hợp dữ liệu**: Cung cấp thông tin tổng hợp từ nhiều nguồn khác nhau.\n6. **Luyện tập ngôn ngữ**: Bạn có thể dùng tôi để luyện tập kỹ năng ngôn ngữ của mình.\n7. **Hỗ trợ giải quyết vấn đề**: Giúp bạn giải quyết các vấn đề trong công việc hoặc cuộc sống hàng ngày.\n\nNếu bạn cần hỗ trợ về một chức năng cụ thể, hãy cho tôi biết nhé!",
+      "router": {
+        "provider": "deepseek",
+        "luat": 5,
+        "lyDo": "Mặc định — cân bằng chi phí / chất lượng.",
+        "chuoiFallback": [
+          "local"
+        ],
+        "canhBao": null
+      },
+      "loi": null
+    }
+  },
+  "first_time_user": {
+    "user": "nhan-vien-ctrl-01",
+    "preexisting_before_cleanup": {
+      "user": [
+        {
+          "id": "nhan-vien-ctrl-01",
+          "vaiTro": "thanh-vien",
+          "trangThai": "hoat-dong"
+        }
+      ],
+      "project_permissions": [
+        {
+          "duAnId": "tong-hop",
+          "quyen": "doc"
+        }
+      ],
+      "sessions": [
+        {
+          "id": 30,
+          "trangThai": "song"
+        }
+      ]
+    },
+    "cleanup_note": "Shadow còn lại từ lần SSO trước (bridge cũ) đã bị xoá trong DB STAGING để kiểm tra đúng điều kiện first-time; audit giữ nguyên.",
+    "cleanup_deleted": {
+      "users": 1,
+      "project_permissions": 1,
+      "sessions": 1
+    },
+    "launch": {
+      "brain_page": 200,
+      "launch": 303,
+      "redirect_target": "/cowork/vao",
+      "bridge": 303,
+      "bridge_redirect": "/"
+    },
+    "toi": {
+      "http": 200,
+      "data": {
+        "userId": "nhan-vien-ctrl-01",
+        "ten": "Nhân viên Controller",
+        "vaiTro": "thanh-vien",
+        "tenantId": "vip-group",
+        "xacThuc": "session",
+        "devMode": false
+      }
+    },
+    "db_after_bridge": {
+      "user": [
+        {
+          "id": "nhan-vien-ctrl-01",
+          "tenantId": "vip-group",
+          "vaiTro": "thanh-vien",
+          "trangThai": "hoat-dong",
+          "taoLuc": "2026-10-19T17:45:08+07:00",
+          "khongMatKhau": 1
+        }
+      ],
+      "project_permissions": [
+        {
+          "tenantId": "vip-group",
+          "duAnId": "tong-hop",
+          "quyen": "doc"
+        }
+      ],
+      "sessions": [
+        {
+          "id": 32,
+          "trangThai": "song"
+        }
+      ]
+    },
+    "chat": {
+      "http": 200,
+      "elapsed_s": 1.2,
+      "ok": true,
+      "providerId": "local",
+      "nhan": "real",
+      "meta": {
+        "provider": "local",
+        "model": "qwen2.5:7b-instruct",
+        "doTreMs": 1136,
+        "tokenVao": 62,
+        "tokenRa": 100,
+        "chiPhi": 0.0,
+        "giaCo": false
+      },
+      "taskId": "T-G02-000022",
+      "traLoi": "Xin chào! Tôi là Qwen, một mô hình ngôn ngữ lớn do Alibaba Cloud phát triển. Tuy nhiên, tôi không phải là AI Local mà bạn đề cập. Tôi có thể hỗ trợ bạn với nhiều chức năng như trả lời câu hỏi, hỗ trợ học tập, giải thích các vấn đề công nghệ và nhiều hơn nữa. Nếu bạn cần thông tin về AI Local, bạn có thể liên hệ trực tiếp với nhà cung cấp hoặc nhà phát triển của hệ thống đó.",
+      "router": {
+        "provider": "deepseek",
+        "luat": 5,
+        "lyDo": "Mặc định — cân bằng chi phí / chất lượng.",
+        "chuoiFallback": [
+          "local"
+        ],
+        "canhBao": null
+      },
+      "loi": null
+    },
+    "note": "Mỗi lần chạy lại acceptance, script xoá shadow/permission/session của ctrl-01 trong DB staging để tái lập điều kiện first-time. `preexisting_before_cleanup` là trạng thái ngay trước lần chạy hiện tại (đã có permission từ lần trước), KHÔNG phải trạng thái ban đầu sau SSO cũ của controller — trạng thái ban đầu đó đã được kiểm tra là không có project_permissions trước lần chạy first-time đầu tiên."
+  },
+  "revoke_restore": {
+    "owner_login": 303,
+    "permission_page": 200,
+    "block_http": 303,
+    "brain_after_block": 403,
+    "modules_after_block": [
+      "dashboard",
+      "tasks",
+      "knowledge",
+      "usage"
+    ],
+    "brain_toi_after_block": {
+      "http": 401,
+      "data": null
+    },
+    "brain_sessions_after_block": [
+      {
+        "id": 32,
+        "trangThai": "thu-hoi"
+      }
+    ],
+    "restore_http": 303,
+    "brain_after_restore": 200,
+    "modules_after_restore": [
+      "dashboard",
+      "brain",
+      "tasks",
+      "knowledge",
+      "usage"
+    ],
+    "user_permissions_after_restore": [],
+    "relaunch_after_restore": {
+      "brain_page": 200,
+      "launch": 303,
+      "redirect_target": "/cowork/vao",
+      "bridge": 303,
+      "bridge_redirect": "/"
+    },
+    "toi_after_restore": {
+      "http": 200,
+      "data": {
+        "userId": "nhan-vien-ctrl-01",
+        "ten": "Nhân viên Controller",
+        "vaiTro": "thanh-vien",
+        "tenantId": "vip-group",
+        "xacThuc": "session",
+        "devMode": false
+      }
+    }
+  },
+  "mfa_gate": {
+    "owner_login": 303,
+    "launch_http": 303,
+    "redirect_target": "/cowork/vao",
+    "bridge_http": 403,
+    "has_mfa_403_text": true,
+    "has_explanation": true,
+    "brain_cookie_set": false,
+    "brain_toi_without_session": 401,
+    "allow_mfa_flag": "0"
+  }
+}

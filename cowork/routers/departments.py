@@ -46,8 +46,12 @@ async def trang_tao(request: Request):
     user = await web.yeu_cau_dang_nhap(request)
     if not rbac.co_quyen(user, request.state.perms, "departments.create"):
         raise Forbidden("Bạn không có quyền tạo ban/bộ phận.")
-    if rbac.pham_vi_ban(db.connect(), user) is not None:
-        raise Forbidden("Chỉ quản trị toàn tenant mới được tạo ban mới.")
+    conn = db.connect()
+    try:
+        if rbac.pham_vi_ban(conn, user) is not None:
+            raise Forbidden("Chỉ quản trị toàn tenant mới được tạo ban mới.")
+    finally:
+        conn.close()
     return web.render(request, "departments/form.html", page_title="Tạo ban / bộ phận", user=user,
                       dept=None)
 
@@ -86,11 +90,21 @@ async def chi_tiet(request: Request, dept_id: str):
             "SELECT u.*, r.name AS role_name, r.level AS role_level FROM users u "
             "JOIN roles r ON r.code=u.role_code WHERE u.department_id=? AND u.status<>'archived' "
             "ORDER BY r.level DESC, u.id", (dept_id,)).fetchall()]
+        ung_where = ["u.tenant_id=?", "u.status='active'", "r.level>=?", "r.level<?",
+                     "u.role_code<>?"]
+        ung_params: list = [user["tenant_id"], rbac.cap_vai_tro(conn, rbac.MANAGER),
+                            rbac.cap_vai_tro(conn, user["role_code"]), rbac.SUPER]
+        scope = rbac.pham_vi_ban(conn, user)
+        if scope is not None:
+            if not scope:
+                ung_where.append("0=1")
+            else:
+                ung_where.append("u.department_id IN (" + ",".join("?" * len(scope)) + ")")
+                ung_params += list(scope)
         ung_vien = [dict(r) for r in conn.execute(
             "SELECT u.id, u.display_name, r.name AS role_name FROM users u "
-            "JOIN roles r ON r.code=u.role_code WHERE u.tenant_id=? AND u.status='active' "
-            "AND r.level>=? ORDER BY u.display_name",
-            (user["tenant_id"], rbac.cap_vai_tro(conn, rbac.MANAGER))).fetchall()]
+            "JOIN roles r ON r.code=u.role_code WHERE " + " AND ".join(ung_where) +
+            " ORDER BY u.display_name", ung_params).fetchall()]
         co_sua = (rbac.co_quyen(user, request.state.perms, "departments.update")
                   and rbac.trong_pham_vi(conn, user, dept_id))
         co_luu_tru = (rbac.co_quyen(user, request.state.perms, "departments.delete")

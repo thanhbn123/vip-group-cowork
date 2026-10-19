@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import ipaddress
 import json
 from datetime import datetime
 
@@ -18,6 +19,27 @@ templates = Jinja2Templates(directory=str(config.BASE_DIR / "cowork" / "template
 
 class MustChangePassword(Exception):
     pass
+
+
+def ip_cua(request) -> str:
+    """IP client cho rate limit/audit. CHỈ tin header khi `COWORK_TIN_PROXY=1`.
+
+    Caddy trên VPS ghi đè `X-Real-IP` bằng peer thật. Khi chạy trực tiếp localhost,
+    header do client tự gửi là giả mạo nên phải bỏ qua (mặc định TIN_PROXY=0).
+    """
+    try:
+        if config.TIN_PROXY:
+            for header in ("x-real-ip", "x-forwarded-for"):
+                raw = (request.headers.get(header) or "").split(",")[0].strip()
+                if not raw:
+                    continue
+                try:
+                    return str(ipaddress.ip_address(raw))
+                except ValueError:
+                    continue
+        return request.client.host if request.client else "?"
+    except Exception:  # noqa: BLE001
+        return "?"
 
 
 def _dt(value: str | None, fmt: str = "%d/%m/%Y %H:%M") -> str:

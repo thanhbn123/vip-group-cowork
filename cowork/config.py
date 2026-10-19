@@ -68,6 +68,9 @@ BRAIN_HEALTH_INTERNAL_PATH = "/api/cowork/suc-khoe"
 
 ENV = os.environ.get("COWORK_ENV", "local").strip() or "local"
 
+#: Tin header proxy (X-Real-IP/X-Forwarded-For) — CHỈ bật khi chạy sau Caddy đã GHI ĐÈ.
+TIN_PROXY = os.environ.get("COWORK_TIN_PROXY", "0").strip() == "1"
+
 
 def _secret(path: Path, env_name: str, size: int = 48) -> str:
     """Bí mật ổn định: env → tệp 0600 → sinh mới. Tệp nằm trong data/ (gitignore)."""

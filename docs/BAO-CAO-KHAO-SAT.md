@@ -5,6 +5,8 @@
 **Phạm vi:** máy MacBook của chủ dự án, Mac Studio (VIP AI Brain), VPS `160.22.170.20`, DNS `vipgroup.com.vn`
 **Nguyên tắc:** chỉ đọc — không sửa, không deploy, không push, không đụng dữ liệu thật.
 
+**Tên miền chính thức (chốt 19/10/2026):** COWORK = `https://cowork.vipgroup.com.vn` · VIP AI Brain = `https://ai.vipgroup.com.vn`. Chi tiết kiểm tra: `docs/CAU-HINH-TEN-MIEN.md`.
+
 ---
 
 ## 1. KẾT LUẬN NHANH
@@ -12,7 +14,7 @@
 | Câu hỏi | Kết luận |
 |---|---|
 | Đã có dự án COWORK chưa? | **CHƯA CÓ.** Không có source code, giao diện, backend hay database COWORK. |
-| Có tên miền dành cho COWORK chưa? | **Có DNS, chưa có dịch vụ.** `cowork.vipgroup.com.vn` và `id.vipgroup.com.vn` cùng trỏ `160.22.170.20`; gọi HTTPS trả lỗi kết nối (`000`). |
+| Có tên miền dành cho COWORK chưa? | **DNS đã đúng, chưa có site block.** `cowork.vipgroup.com.vn` trỏ `160.22.170.20`; Caddy chưa cấu hình tên này nên HTTPS lỗi `TLS alert internal error`. Không cần đổi DNS. |
 | Có gì đang chạy thật? | **VIP AI Brain** production tại `https://ai.vipgroup.com.vn`: FastAPI + SQLite `vip-brain.db`, AI Local `qwen2.5:7b-instruct` trên Mac Studio, 1 tenant, 7 user. |
 | Có được xây lại Brain không? | **KHÔNG.** Brain giữ nguyên; COWORK là lớp ứng dụng mới, gọi Brain như dịch vụ AI. |
 | Phần nào tái dùng được? | ID người dùng, phiên đăng nhập, tenant, audit, mô hình quyền theo dự án, Ollama/AI Local, tunnel VPS, backup — của Brain. |
@@ -33,8 +35,10 @@
 | `rg -l -i "cowork" ~/.claude/projects ~/.codex` | **0 phiên** lập trình trước đó. |
 | `find ~/Library/CloudStorage -maxdepth 3 -iname "*cowork*"` | **0 kết quả** trên hai ổ Synology Drive. |
 | `dig +short cowork.vipgroup.com.vn` | `160.22.170.20` (DNS đã chuẩn bị). |
-| `curl -I https://cowork.vipgroup.com.vn/` | `000` — **chưa có dịch vụ/TLS**. |
-| `dig +short id.vipgroup.com.vn` | `160.22.170.20` — cũng chưa có dịch vụ. |
+| `curl -I https://cowork.vipgroup.com.vn/` | `000` / `tlsv1 alert internal error` — **chưa có site block + chứng chỉ**. |
+| `dig +short @8.8.8.8 cowork.vipgroup.com.vn` | `160.22.170.20` — DNS đã lan truyền. |
+| Caddy VPS | `v2.11.4`, container `vip-staging-caddy`, **không có block `cowork`**; cổng `18835` đang trống. |
+| `dig +short id.vipgroup.com.vn` | `160.22.170.20` — tên phụ, chưa có dịch vụ; không dùng làm tên chính thức. |
 
 **Kết luận:** COWORK là dự án **greenfield**, không phải dự án đang dở cần sửa. Việc "không xây lại phần đã có" áp dụng cho **VIP AI Brain**, không áp dụng cho COWORK.
 
@@ -168,11 +172,11 @@ Ký hiệu: ✅ có và dùng được · 🟡 có một phần · ❌ chưa có
 | Bước | Nội dung | Điều kiện hoàn thành | Trạng thái |
 |---|---|---|---|
 | P1 | Khảo sát (báo cáo này) | Có bằng chứng, không sửa gì | ✅ xong |
-| P2 | Lõi COWORK: DB, auth, RBAC, tenant, audit, session | Test bảo mật xanh; seed 5 vai trò | ⏳ làm ngay |
-| P3 | Màn hình COWORK | 8 màn hình dùng được, responsive | ⏳ làm ngay |
-| P4 | Cầu nối Brain staging | Ticket one-time, phiên Brain, chat local thật, thu hồi chặn | ⏳ làm ngay |
-| P5 | Nghiệm thu 8 bước | Có log + ảnh/JSON, không MOCK | ⏳ sau P4 |
-| P6 | Bàn giao | Tài liệu chạy, tài khoản, rollback, kế hoạch production | ⏳ sau P5 |
+| P2 | Lõi COWORK: DB, auth, RBAC, tenant, audit, session | Test bảo mật xanh; seed 5 vai trò | ✅ xong (14 test + agent bổ sung) |
+| P3 | Màn hình COWORK | 8 màn hình dùng được, responsive | ✅ xong (15+ màn hình, có ảnh) |
+| P4 | Cầu nối Brain staging | Ticket one-time, phiên Brain, chat local thật, thu hồi chặn | 🔄 đang nghiệm thu (ticket + phiên Brain đã chạy; chat local đang vá quyền dự án chung) |
+| P5 | Nghiệm thu 8 bước | Có log + ảnh/JSON, không MOCK | 🔄 5 agent đang chạy; controller tích hợp |
+| P6 | Bàn giao | Tài liệu chạy, tài khoản, rollback, kế hoạch production | 🔄 tài liệu đã soạn; chờ bằng chứng cuối |
 
 ### 7.1. Điều kiện "đủ điều kiện để làm ngay"
 - Chỉ ghi trong workspace `VIP GROUP ID/cowork`.

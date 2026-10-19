@@ -1,0 +1,27 @@
+# AG-03 — replay test đối kháng trên bản HEAD của 5 tệp thuộc AG-03
+# Các làn khác giữ nguyên cây làm việc hiện tại; chỉ 5 tệp AG-03 bị trả về HEAD.
+# Kết quả: 4 passed / 16 failed (các lỗ hổng đã được vá sau đó).
+# Lệnh replay:
+#   cp cây làm việc -> /tmp; git show HEAD:<5 tệp AG-03> > bản sao;
+#   /.../.venv/bin/python -m pytest -q --tb=no -rA tests/test_admin_ag03.py
+
+PASSED tests/test_admin_ag03.py::test_super_admin_khong_bi_thay_doi_boi_admin
+PASSED tests/test_admin_ag03.py::test_khong_tao_duoc_super_admin_thu_hai
+PASSED tests/test_admin_ag03.py::test_admin_khong_tu_nang_quyen
+PASSED tests/test_admin_ag03.py::test_audit_dung_actor_target_va_khong_lo_mat_khau
+FAILED tests/test_admin_ag03.py::test_admin_scope_chi_trong_ban - AssertionEr...
+FAILED tests/test_admin_ag03.py::test_admin_scope_null_va_khong_dat_pham_vi_cho_nguoi_khac
+FAILED tests/test_admin_ag03.py::test_roles_manage_bi_uỷ_quyen_khong_sua_vai_tro_ngang_cap
+FAILED tests/test_admin_ag03.py::test_super_khong_gan_duoc_quyen_chi_super_cho_vai_tro_khac
+FAILED tests/test_admin_ag03.py::test_permissions_grant_subset_scope_va_nguyen_tu
+FAILED tests/test_admin_ag03.py::test_module_va_cai_dat_chi_super - Failed: D...
+FAILED tests/test_admin_ag03.py::test_truong_ban_chi_thay_va_sua_trong_ban - ...
+FAILED tests/test_admin_ag03.py::test_cach_ly_tenant_nguoi_dung_ban_audit - A...
+FAILED tests/test_admin_ag03.py::test_thu_hoi_phien_phai_dung_chu_so_huu - As...
+FAILED tests/test_admin_ag03.py::test_tai_khoan_luu_tru_khong_bi_khoi_phuc_boi_admin
+FAILED tests/test_admin_ag03.py::test_cap_nhat_ban_khong_di_chuyen_super_hoac_nguoi_ngoai_pham_vi
+FAILED tests/test_admin_ag03.py::test_employee_duoc_cap_quyen_khong_thao_tac_ngoai_ban
+FAILED tests/test_admin_ag03.py::test_tao_ban_trung_ma_tenant_khac_khong_500
+FAILED tests/test_admin_ag03.py::test_mo_khoa_xoa_bo_dem_dang_nhap_sai_cua_target
+FAILED tests/test_admin_ag03.py::test_bon_muc_quyen_khong_lam_500_module_khong_co_use
+FAILED tests/test_admin_ag03.py::test_thong_ke_audit_khong_ro_ri_tenant_cho_nhan_vien

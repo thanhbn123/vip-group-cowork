@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- LaunchAgent tunnel COWORK — DÁN vào ~/Library/LaunchAgents/ trên Mac Studio.
+     Chưa chạy. Cần duyệt cổng 2. -->
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.vipgroup.cowork.tunnel-vps</string>
+  <key>ProgramArguments</key><array>
+    <string>/bin/sh</string>
+    <string>/Users/macstudio/VIP-AI/cowork/bin/tunnel-vps.sh</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>StandardOutPath</key><string>/Users/macstudio/Library/Logs/VIPAI/cowork-tunnel.log</string>
+  <key>StandardErrorPath</key><string>/Users/macstudio/Library/Logs/VIPAI/cowork-tunnel.err.log</string>
+</dict></plist>

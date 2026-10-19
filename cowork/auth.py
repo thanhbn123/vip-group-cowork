@@ -62,7 +62,8 @@ def gio_phien(conn: sqlite3.Connection) -> int:
         return config.SESSION_HOURS
 
 
-def tao_phien(conn: sqlite3.Connection, user: dict, request) -> tuple[dict, str]:
+def tao_phien(conn: sqlite3.Connection, user: dict, request,
+              ip: str | None = None) -> tuple[dict, str]:
     token = security.token_moi(32)
     csrf = security.token_moi(24)
     now = datetime.now(db.TZ).replace(microsecond=0)
@@ -73,17 +74,20 @@ def tao_phien(conn: sqlite3.Connection, user: dict, request) -> tuple[dict, str]
         "last_seen_at, expires_at, ip, user_agent, status) VALUES(?,?,?,?,?,?,?,?,?,?, 'active')",
         (sid, security.sha256(token), csrf, user["id"], user["tenant_id"],
          now.isoformat(), now.isoformat(), het_han.isoformat(),
-         request.client.host if request.client else None,
+         (request.client.host if request.client else None) if ip is None else ip,
          (request.headers.get("user-agent") or "")[:400] or None),
     )
-    # Giới hạn 8 phiên sống / người: thu hồi các phiên cũ nhất.
+    # Giới hạn 8 phiên sống / người: thu hồi các phiên cũ nhất, KHÔNG BAO GIỜ thu hồi
+    # phiên vừa tạo (created_at chỉ tới giây nên nhiều phiên có thể trùng thời điểm).
     rows = conn.execute(
-        "SELECT id FROM sessions WHERE user_id=? AND status='active' ORDER BY created_at DESC",
+        "SELECT id FROM sessions WHERE user_id=? AND status='active' "
+        "ORDER BY created_at DESC, rowid DESC",
         (user["id"],)).fetchall()
-    for r in rows[8:]:
+    phien_cu = [r["id"] for r in rows if r["id"] != sid]
+    for old_id in phien_cu[7:]:
         conn.execute("UPDATE sessions SET status='revoked', revoked_at=?, revoked_by=?, "
                      "revoke_reason='Vượt giới hạn 8 phiên' WHERE id=?",
-                     (db.now_iso(), user["id"], r["id"]))
+                     (db.now_iso(), user["id"], old_id))
     conn.commit()
     return {"id": sid, "csrf_token": csrf, "expires_at": het_han.isoformat()}, token
 
@@ -249,6 +253,10 @@ def dang_nhap(conn: sqlite3.Connection, user_id: str, mat_khau: str, ip: str) ->
     if not user or user["status"] != "active":
         _ghi_lan(conn, user_id, ip, False)
         raise AuthRequired("Tài khoản chưa kích hoạt hoặc đang bị khoá.")
+    # Đăng nhập đúng chứng minh chủ tài khoản: xoá bộ đếm sai của chính user+IP này
+    # để các lần gõ nhầm trước đó không khoá oan về sau.
+    conn.execute("DELETE FROM login_attempts WHERE user_id=? AND ip=? AND success=0",
+                 (user_id, ip))
     _ghi_lan(conn, user_id, ip, True)
     conn.execute("UPDATE users SET last_login_at=?, failed_attempts=0, locked_until=NULL, "
                  "updated_at=? WHERE id=?", (db.now_iso(), db.now_iso(), user_id))

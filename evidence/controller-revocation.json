@@ -1,0 +1,19 @@
+{
+  "open_before": 200,
+  "brain_toi_before": 200,
+  "revoke_changes": {
+    "brain": {
+      "truoc": "default",
+      "sau": "block"
+    }
+  },
+  "cowork_brain_after": 403,
+  "brain_toi_after": 401,
+  "restore_changes": {
+    "brain": {
+      "truoc": "block",
+      "sau": "default"
+    }
+  },
+  "cowork_brain_restored": 200
+}

@@ -1,0 +1,765 @@
+{
+  "meta": {
+    "agent": "AG-05 QA & SECURITY",
+    "duAn": "VIP GROUP COWORK",
+    "batDau": "2026-10-19T17:53:03+07:00",
+    "ketThuc": "2026-10-19T17:53:07+07:00",
+    "runTag": "20261019-175303",
+    "cowork": "http://127.0.0.1:8899",
+    "brain": "http://127.0.0.1:8892",
+    "brainProductionGuard": "không chạm 127.0.0.1:8891 / ai.vipgroup.com.vn",
+    "dbDoc": "/Users/viporder/Library/CloudStorage/SynologyDrive-Macbook/VIP GROUP ID/cowork/data/cowork.db",
+    "coworkHealth": {
+      "http": 200,
+      "data": {
+        "app": "cowork",
+        "version": "1.0.0",
+        "db": "ok",
+        "brain": "bat",
+        "gio": "2026-10-19T17:53:03+07:00"
+      }
+    },
+    "brainHealth": {
+      "http": 200,
+      "data": {
+        "phienBan": "g02",
+        "gio": "2026-10-19T17:53:03+07:00",
+        "db": "ok"
+      },
+      "ok": true
+    },
+    "phienBanScript": "1.0.0",
+    "nguyenTac": [
+      "HTTP thật, cookie jar riêng từng người",
+      "không in mật khẩu/ticket/CSRF",
+      "mock/cloud không được tính PASS"
+    ],
+    "luuY": [
+      "POST quản trị bị từ chối ở tầng nghiệp vụ trả 303 + flash lỗi (quy ước routers/accounts.py); GET route quản trị trả 403.",
+      "Brain staging (uvicorn access log) ghi ticket trong query string — ticket dùng một lần, TTL 60 giây; nên tắt/che access log khi lên thật."
+    ]
+  },
+  "buoc": [
+    {
+      "id": "B1",
+      "name": "Chủ sở hữu đăng nhập COWORK",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/dang-nhap",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/dang-nhap",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        }
+      ],
+      "details": {
+        "nguoiDung": "anh-thanh",
+        "vaiTro": "super_admin",
+        "tenantId": "vip-group",
+        "soModule": 15,
+        "cookie": {
+          "ten": "cowork_session",
+          "httpOnly": true,
+          "sameSite": "lax",
+          "giaTri": "***"
+        },
+        "matKhauNguon": "secrets/owner-anh-thanh.txt"
+      }
+    },
+    {
+      "id": "B2",
+      "name": "Tạo quản trị cấp dưới mới (qa-admin-*)",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/tai-khoan/tao-moi",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/tao-moi",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan/qa-admin-20261019-175303",
+          "status": 200
+        }
+      ],
+      "details": {
+        "id": "qa-admin-20261019-175303",
+        "vaiTro": "admin",
+        "ban": "ban-dieu-hanh",
+        "trangThai": "active",
+        "phamVi": "tenant (admin_scopes.department_id=NULL)",
+        "xacMinhDb": true,
+        "xacMinhHttp": 200,
+        "matKhau": {
+          "giaTri": "***",
+          "doDai": 22,
+          "luuO": "bộ nhớ tiến trình, không ghi đĩa"
+        }
+      }
+    },
+    {
+      "id": "B3",
+      "name": "Quản trị tạo nhân viên Ban Kinh doanh (qa-emp-*)",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/dang-nhap",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/dang-nhap",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan/tao-moi",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/tao-moi",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan/qa-emp-20261019-175303",
+          "status": 200
+        }
+      ],
+      "details": {
+        "id": "qa-emp-20261019-175303",
+        "vaiTro": "employee",
+        "ban": "kinh-doanh",
+        "nguoiTao": "qa-admin-20261019-175303",
+        "trangThai": "active",
+        "xacMinhDb": true,
+        "xacMinhHttp": 200,
+        "matKhau": {
+          "giaTri": "***",
+          "doDai": 22
+        }
+      }
+    },
+    {
+      "id": "B4",
+      "name": "Nhân viên đăng nhập",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/dang-nhap",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/dang-nhap",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        }
+      ],
+      "details": {
+        "nguoiDung": "qa-emp-20261019-175303",
+        "vaiTro": "employee",
+        "ban": "Ban Kinh doanh",
+        "modules": [
+          "dashboard",
+          "brain",
+          "tasks",
+          "knowledge",
+          "usage"
+        ],
+        "soPhienMoi": 1
+      }
+    },
+    {
+      "id": "B5",
+      "name": "Nhân viên chỉ thấy module được cấp",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/module/tasks",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/module/knowledge",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/module/usage",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/ban",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/vai-tro",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/nhat-ky",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/cai-dat",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/phan-quyen",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/module-registry",
+          "status": 403
+        }
+      ],
+      "details": {
+        "apiMeModules": [
+          "dashboard",
+          "brain",
+          "tasks",
+          "knowledge",
+          "usage"
+        ],
+        "sidebarHrefs": [
+          "/",
+          "/brain",
+          "/module/knowledge",
+          "/module/tasks",
+          "/module/usage"
+        ],
+        "khopSidebar": true,
+        "soMucQuanTriTrongSidebar": 0,
+        "routeQuanTriBiChan": {
+          "/tai-khoan": 403,
+          "/ban": 403,
+          "/vai-tro": 403,
+          "/nhat-ky": 403,
+          "/cai-dat": 403,
+          "/phan-quyen": 403,
+          "/module-registry": 403
+        },
+        "modulesTruyCapDuoc": [
+          "/",
+          "/brain",
+          "/module/tasks",
+          "/module/knowledge",
+          "/module/usage"
+        ]
+      }
+    },
+    {
+      "id": "B6",
+      "name": "Mở VIP AI Brain từ COWORK (SSO ticket)",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:03+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/brain",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/brain/mo",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8892/cowork/vao?ticket=***",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8892/api/auth/toi",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8892/cowork/vao?ticket=***",
+          "status": 401
+        }
+      ],
+      "details": {
+        "coworkPage": 200,
+        "postMoBrain": 303,
+        "redirect": "http://127.0.0.1:8892/cowork/vao?ticket=***",
+        "bridgeVao": 303,
+        "brainToi": {
+          "http": 200,
+          "userId": "qa-emp-20261019-175303",
+          "vaiTro": "thanh-vien",
+          "tenantId": "vip-group"
+        },
+        "dangNhapLanHai": 0,
+        "goiBrainTrongPhien": 2,
+        "ticketDungMotLan": {
+          "http": 401,
+          "ketLuan": "không tái sử dụng được"
+        },
+        "cookiePhienBrain": {
+          "ten": "vip_session",
+          "giaTri": "***"
+        }
+      }
+    },
+    {
+      "id": "B7",
+      "name": "Chat thật với AI Local (local/real)",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:03+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:8892/api/chat",
+          "status": 200
+        }
+      ],
+      "details": {
+        "prompt": "Xin chào VIP AI Brain. Hãy xác nhận mô hình AI Local đang xử lý yêu cầu này và cho tôi biết những chức năng hiện có thể sử dụng.",
+        "providerId": "local",
+        "nhan": "real",
+        "meta": {
+          "provider": "local",
+          "model": "qwen2.5:7b-instruct",
+          "doTreMs": 3682,
+          "tokenVao": 62,
+          "tokenRa": 271,
+          "chiPhi": 0.0,
+          "giaCo": false
+        },
+        "router": {
+          "provider": "local",
+          "luat": null,
+          "lyDo": "Người dùng ép chọn"
+        },
+        "taskId": "T-G02-000024",
+        "doDaiTraLoi": 961,
+        "traLoiTrich": "Xin chào! Tôi xin được giới thiệu rằng tôi là Qwen, một trợ lý AI do Alibaba Cloud phát triển. Tôi có thể hỗ trợ bạn với nhiều chức năng khác nhau. Tuy nhiên, về mặt kỹ thuật, tôi không xác định được liệu yêu cầu của bạn có được xử lý bởi mô hình AI Local hay không, vì thông tin này không nằm trong phạm vi tôi có thể truy cập.\n\nTuy nhiên, tôi có thể hỗ trợ bạn với các chức năng sau:\n\n1. **Trả lời ",
+        "biChan": 0
+      }
+    },
+    {
+      "id": "B8",
+      "name": "Thu hồi quyền Brain + phiên Brain cũ",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/ho-so",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/qa-emp-20261019-175303/phan-quyen",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/brain",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/ho-so",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/brain/mo",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8892/api/auth/toi",
+          "status": 401
+        }
+      ],
+      "details": {
+        "thoiDiemThuHoi": "2026-10-19T17:53:07+07:00",
+        "nguoiThucHien": "anh-thanh (super_admin)",
+        "hinhThuc": "thu hồi quyền module brain (user_permissions deny)",
+        "dbQuyen": [
+          {
+            "permission_code": "brain.use",
+            "effect": "deny"
+          },
+          {
+            "permission_code": "brain.view",
+            "effect": "deny"
+          }
+        ],
+        "coworkBrain": 403,
+        "coworkBrainMo": 403,
+        "brainToiSauThuHoi": 401,
+        "phienBrainCu": "không truy cập được (401)"
+      }
+    }
+  ],
+  "kiemThuBaoMat": [
+    {
+      "id": "S1",
+      "name": "Không cookie → 303/401",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan",
+          "status": 303
+        }
+      ],
+      "details": {
+        "trangChu": 303,
+        "apiMe": 401,
+        "taiKhoan": 303,
+        "chuyenHuong": "/dang-nhap?next=%2F"
+      }
+    },
+    {
+      "id": "S2",
+      "name": "Thiếu/sai CSRF → 403",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "POST",
+          "url": "/tai-khoan/tao-moi",
+          "status": 403
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/tao-moi",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/ho-so",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/ho-so",
+          "status": 403
+        }
+      ],
+      "details": {
+        "thieuCsrf": 403,
+        "csrfSai": 403,
+        "originLa": 403,
+        "taiKhoanKhongDuocTao": true
+      }
+    },
+    {
+      "id": "S3",
+      "name": "Nhân viên gọi route quản trị → 403",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/tai-khoan",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/ban",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/vai-tro",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/nhat-ky",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/cai-dat",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/phan-quyen",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/module-registry",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/ho-so",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/qa-admin-20261019-175303/khoa",
+          "status": 303
+        }
+      ],
+      "details": {
+        "routeGet": {
+          "/tai-khoan": 403,
+          "/ban": 403,
+          "/vai-tro": 403,
+          "/nhat-ky": 403,
+          "/cai-dat": 403,
+          "/phan-quyen": 403,
+          "/module-registry": 403
+        },
+        "postKhoaHttp": 303,
+        "postKhoaBiChan": true,
+        "quanTriVanActive": true,
+        "auditSuspend": 0,
+        "ghiChu": "GET route quản trị = 403; POST khoá bị chặn ở service, COWORK trả 303 + flash lỗi theo quy ước của routers/accounts.py — trạng thái không đổi."
+      }
+    },
+    {
+      "id": "S4",
+      "name": "Cross-tenant: b-admin không đọc được anh-thanh → 404",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/dang-nhap",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/dang-nhap",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan/anh-thanh",
+          "status": 404
+        },
+        {
+          "method": "GET",
+          "url": "/ho-so",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/anh-thanh/khoa",
+          "status": 404
+        },
+        {
+          "method": "GET",
+          "url": "/tai-khoan",
+          "status": 200
+        }
+      ],
+      "details": {
+        "tenantId": "tenant-b",
+        "xemAnhThanh": 404,
+        "khoaAnhThanh": 404,
+        "danhSachKhongLo": true,
+        "anhThanhVanActive": true
+      }
+    },
+    {
+      "id": "S5",
+      "name": "Phiên bị thu hồi → 303 /dang-nhap",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "/ho-so",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "url": "/tai-khoan/qa-admin-20261019-175303/thu-hoi-phien",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/",
+          "status": 303
+        },
+        {
+          "method": "GET",
+          "url": "/api/me",
+          "status": 401
+        }
+      ],
+      "details": {
+        "thuHoi": 303,
+        "trangChuSauThuHoi": 303,
+        "chuyenHuong": "/dang-nhap?next=%2F",
+        "apiMe": 401,
+        "soPhienActiveConLai": 0
+      }
+    },
+    {
+      "id": "S6",
+      "name": "Cổng bridge Brain fail-closed",
+      "status": "PASS",
+      "startedAt": "2026-10-19T17:53:07+07:00",
+      "finishedAt": "2026-10-19T17:53:07+07:00",
+      "http": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8892/cowork/vao",
+          "status": 400
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:8892/api/cowork/thu-hoi",
+          "status": 401
+        }
+      ],
+      "details": {
+        "vaoKhongTicket": 400,
+        "thuHoiKhongChuKy": 401
+      }
+    }
+  ],
+  "donDep": {
+    "batDau": "2026-10-19T17:53:07+07:00",
+    "taiKhoan": {
+      "admin": {
+        "id": "qa-admin-20261019-175303",
+        "hanhDong": [
+          {
+            "thuHoiPhien": 303
+          },
+          {
+            "luuTru": 303
+          }
+        ],
+        "trangThaiSau": "archived",
+        "ketQua": "PASS"
+      },
+      "employee": {
+        "id": "qa-emp-20261019-175303",
+        "hanhDong": [
+          {
+            "thuHoiPhien": 303
+          },
+          {
+            "luuTru": 303
+          }
+        ],
+        "trangThaiSau": "archived",
+        "ketQua": "PASS"
+      }
+    },
+    "ketThuc": "2026-10-19T17:53:07+07:00",
+    "ghiChu": "Tài khoản QA đã lưu trữ (archived), không xoá cứng; bản ghi audit còn nguyên."
+  },
+  "tongHop": {
+    "steps": {
+      "PASS": 8,
+      "FAIL": 0,
+      "BLOCKED": 0
+    },
+    "security": {
+      "PASS": 6,
+      "FAIL": 0,
+      "BLOCKED": 0
+    },
+    "ketLuan": "PASS toàn bộ"
+  }
+}

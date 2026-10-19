@@ -85,7 +85,7 @@
         <button type="button" class="btn btn-ghost btn-sm btn-block" data-brain-test="/cai-dat/kiem-tra-brain">
           {{ ui.icon('refresh', 16) }} Kiểm tra kết nối
         </button>
-        <div class="brain-test-result" data-brain-result hidden></div>
+        <div class="brain-test-result" data-brain-result role="status" aria-live="polite" hidden></div>
         {% if not suc_khoe.ok %}<p class="hint err-hint">{{ suc_khoe.thongBao }}</p>{% endif %}
       </aside>
     </div>

@@ -1,0 +1,12 @@
+# Brain production snapshot — 2026-10-19 17:37:28 +0700
+# Read-only via SSH; no changes made.
+host=vip-ai-studio.local
+health={"ok":true,"data":{"phienBan":"g02","gio":"2026-10-19T17:37:28+07:00","db":"ok"}}
+db_integrity=ok
+users=7
+tenants=1
+sessions_song=20
+audit_rows=187
+port8899=0
+port8892=0
+# Kết luận: COWORK chưa chạy trên Mac Studio; Brain production vẫn 127.0.0.1:8891.

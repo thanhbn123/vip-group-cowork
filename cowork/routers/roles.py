@@ -53,8 +53,7 @@ async def chi_tiet(request: Request, role_code: str):
                                     "so_chon": sum(1 for p in ds if p["code"] in selected)})
         so_nguoi = conn.execute("SELECT COUNT(*) FROM users WHERE role_code=? AND status<>'archived'",
                                 (role_code,)).fetchone()[0]
-        co_sua = (rbac.co_quyen(user, request.state.perms, "roles.manage")
-                  and role_code != rbac.SUPER and not role["is_locked"])
+        co_sua = rbac.co_the_sua_vai_tro(conn, user, request.state.perms, role_code)
     finally:
         conn.close()
     return web.render(request, "roles/detail.html", page_title=f"Vai trò · {role['name']}",

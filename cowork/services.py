@@ -39,9 +39,12 @@ def _bat_buoc_ban(role_code: str) -> bool:
 
 
 def _kiem_tra_pham_vi_ban(conn: sqlite3.Connection, actor: dict, dept_id: str | None) -> None:
-    if actor["role_code"] in (rbac.ADMIN, rbac.MANAGER) and actor["role_code"] != rbac.SUPER:
-        if not rbac.trong_pham_vi(conn, actor, dept_id):
-            raise Forbidden("Ban/bộ phận này nằm ngoài phạm vi bạn được uỷ quyền.")
+    # Super Admin toàn quyền; mọi vai trò khác chỉ thao tác trong phạm vi của mình.
+    # Vai trò không có phạm vi (nhân viên/đối tác) trả về tập rỗng ⇒ bị chặn.
+    if actor["role_code"] == rbac.SUPER:
+        return
+    if not rbac.trong_pham_vi(conn, actor, dept_id):
+        raise Forbidden("Ban/bộ phận này nằm ngoài phạm vi bạn được uỷ quyền.")
 
 
 def _thong_bao_ban(conn: sqlite3.Connection, dept_id: str | None) -> str:
@@ -72,6 +75,8 @@ def tao_nguoi_dung(conn: sqlite3.Connection, actor: dict, perms: set[str], data:
     if not role:
         raise ValidationError("Vai trò không hợp lệ.")
     rbac.kiem_tra_gan_vai_tro(conn, actor, role_code)
+    if role_code == rbac.ADMIN and not rbac.la_super(actor):
+        raise Forbidden("Chỉ Super Admin được tạo tài khoản Quản trị cấp dưới.")
     dept_id = (data.get("department_id") or "").strip() or None
     if _bat_buoc_ban(role_code) and not dept_id:
         raise ValidationError("Trưởng ban và nhân viên phải thuộc một ban/bộ phận.")
@@ -113,11 +118,8 @@ def _luu_scope_admin(conn: sqlite3.Connection, actor: dict, user_id: str, data: 
                      request=None) -> None:
     """Chỉ Super Admin được đặt phạm vi cho quản trị cấp dưới."""
     if actor["role_code"] != rbac.SUPER:
-        conn.execute("INSERT OR IGNORE INTO admin_scopes(tenant_id, user_id, department_id, "
-                     "created_at, created_by) VALUES(?,?,NULL,?,?)",
-                     (actor["tenant_id"], user_id, db.now_iso(), actor["id"]))
-        conn.commit()
-        return
+        # Không bao giờ mặc định phạm vi toàn tenant cho người không phải Super Admin.
+        raise Forbidden("Chỉ Super Admin được đặt phạm vi quản trị.")
     mode = (data.get("scope_mode") or "tenant").strip()
     conn.execute("DELETE FROM admin_scopes WHERE user_id=?", (user_id,))
     if mode == "tenant":
@@ -240,6 +242,11 @@ def doi_trang_thai(conn: sqlite3.Connection, actor: dict, perms: set[str], targe
         raise Forbidden("Không thể khoá Super Admin.")
     conn.execute("UPDATE users SET status=?, updated_at=? WHERE id=?",
                  (trang_thai, db.now_iso(), target["id"]))
+    if trang_thai == "active":
+        # Mở khoá phải xoá bộ đếm đăng nhập sai của CHÍNH tài khoản này (mọi IP),
+        # nếu không người dùng vẫn bị rate-limit chặn dù tài khoản đã hoạt động lại.
+        conn.execute("DELETE FROM login_attempts WHERE user_id=? AND success=0",
+                     (target["id"],))
     conn.commit()
     if trang_thai == "suspended":
         auth.thu_hoi_cua_user(conn, target["id"], actor["id"], "Tài khoản bị khoá")
@@ -255,6 +262,8 @@ def luu_tru_nguoi_dung(conn: sqlite3.Connection, actor: dict, perms: set[str], t
         raise Forbidden("Không thể lưu trữ Super Admin.")
     conn.execute("UPDATE users SET status='archived', updated_at=? WHERE id=?",
                  (db.now_iso(), target["id"]))
+    # Scope quản trị của tài khoản đã lưu trữ không còn giá trị.
+    conn.execute("DELETE FROM admin_scopes WHERE user_id=?", (target["id"],))
     conn.commit()
     auth.thu_hoi_cua_user(conn, target["id"], actor["id"], "Tài khoản bị lưu trữ")
     brain.thu_hoi_phien(conn, target["id"], "COWORK lưu trữ tài khoản")
@@ -307,28 +316,51 @@ def dat_quyen_module(conn: sqlite3.Connection, actor: dict, perms: set[str], tar
     if not rbac.co_the_quan_ly(conn, actor, perms, target, "permissions.grant"):
         raise Forbidden("Tài khoản ngoài phạm vi hoặc không đủ cấp để phân quyền.")
     hop_le = {r["code"]: dict(r) for r in conn.execute("SELECT * FROM modules").fetchall()}
-    before = {r["code"]: r["mode"] for r in trang_thai_quyen_module(conn, target)}
+    hop_le_quyen = {r["code"] for r in conn.execute("SELECT code FROM permissions").fetchall()}
+
+    def _ma_quyen(module_code: str) -> tuple[list[str], list[str]]:
+        """Chỉ trả mã quyền THỰC SỰ tồn tại cho module.
+
+        Nhiều module (accounts, departments, roles…) chỉ có view + action, không
+        có `<module>.use`. Ghi thẳng `use` sẽ vi phạm khoá ngoại (lỗi 500).
+        Với các module đó, mức "sử dụng" tương đương "chỉ xem" ở tầng module.
+        """
+        view, use = _quyen_module(module_code)
+        return ([view] if view in hop_le_quyen else [],
+                [use] if use in hop_le_quyen else [])
+
+    # Kiểm tra TOÀN BỘ lựa chọn trước khi ghi: tránh thu hồi dở dang nếu một
+    # module sau đó bị từ chối (DB chạy autocommit).
     for module_code, mode in lua_chon.items():
         if module_code not in hop_le:
             continue
         if mode not in ("default", "view", "use", "block"):
             raise ValidationError(f"Lựa chọn quyền không hợp lệ cho module {module_code}.")
-        view, use = _quyen_module(module_code)
-        conn.execute("DELETE FROM user_permissions WHERE user_id=? AND permission_code IN (?,?)",
-                     (target["id"], view, use))
+        if mode in ("view", "use"):
+            view_codes, use_codes = _ma_quyen(module_code)
+            for code in (view_codes if mode == "view" else view_codes + use_codes):
+                rbac.kiem_tra_cap_quyen(actor, perms, code)
+    before = {r["code"]: r["mode"] for r in trang_thai_quyen_module(conn, target)}
+    for module_code, mode in lua_chon.items():
+        if module_code not in hop_le:
+            continue
+        view_codes, use_codes = _ma_quyen(module_code)
+        codes = view_codes + use_codes
+        if codes:
+            conn.execute(
+                "DELETE FROM user_permissions WHERE user_id=? AND permission_code IN ("
+                + ",".join("?" * len(codes)) + ")", (target["id"], *codes))
         if mode == "default":
             continue
         allow = []
         deny = []
         if mode == "block":
-            deny = [view, use]
+            deny = codes
         elif mode == "view":
-            allow = [view]
-            deny = [use]
+            allow = view_codes
+            deny = use_codes
         elif mode == "use":
-            allow = [view, use]
-        for code in allow:
-            rbac.kiem_tra_cap_quyen(actor, perms, code)
+            allow = view_codes + use_codes
         for code, effect in [(c, "allow") for c in allow] + [(c, "deny") for c in deny]:
             conn.execute(
                 "INSERT INTO user_permissions(tenant_id, user_id, permission_code, effect, "
@@ -361,9 +393,11 @@ def tao_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], data: dict,
     code = (data.get("code") or security.slug(name, 30)).strip().lower()
     if not re.match(r"^[a-z0-9][a-z0-9-]{1,39}$", code):
         raise ValidationError("Mã ban chỉ gồm a-z, 0-9 và dấu gạch ngang.")
-    if conn.execute("SELECT 1 FROM departments WHERE tenant_id=? AND code=?",
-                    (actor["tenant_id"], code)).fetchone():
-        raise Conflict("Mã ban đã tồn tại.")
+    # `departments.id` hiện là duy nhất TOÀN HỆ THỐNG (id = code). Kiểm tra toàn
+    # cục để tránh IntegrityError 500 khi tenant khác đã dùng cùng mã.
+    if conn.execute("SELECT 1 FROM departments WHERE id=? OR (tenant_id=? AND code=?)",
+                    (code, actor["tenant_id"], code)).fetchone():
+        raise Conflict("Mã ban đã tồn tại (mã ban là duy nhất toàn hệ thống).")
     now = db.now_iso()
     dept_id = code
     conn.execute(
@@ -380,6 +414,8 @@ def tao_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], data: dict,
 def cap_nhat_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], dept: dict,
                  data: dict, request=None) -> None:
     rbac.doi_quyen(actor, perms, "departments.update", "Bạn không có quyền sửa ban/bộ phận.")
+    if dept.get("tenant_id") != actor["tenant_id"]:
+        raise Forbidden("Ban/bộ phận này không thuộc tenant của bạn.")
     if not rbac.trong_pham_vi(conn, actor, dept["id"]):
         raise Forbidden("Ban này nằm ngoài phạm vi bạn được uỷ quyền.")
     name = (data.get("name") or dept["name"]).strip()[:120]
@@ -396,6 +432,11 @@ def cap_nhat_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], dept: d
             raise ValidationError("Trưởng ban phải là tài khoản đang hoạt động.")
         if rbac.cap_vai_tro(conn, mgr["role_code"]) < rbac.cap_vai_tro(conn, rbac.MANAGER):
             raise ValidationError("Trưởng ban phải có vai trò Trưởng ban hoặc cao hơn.")
+        # Gán trưởng ban là thao tác lên tài khoản đó: phải trong phạm vi, thấp hơn
+        # cấp và không được là Super Admin/tài khoản đã lưu trữ.
+        if not rbac.co_the_quan_ly(conn, actor, perms, dict(mgr), "departments.update"):
+            raise Forbidden("Bạn không được gán người này làm trưởng ban "
+                            "(khác cấp, ngoài phạm vi hoặc tài khoản đã lưu trữ).")
         conn.execute("UPDATE users SET department_id=?, updated_at=? WHERE id=?",
                      (dept["id"], db.now_iso(), manager_id))
     conn.execute("UPDATE departments SET name=?, description=?, manager_user_id=?, updated_at=? "
@@ -408,6 +449,8 @@ def cap_nhat_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], dept: d
 def luu_tru_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], dept: dict,
                 request=None) -> None:
     rbac.doi_quyen(actor, perms, "departments.delete", "Bạn không có quyền lưu trữ ban.")
+    if dept.get("tenant_id") != actor["tenant_id"]:
+        raise Forbidden("Ban/bộ phận này không thuộc tenant của bạn.")
     if not rbac.trong_pham_vi(conn, actor, dept["id"]):
         raise Forbidden("Ban này nằm ngoài phạm vi bạn được uỷ quyền.")
     so_nguoi = conn.execute(
@@ -423,14 +466,30 @@ def luu_tru_ban(conn: sqlite3.Connection, actor: dict, perms: set[str], dept: di
 
 
 # ------------------------------------------------------------------ vai trò
+def _kiem_tra_tenant_cau_hinh(actor: dict) -> None:
+    """Vai trò/module/cài đặt là cấu hình TOÀN HỆ THỐNG (schema hiện chưa tenant-scoped).
+
+    Chỉ Super Admin của tenant gốc mới được sửa, để tenant khác không thay đổi
+    ma trận quyền/module/setting ảnh hưởng tenant gốc. Người dùng tenant khác vẫn
+    được quản lý tài khoản/ban trong tenant của mình theo phân quyền thường.
+    """
+    if actor["tenant_id"] != config.TENANT_MAC_DINH:
+        raise Forbidden("Cấu hình vai trò/module/cài đặt là toàn hệ thống; "
+                        "chỉ Super Admin tenant gốc được sửa.")
+
+
 def cap_nhat_quyen_vai_tro(conn: sqlite3.Connection, actor: dict, perms: set[str],
                            role_code: str, quyen: list[str], request=None) -> dict:
     rbac.doi_quyen(actor, perms, "roles.manage", "Chỉ Super Admin được sửa quyền vai trò.")
+    _kiem_tra_tenant_cau_hinh(actor)
     role = rbac.lay_vai_tro(conn, role_code)
     if not role:
         raise NotFound("Vai trò không tồn tại.")
     if role_code == rbac.SUPER or role["is_locked"]:
         raise Forbidden("Vai trò Super Admin được khoá, không thể sửa.")
+    if not rbac.co_the_sua_vai_tro(conn, actor, perms, role_code):
+        raise Forbidden("Bạn chỉ được sửa vai trò thấp hơn cấp của mình và cần cả "
+                        "quyền 'roles.manage' lẫn 'permissions.grant'.")
     hop_le = {r["code"] for r in conn.execute("SELECT code FROM permissions").fetchall()}
     moi = {p for p in quyen if p in hop_le}
     # Quyền hành động phải đi kèm quyền xem module.
@@ -439,8 +498,20 @@ def cap_nhat_quyen_vai_tro(conn: sqlite3.Connection, actor: dict, perms: set[str
             module_code = p.split(".", 1)[0]
             if p.split(".", 1)[1] != "view":
                 moi.add(f"{module_code}.view")
+    moi &= hop_le
+    # Quyền miễn nhiễm chỉ thuộc về vai trò Super Admin.
+    if moi & rbac.QUYEN_CHI_SUPER:
+        raise Forbidden("Không thể gán quyền chỉ dành cho Super Admin cho vai trò khác.")
     cu = {r["permission_code"] for r in conn.execute(
         "SELECT permission_code FROM role_permissions WHERE role_code=?", (role_code,)).fetchall()}
+    if not rbac.la_super(actor):
+        # Chỉ được thêm quyền mình có (subset) và chỉ được thu hồi quyền mình có.
+        for p in sorted(moi - cu):
+            rbac.kiem_tra_cap_quyen(actor, perms, p)
+        for p in sorted(cu - moi):
+            if p not in perms:
+                raise Forbidden(f"Không thể thu hồi quyền '{p}' vì bạn không có quyền này.")
+    # Mọi kiểm tra xong mới ghi, tránh làm mất ma trận quyền khi bị từ chối.
     conn.execute("DELETE FROM role_permissions WHERE role_code=?", (role_code,))
     conn.executemany("INSERT INTO role_permissions(role_code, permission_code) VALUES(?,?)",
                      [(role_code, p) for p in sorted(moi)])
@@ -454,6 +525,9 @@ def cap_nhat_quyen_vai_tro(conn: sqlite3.Connection, actor: dict, perms: set[str
 def cap_nhat_module(conn: sqlite3.Connection, actor: dict, perms: set[str], module: dict,
                     data: dict, request=None) -> None:
     rbac.doi_quyen(actor, perms, "modules.manage", "Chỉ Super Admin được quản lý module.")
+    if not rbac.la_super(actor):
+        raise Forbidden("Chỉ Super Admin được quản lý module.")
+    _kiem_tra_tenant_cau_hinh(actor)
     if module["code"] in ("dashboard", "accounts", "settings"):
         raise Forbidden("Module nền tảng không thể tắt.")
     status = "active" if str(data.get("status", module["status"])) == "active" else "disabled"
@@ -477,6 +551,10 @@ CAI_DAT_CHO_PHEP = {
 def cap_nhat_cai_dat(conn: sqlite3.Connection, actor: dict, perms: set[str], data: dict,
                      request=None) -> list[str]:
     rbac.doi_quyen(actor, perms, "settings.manage", "Chỉ Super Admin được sửa cài đặt.")
+    if not rbac.la_super(actor):
+        # settings.manage/settings.view là quyền miễn nhiễm, không uỷ quyền được.
+        raise Forbidden("Chỉ Super Admin được sửa cài đặt.")
+    _kiem_tra_tenant_cau_hinh(actor)
     thay_doi = []
     for key in CAI_DAT_CHO_PHEP:
         if key not in data:
@@ -575,11 +653,21 @@ def thong_ke(conn: sqlite3.Connection, user: dict, perms: set[str]) -> dict:
         khoa = 0 if user["status"] == "active" else 1
     ds_ban = conn.execute("SELECT COUNT(*) FROM departments WHERE tenant_id=? AND status='active'",
                           (tenant,)).fetchone()[0]
+    if not (rbac.la_super(user) or "accounts.view" in perms):
+        # Người dùng thường chỉ biết ban của mình, không thấy tổng số ban toàn tenant.
+        ds_ban = 1 if user.get("department_id") else 0
     phien = conn.execute("SELECT COUNT(*) FROM sessions WHERE tenant_id=? AND status='active'",
                          (tenant,)).fetchone()[0]
     if not (rbac.la_super(user) or "accounts.view" in perms):
         phien = conn.execute("SELECT COUNT(*) FROM sessions WHERE user_id=? AND status='active'",
                              (user["id"],)).fetchone()[0]
-    audit_hom_nay = audit.dem_hom_nay(conn, tenant)
+    if rbac.la_super(user) or "accounts.view" in perms or "audit.view" in perms:
+        audit_hom_nay = audit.dem_hom_nay(conn, tenant)
+    else:
+        # Người dùng thường chỉ thấy số sự kiện do CHÍNH MÌNH tạo, không phải
+        # toàn tenant (tránh rò rỉ mức hoạt động của tổ chức).
+        audit_hom_nay = int(conn.execute(
+            "SELECT COUNT(*) FROM audit_log WHERE tenant_id=? AND actor_id=? AND created_at>=?",
+            (tenant, user["id"], db.today_iso())).fetchone()[0])
     return {"tongNguoiDung": int(tong), "dangHoatDong": int(hoat_dong), "dangKhoa": int(khoa),
             "soBan": int(ds_ban), "phienSong": int(phien), "auditHomNay": audit_hom_nay}

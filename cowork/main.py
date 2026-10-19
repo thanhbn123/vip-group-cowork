@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import config, db, web
 from .errors import AuthRequired, CoworkError, Forbidden, NotFound, ValidationError
@@ -103,6 +104,22 @@ async def _loi_nghiep_vu(request: Request, exc: CoworkError):
         return _json_loi(exc.status, exc.code, exc.message)
     return web.render(request, "400.html", page_title="Không thực hiện được",
                       status_code=exc.status, thong_bao=exc.message)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _http_exception(request: Request, exc: StarletteHTTPException):
+    """Route không tồn tại / sai method: API trả JSON, trình duyệt nhận trang HTML."""
+    chi_tiet = exc.detail if isinstance(exc.detail, str) else "Yêu cầu không hợp lệ."
+    if _json_duong(request.url.path):
+        return _json_loi(exc.status_code, f"HTTP_{exc.status_code}", chi_tiet)
+    if exc.status_code == 404:
+        return web.render(request, "404.html", page_title="Không tìm thấy", status_code=404,
+                          thong_bao="Đường dẫn không tồn tại hoặc đã bị gỡ.")
+    if exc.status_code == 403:
+        return web.render(request, "403.html", page_title="Không đủ quyền", status_code=403,
+                          thong_bao=chi_tiet)
+    return web.render(request, "400.html", page_title="Không thực hiện được",
+                      status_code=exc.status_code, thong_bao=chi_tiet)
 
 
 @app.exception_handler(RequestValidationError)

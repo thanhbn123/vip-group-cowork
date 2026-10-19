@@ -1,0 +1,69 @@
+{
+  "user_before": [
+    {
+      "id": "nhan-vien-ctrl-01",
+      "vaiTro": "thanh-vien",
+      "taoLuc": "2026-10-19T17:45:08+07:00",
+      "trangThai": "hoat-dong"
+    }
+  ],
+  "after_cleanup_user": [
+    {
+      "id": "nhan-vien-ctrl-01",
+      "vaiTro": "thanh-vien",
+      "taoLuc": "2026-10-19T17:45:08+07:00",
+      "trangThai": "hoat-dong"
+    }
+  ],
+  "after_cleanup_permissions": [],
+  "login": 303,
+  "launch": 303,
+  "redirect_target": "/cowork/vao",
+  "bridge": 303,
+  "toi": {
+    "http": 200,
+    "data": {
+      "userId": "nhan-vien-ctrl-01",
+      "ten": "Nhân viên Controller",
+      "vaiTro": "thanh-vien",
+      "tenantId": "vip-group",
+      "xacThuc": "session",
+      "devMode": false
+    }
+  },
+  "after_launch_user": [
+    {
+      "id": "nhan-vien-ctrl-01",
+      "vaiTro": "thanh-vien",
+      "taoLuc": "2026-10-19T17:45:08+07:00",
+      "trangThai": "hoat-dong"
+    }
+  ],
+  "after_launch_permissions": [
+    {
+      "tenantId": "vip-group",
+      "userId": "nhan-vien-ctrl-01",
+      "duAnId": "tong-hop",
+      "quyen": "doc"
+    }
+  ],
+  "chat": {
+    "http": 200,
+    "elapsed_s": 2.7,
+    "ok": true,
+    "providerId": "local",
+    "nhan": "real",
+    "meta": {
+      "provider": "local",
+      "model": "qwen2.5:7b-instruct",
+      "doTreMs": 2607,
+      "tokenVao": 62,
+      "tokenRa": 232,
+      "chiPhi": 0.0,
+      "giaCo": false
+    },
+    "taskId": "T-G02-000023",
+    "traLoi": "Chào bạn! Tôi là Qwen, một mô hình ngôn ngữ lớn được tạo ra bởi Alibaba Cloud, chứ không phải VIP AI Brain. Tuy nhiên, tôi hiểu yêu cầu của bạn.\n\nTrong mô hình AI Local mà bạn đề cập, hiện tại nó hỗ trợ các chức năng như sau:\n\n1. **Tạo nội dung**: Tạo ra các câu chuyện, kịch bản, email, bài báo, thơ, v.v.\n2. **Phản hồi và giải đáp**: Trả lời các câu hỏi, giải thích các khái niệm, hướng dẫn giải quyết vấn đề.\n3. **Tiếng Việt**: Mô hình này hỗ trợ xử lý ngôn ngữ Việt một cách hiệu quả.\n4. **Phát triển ứng dụng**: Có thể hỗ trợ trong quá trình phát triển ứng dụng thông qua việc tạo mã tự động, giải thích mã, v.v.\n5. **Nghiên cứu học máy**: Có thể dùng để hỗ trợ trong quá trình học và triển khai mô hình học máy.\n\nNếu bạn cần hỗ trợ thêm về bất kỳ chức năng cụ thể nào, hãy cho tôi biết nhé!",
+    "loi": null
+  }
+}

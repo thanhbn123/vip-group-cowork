@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- LaunchAgent COWORK — DÁN vào ~/Library/LaunchAgents/ trên Mac Studio.
+     Chưa chạy. Cần chủ dự án phê duyệt cổng 1. -->
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.vipgroup.cowork</string>
+  <key>ProgramArguments</key><array>
+    <string>/bin/sh</string>
+    <string>/Users/macstudio/VIP-AI/cowork/run.sh</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/macstudio/VIP-AI/cowork</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>StandardOutPath</key><string>/Users/macstudio/Library/Logs/VIPAI/cowork.log</string>
+  <key>StandardErrorPath</key><string>/Users/macstudio/Library/Logs/VIPAI/cowork.err.log</string>
+</dict></plist>

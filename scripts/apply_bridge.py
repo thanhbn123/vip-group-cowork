@@ -12,6 +12,7 @@ Không sửa `vip-brain.db`, không sửa frontend, không đổi cổng Brain p
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -66,8 +67,20 @@ def main(argv: list[str]) -> int:
     patch_main(backend / "app" / "main.py")
     venv_py = backend / ".venv" / "bin" / "python"
     if venv_py.is_file():
-        r = subprocess.run([str(venv_py), "-c", "import app.main; print('import ok')"],
-                           cwd=str(backend), capture_output=True, text=True)
+        # Kiểm tra import trên một DB TẠM: nếu để trống VIP_BRAIN_DB, Brain sẽ rơi về
+        # `backend/vip-brain.db` (tạo file rác), còn trỏ vào DB staging thật thì có thể
+        # đụng tiến trình đang chạy. DB tạm chỉ để app khởi tạo/migrate rồi xoá.
+        check_db = stg / "data" / ".import-check.db"
+        check_db.parent.mkdir(parents=True, exist_ok=True)
+        env = dict(os.environ)
+        env["VIP_BRAIN_DB"] = str(check_db)
+        env["VIP_BRAIN_BO_QUA_ENV"] = "1"
+        try:
+            r = subprocess.run([str(venv_py), "-c", "import app.main; print('import ok')"],
+                               cwd=str(backend), capture_output=True, text=True, env=env)
+        finally:
+            for suffix in ("", "-wal", "-shm"):
+                Path(str(check_db) + suffix).unlink(missing_ok=True)
         if r.returncode != 0:
             print(r.stdout)
             print(r.stderr)

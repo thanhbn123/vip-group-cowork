@@ -109,15 +109,57 @@ def _tenant_ton_tai(conn, tenant_id: str) -> bool:
 
 
 def _vai_tro_brain(user_id: str, vai_tro_cowork: str) -> str:
+    """Ánh xạ vai trò COWORK → Brain, FAIL-CLOSED theo phạm vi quyền.
+
+    Chỉ `super_admin` của COWORK mới được map sang vai trò quản trị Brain. `admin` và
+    `department_manager` của COWORK có phạm vi hẹp hơn (theo ban / tenant), trong khi
+    vai trò `quan-tri` của Brain mở settings/audit/providers — map thẳng sẽ nâng quyền
+    vượt phạm vi COWORK. Mọi vai trò còn lại (admin, department_manager, employee,
+    partner) đều hạ xuống `thanh-vien`. Nếu sau này cần uỷ quyền Brain admin, phải làm
+    thành cấu hình riêng có kiểm soát, không nới hàm này.
+    """
     if vai_tro_cowork == "super_admin" and user_id == "anh-thanh":
         return "chu-so-huu"
-    if vai_tro_cowork in ("super_admin", "admin", "department_manager"):
+    if vai_tro_cowork == "super_admin":
         return "quan-tri"
     return "thanh-vien"
 
 
+def _dam_bao_quyen_chat_chung(conn, user_id: str, tenant_id: str, vai_tro_brain: str,
+                              *, moi_tao: bool = False) -> None:
+    """Cấp quyền ĐỌC dự án `tong-hop` cho shadow user của COWORK.
+
+    Đây là quyền tối thiểu để một nhân viên COWORK dùng được cửa chat chung của Brain:
+    `api/chat.py` chặn vai `thanh-vien` nếu không thấy `duAnId` (mặc định `tong-hop`).
+    Quyền chỉ là `doc` trên ĐÚNG dự án chung `tong-hop` — KHÔNG cấp quyền dữ liệu của
+    các dự án khác (kế toán, hải quan, logistics…). INSERT OR IGNORE để không ghi đè
+    quyền đã có.
+
+    Với user ĐÃ TỒN TẠI (`moi_tao=False`), chỉ backfill khi hội đủ dấu hiệu shadow cũ:
+    không có mật khẩu Brain VÀ chưa có bất kỳ dòng `project_permissions` nào. Tài khoản
+    native có mật khẩu, hoặc đã có quyền dự án, KHÔNG bị chạm — tránh mở rộng quyền
+    ngoài phạm vi chỉ vì một ticket COWORK trùng id.
+    """
+    if vai_tro_brain != "thanh-vien":
+        return  # quản trị Brain đã thấy mọi dự án (duAnIds=None)
+    if not moi_tao:
+        row = conn.execute("SELECT matKhauHash, salt FROM users WHERE id=?", (user_id,)).fetchone()
+        if row and ((row["matKhauHash"] not in (None, b"", "")) or
+                    (row["salt"] not in (None, b"", ""))):
+            return  # tài khoản native có mật khẩu — không đụng
+        if conn.execute(
+                "SELECT 1 FROM project_permissions WHERE tenantId=? AND userId=? LIMIT 1",
+                (tenant_id, user_id)).fetchone():
+            return  # đã có quyền dự án (kể cả hẹp) — không tự mở thêm
+    conn.execute(
+        "INSERT OR IGNORE INTO project_permissions(tenantId, userId, duAnId, quyen) "
+        "VALUES(?,?, 'tong-hop', 'doc')",
+        (tenant_id, user_id),
+    )
+
+
 def _dam_bao_nguoi_dung(conn, user: dict, tenant_id: str) -> tuple[bool, str]:
-    """Tạo shadow user nếu chưa có; KHÔNG sửa user đã tồn tại. Trả (ok, lý do)."""
+    """Tạo shadow user nếu chưa có; KHÔNG sửa vai trò user đã tồn tại. Trả (ok, lý do)."""
     user_id = user.get("id", "")
     row = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
     if row:
@@ -125,14 +167,20 @@ def _dam_bao_nguoi_dung(conn, user: dict, tenant_id: str) -> tuple[bool, str]:
             return False, "Tài khoản Brain thuộc tenant khác — từ chối."
         if (row["trangThai"] or "") != "hoat-dong":
             return False, "Tài khoản Brain đang bị khoá — từ chối."
+        # Shadow cũ do bridge trước đây tạo có thể chưa có quyền chat chung; backfill
+        # có điều kiện (xem docstring) để user không phải bị xoá/tạo lại.
+        _dam_bao_quyen_chat_chung(conn, user_id, tenant_id,
+                                  row["vaiTro"] or "thanh-vien", moi_tao=False)
+        conn.commit()
         return True, ""
     if not _tenant_ton_tai(conn, tenant_id):
         return False, "Tenant chưa tồn tại trong VIP AI BRAIN — từ chối."
+    vai_tro_brain = _vai_tro_brain(user_id, user.get("vaiTro") or "employee")
     conn.execute(
         "INSERT INTO users(id, tenantId, ten, vaiTro, taoLuc, trangThai) VALUES(?,?,?,?,?, 'hoat-dong')",
-        (user_id, tenant_id, user.get("ten") or user_id,
-         _vai_tro_brain(user_id, user.get("vaiTro") or "employee"), cau_hinh.gio_vn()),
+        (user_id, tenant_id, user.get("ten") or user_id, vai_tro_brain, cau_hinh.gio_vn()),
     )
+    _dam_bao_quyen_chat_chung(conn, user_id, tenant_id, vai_tro_brain, moi_tao=True)
     conn.commit()
     return True, ""
 

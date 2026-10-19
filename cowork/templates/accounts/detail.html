@@ -95,23 +95,23 @@
       </div>
       <div class="table-wrap">
         <table class="table compact">
-          <thead><tr><th>Module</th><th>Mặc định vai trò</th><th>Hiệu lực</th><th></th></tr></thead>
+          <thead><tr><th scope="col">Module</th><th scope="col">Mặc định vai trò</th><th scope="col">Hiệu lực</th><th scope="col"><span class="visually-hidden">Thao tác</span></th></tr></thead>
           <tbody>
             {% for m in quyen_module %}
             <tr class="{% if m.effective == 'block' %}row-off{% endif %}">
-              <td><b>{{ m.name }}</b><small class="block muted">{{ m.code }}</small></td>
-              <td>
+              <td data-label="Module"><b>{{ m.name }}</b><small class="block muted">{{ m.code }}</small></td>
+              <td data-label="Mặc định vai trò">
                 {% if m.default == 'use' %}<span class="badge status-ok">Sử dụng</span>
                 {% elif m.default == 'view' %}<span class="badge status-info">Chỉ xem</span>
                 {% else %}<span class="badge status-muted">Không cấp</span>{% endif %}
               </td>
-              <td>
+              <td data-label="Hiệu lực">
                 {% if m.effective == 'use' %}<span class="badge status-ok">Sử dụng</span>
                 {% elif m.effective == 'view' %}<span class="badge status-info">Chỉ xem</span>
                 {% else %}<span class="badge status-danger">Bị chặn</span>{% endif %}
                 {% if m.mode != 'default' %}<span class="badge status-warn">uỷ quyền riêng</span>{% endif %}
               </td>
-              <td class="row-actions">
+              <td class="row-actions" data-label="Thao tác">
                 {% if co_cap_quyen %}<a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ target.id }}/phan-quyen">Sửa</a>{% endif %}
               </td>
             </tr>
@@ -134,15 +134,15 @@
       {% if phien %}
       <div class="table-wrap">
         <table class="table compact">
-          <thead><tr><th>Phiên</th><th>Bắt đầu</th><th>Hoạt động cuối</th><th>IP</th><th></th></tr></thead>
+          <thead><tr><th scope="col">Phiên</th><th scope="col">Bắt đầu</th><th scope="col">Hoạt động cuối</th><th scope="col">IP</th><th scope="col"><span class="visually-hidden">Thao tác</span></th></tr></thead>
           <tbody>
             {% for s in phien %}
             <tr>
-              <td><code>{{ s.id[:10] }}</code><small class="block muted">hết hạn {{ s.expires_at|dt }}</small></td>
-              <td>{{ s.created_at|dt }}</td>
-              <td>{{ s.last_seen_at|dt }}</td>
-              <td class="muted">{{ s.ip or '—' }}</td>
-              <td class="row-actions">
+              <td data-label="Phiên"><code>{{ s.id[:10] }}</code><small class="block muted">hết hạn {{ s.expires_at|dt }}</small></td>
+              <td data-label="Bắt đầu">{{ s.created_at|dt }}</td>
+              <td data-label="Hoạt động cuối">{{ s.last_seen_at|dt }}</td>
+              <td class="muted" data-label="IP">{{ s.ip or '—' }}</td>
+              <td class="row-actions" data-label="Thao tác">
                 {% if co_thu_hoi_phien %}
                 <form method="post" action="/tai-khoan/{{ target.id }}/phien/{{ s.id }}/thu-hoi">
                   <input type="hidden" name="_csrf" value="{{ csrf }}">

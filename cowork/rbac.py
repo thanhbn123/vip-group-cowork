@@ -95,7 +95,11 @@ def pham_vi_ban(conn: sqlite3.Connection, user: dict) -> set[str] | None:
         return None
     if user["role_code"] == ADMIN:
         rows = conn.execute(
-            "SELECT department_id FROM admin_scopes WHERE user_id=?", (user["id"],)
+            "SELECT s.department_id FROM admin_scopes s "
+            "LEFT JOIN departments d ON d.id=s.department_id "
+            "WHERE s.user_id=? AND s.tenant_id=? "
+            "AND (s.department_id IS NULL OR d.tenant_id=?)",
+            (user["id"], user["tenant_id"], user["tenant_id"])
         ).fetchall()
         if not rows:
             # Không khai báo scope = chỉ ban của mình (mặc định đóng), không phải toàn tenant.
@@ -126,12 +130,16 @@ def co_the_quan_ly(conn: sqlite3.Connection, actor: dict, perms: set[str], targe
         return False
     if target["role_code"] == SUPER:
         return False
+    if target.get("status") == "archived" and not la_super(actor):
+        # Tài khoản đã lưu trữ là bất biến với mọi quản trị cấp dưới.
+        return False
     if cap_vai_tro(conn, target["role_code"]) >= cap_vai_tro(conn, actor["role_code"]):
         return False
     if not co_quyen(actor, perms, hanh_dong):
         return False
-    if actor["role_code"] in (ADMIN, MANAGER) and not trong_pham_vi(
-            conn, actor, target.get("department_id")):
+    # Phạm vi áp dụng cho MỌI vai trò không phải Super Admin. Vai trò không có
+    # phạm vi (nhân viên/đối tác) trả về tập rỗng ⇒ không quản lý được ai.
+    if not trong_pham_vi(conn, actor, target.get("department_id")):
         return False
     return True
 
@@ -153,6 +161,25 @@ def kiem_tra_gan_vai_tro(conn: sqlite3.Connection, actor: dict, role_code: str) 
     if not co_the_gan_vai_tro(conn, actor, role_code):
         raise Forbidden("Bạn chỉ được gán vai trò thấp hơn cấp của mình; "
                         "không thể tạo hoặc gán Super Admin.")
+
+
+def co_the_sua_vai_tro(conn: sqlite3.Connection, actor: dict, perms: set[str],
+                       role_code: str) -> bool:
+    """Vai trò sửa được: không phải Super Admin/khoá, thấp hơn cấp người thao tác.
+
+    Quản trị được uỷ quyền phải có cả `roles.manage` và `permissions.grant`;
+    việc kiểm tra từng quyền được cấp/thu hồi nằm ở service.
+    """
+    role = lay_vai_tro(conn, role_code)
+    if not role or role_code == SUPER or role.get("is_locked"):
+        return False
+    if la_super(actor):
+        return True
+    if not co_quyen(actor, perms, "roles.manage"):
+        return False
+    if not co_quyen(actor, perms, "permissions.grant"):
+        return False
+    return int(role["level"]) < cap_vai_tro(conn, actor["role_code"])
 
 
 def co_the_cap_quyen(actor: dict, perms: set[str], quyen: str) -> bool:

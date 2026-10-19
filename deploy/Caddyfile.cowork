@@ -1,0 +1,23 @@
+# Khối Caddy cho COWORK — DÁN SAU KHI ĐƯỢC DUYỆT.
+# Đích: /srv/vip-staging-proxy/Caddyfile
+# Sao lưu trước: cp Caddyfile Caddyfile.bak-before-cowork-$(date +%Y%m%d-%H%M)
+
+cowork.vipgroup.com.vn {
+    encode zstd gzip
+    header {
+        X-Robots-Tag "noindex, nofollow"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+    reverse_proxy 127.0.0.1:18835 {
+        header_up X-Real-IP {remote_host}
+        header_down Set-Cookie "^(.*)$" "$1; Secure"
+    }
+    log {
+        output file /data/access-cowork.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+    }
+}

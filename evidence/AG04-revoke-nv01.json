@@ -1,0 +1,71 @@
+{
+  "login": 303,
+  "luc": "2026-10-19T17:46:26+0700",
+  "launch_before": {
+    "brain": 200,
+    "launch": 303,
+    "target": "/cowork/vao",
+    "bridge": 303
+  },
+  "toi_before": {
+    "http": 200,
+    "data": {
+      "userId": "nhan-vien-01",
+      "ten": "Nguyễn Văn Nhân",
+      "vaiTro": "thanh-vien",
+      "tenantId": "vip-group",
+      "xacThuc": "session",
+      "devMode": false
+    }
+  },
+  "owner_login": 303,
+  "permission_page": 200,
+  "block_http": 303,
+  "brain_after_block": 403,
+  "modules_after_block": [
+    "dashboard",
+    "tasks",
+    "knowledge",
+    "usage"
+  ],
+  "brain_toi_after_block": {
+    "http": 401
+  },
+  "brain_sessions_after_block": [
+    {
+      "id": 35,
+      "trangThai": "thu-hoi"
+    },
+    {
+      "id": 36,
+      "trangThai": "thu-hoi"
+    }
+  ],
+  "restore_http": 303,
+  "brain_after_restore": 200,
+  "modules_after_restore": [
+    "dashboard",
+    "brain",
+    "tasks",
+    "knowledge",
+    "usage"
+  ],
+  "user_permissions_after_restore": [],
+  "relaunch_after_restore": {
+    "brain": 200,
+    "launch": 303,
+    "target": "/cowork/vao",
+    "bridge": 303
+  },
+  "toi_after_restore": {
+    "http": 200,
+    "data": {
+      "userId": "nhan-vien-01",
+      "ten": "Nguyễn Văn Nhân",
+      "vaiTro": "thanh-vien",
+      "tenantId": "vip-group",
+      "xacThuc": "session",
+      "devMode": false
+    }
+  }
+}

@@ -29,9 +29,10 @@
 </section>
 
 <section class="stat-grid" aria-label="Chỉ số nhanh">
+  {% set xem_tk = 'accounts.view' in perms or is_super %}
   <article class="stat-card">
     <span class="stat-ico blue">{{ ui.icon('users', 20) }}</span>
-    <div><small>Tài khoản</small><b>{{ tk.tongNguoiDung }}</b><span>trong phạm vi</span></div>
+    <div><small>{{ 'Tài khoản' if xem_tk else 'Tài khoản của tôi' }}</small><b>{{ tk.tongNguoiDung }}</b><span>{{ 'trong phạm vi' if xem_tk else 'đang hoạt động' }}</span></div>
   </article>
   <article class="stat-card">
     <span class="stat-ico green">{{ ui.icon('check-circle', 20) }}</span>
@@ -41,10 +42,17 @@
     <span class="stat-ico teal">{{ ui.icon('key', 20) }}</span>
     <div><small>Phiên đang sống</small><b>{{ tk.phienSong }}</b><span>phiên máy chủ</span></div>
   </article>
+  {% if 'audit.view' in perms or is_super %}
   <article class="stat-card">
     <span class="stat-ico gold">{{ ui.icon('list', 20) }}</span>
     <div><small>Sự kiện hôm nay</small><b>{{ tk.auditHomNay }}</b><span>đã ghi nhật ký</span></div>
   </article>
+  {% else %}
+  <article class="stat-card">
+    <span class="stat-ico gold">{{ ui.icon('list', 20) }}</span>
+    <div><small>Sự kiện của tôi hôm nay</small><b>{{ tk.auditHomNay }}</b><span>đã ghi nhật ký</span></div>
+  </article>
+  {% endif %}
 </section>
 
 <div class="dash-grid">

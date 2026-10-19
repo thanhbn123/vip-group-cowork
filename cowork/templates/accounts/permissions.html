@@ -31,24 +31,27 @@
   <div class="table-wrap">
     <table class="table perm-table">
       <thead>
-        <tr><th>Module</th><th>Vai trò mặc định</th><th>Theo vai trò</th><th>Chỉ xem</th><th>Sử dụng</th><th>Chặn</th></tr>
+        <tr><th scope="col">Module</th><th scope="col">Vai trò mặc định</th><th scope="col">Theo vai trò</th><th scope="col">Chỉ xem</th><th scope="col">Sử dụng</th><th scope="col">Chặn</th></tr>
       </thead>
       <tbody>
         {% for m in states %}
         <tr>
-          <td>
+          <td data-label="Module">
             <b>{{ m.name }}</b>
             <small class="block muted">{{ m.code }}{% if m.status != 'active' %} · đang tắt{% endif %}</small>
           </td>
-          <td>
+          <td data-label="Vai trò mặc định">
             {% if m.default == 'use' %}<span class="badge status-ok">Sử dụng</span>
             {% elif m.default == 'view' %}<span class="badge status-info">Chỉ xem</span>
             {% else %}<span class="badge status-muted">Không cấp</span>{% endif %}
           </td>
           {% for opt in ['default','view','use','block'] %}
-          <td class="radio-cell">
+          {% set nhan_opt = {'default':'Theo vai trò','view':'Chỉ xem','use':'Sử dụng','block':'Chặn'}[opt] %}
+          {% set nhan_ngan = {'default':'Mặc định','view':'Xem','use':'Dùng','block':'Chặn'}[opt] %}
+          <td class="radio-cell" data-label="{{ nhan_ngan }}">
             <label class="radio-pill {% if opt == 'block' %}radio-danger{% endif %}">
               <input type="radio" name="quyen_{{ m.code }}" value="{{ opt }}"
+                     aria-label="{{ m.name }} — {{ nhan_opt }}"
                      {% if m.mode == opt %}checked{% endif %} {% if not co_cap %}disabled{% endif %}>
               <span aria-hidden="true"></span>
             </label>

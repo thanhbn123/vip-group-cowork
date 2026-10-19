@@ -1,0 +1,20 @@
+{
+  "login": 200,
+  "auth_toi": {
+    "ok": true,
+    "data": {
+      "userId": "nhan-vien-ctrl-02",
+      "ten": "Nhân viên Controller 2",
+      "vaiTro": "thanh-vien",
+      "tenantId": "vip-group",
+      "xacThuc": "session",
+      "devMode": false
+    }
+  },
+  "chat_ok": true,
+  "providerId": "local",
+  "nhan": "real",
+  "metadata": null,
+  "traLoi": "Xin chào! Tôi là Qwen, một trợ lý AI do Alibaba Cloud phát triển. Dù tên gọi của bạn đề cập đến \"VIP AI Brain\", tôi hiểu rằng bạn đang muốn biết về chức năng của mô hình AI Local mà bạn đang sử dụng. Tuy nhiên, tôi không thể xác nhận liệu mô hình AI Local hiện tại đang xử lý yêu cầu của bạn hay không, vì tôi không có thông tin về việc đó.\n\nTuy nhiên, tôi có thể cung cấp cho bạn một số thông tin về các chức năng thông thường của một mô hình AI Local:\n\n1. **Nhận dạng giọng nói**: Tải lên đoạn录音，我可以为您介绍一些本地AI模型通常具备的功能：\n\n1. 语音识别：上传语音文件，将其转换为文本。\n2. 语言翻译：将一种语言的文本翻译成另一种语言。\n3. 语言生成：生成类似人类的文本，用于写作辅助或创意生成。\n4. 情感分析：分析文本或语音中的情绪和情感。\n5. 问答系统：根据输入的问题提供答案。\n6. 语言理解：理解和解释自然语言指令或查询。\n7. 文本摘要：从大量文本中提取关键信息并生成摘要。\n8. 语音合成：将文本转换为语音。\n9. 机器翻译：将一种语言的文本翻译成另一种语言。\n10. 个性化推荐：根据用户的行为和偏好提供个性化建议。\n\n请注意，这些功能的具体实现和能力可能因不同AI模型而异。如果您需要更具体的信息或帮助，请提供更多关于您所使用的AI模型的详细信息。",
+  "loi": null
+}

@@ -16,7 +16,7 @@
   <form class="filter-bar" method="get" action="/tai-khoan" data-autosubmit>
     <label class="search-box">
       <span>{{ ui.icon('search', 18) }}</span>
-      <input type="search" name="q" value="{{ q }}" placeholder="Tìm ID, tên hoặc email…" maxlength="60">
+      <input type="search" name="q" value="{{ q }}" placeholder="Tìm ID, tên hoặc email…" maxlength="60" aria-label="Tìm theo ID, tên hoặc email">
     </label>
     <select name="vaiTro" aria-label="Lọc theo vai trò">
       <option value="">Mọi vai trò</option>
@@ -39,22 +39,22 @@
   <div class="table-wrap">
     <table class="table">
       <thead>
-        <tr><th>Tài khoản</th><th>Vai trò</th><th>Ban / Bộ phận</th><th>Trạng thái</th><th>Đăng nhập cuối</th><th></th></tr>
+        <tr><th scope="col">Tài khoản</th><th scope="col">Vai trò</th><th scope="col">Ban / Bộ phận</th><th scope="col">Trạng thái</th><th scope="col">Đăng nhập cuối</th><th scope="col"><span class="visually-hidden">Thao tác</span></th></tr>
       </thead>
       <tbody>
         {% for u in rows %}
         <tr>
-          <td>
+          <td data-label="Tài khoản">
             <a class="person" href="/tai-khoan/{{ u.id }}">
               {{ ui.avatar(u.display_name) }}
               <span><b>{{ u.display_name }}</b><small>{{ u.id }}{% if u.email %} · {{ u.email }}{% endif %}</small></span>
             </a>
           </td>
-          <td>{{ ui.role_badge(u.role_code, u.role_name) }}</td>
-          <td>{{ u.department_name or '—' }}</td>
-          <td>{{ ui.status_badge(u.status) }}</td>
-          <td class="muted">{{ u.last_login_at|dt if u.last_login_at else 'Chưa đăng nhập' }}</td>
-          <td class="row-actions">
+          <td data-label="Vai trò">{{ ui.role_badge(u.role_code, u.role_name) }}</td>
+          <td data-label="Ban / Bộ phận">{{ u.department_name or '—' }}</td>
+          <td data-label="Trạng thái">{{ ui.status_badge(u.status) }}</td>
+          <td class="muted" data-label="Đăng nhập cuối">{{ u.last_login_at|dt if u.last_login_at else 'Chưa đăng nhập' }}</td>
+          <td class="row-actions" data-label="Thao tác">
             <a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}">Chi tiết</a>
             {% if 'permissions.grant' in perms or is_super %}
             <a class="btn btn-ghost btn-sm" href="/tai-khoan/{{ u.id }}/phan-quyen">Quyền</a>
@@ -65,7 +65,7 @@
       </tbody>
     </table>
   </div>
-  {{ ui.pager(page, pages, "/tai-khoan?q=" ~ q ~ "&vaiTro=" ~ vaiTro ~ "&ban=" ~ ban ~ "&trangThai=" ~ trangThai) }}
+  {{ ui.pager(page, pages, "/tai-khoan?q=" ~ (q|urlencode) ~ "&vaiTro=" ~ (vaiTro|urlencode) ~ "&ban=" ~ (ban|urlencode) ~ "&trangThai=" ~ (trangThai|urlencode)) }}
   {% else %}
   {{ ui.empty('Không có tài khoản phù hợp', 'Thử xoá bộ lọc hoặc tạo tài khoản mới.') }}
   {% endif %}

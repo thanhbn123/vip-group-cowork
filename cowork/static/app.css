@@ -19,6 +19,7 @@
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;font-family:var(--font);font-size:14.5px;line-height:1.55;color:var(--ink);background:var(--bg)}
 a{color:var(--blue);text-decoration:none}
@@ -74,6 +75,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .nav-tag{font-size:9px;font-weight:800;letter-spacing:.08em;background:rgba(201,162,74,.18);color:var(--gold-2);
   border:1px solid rgba(201,162,74,.35);padding:1px 5px;border-radius:5px}
 .sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-close{display:none}
 .sec-note{display:flex;gap:9px;align-items:flex-start;background:rgba(255,255,255,.04);border-radius:10px;padding:10px}
 .sec-note p{font-size:11px;color:#9fb3c7;line-height:1.45}
 .sec-ico{color:var(--gold-2);margin-top:1px}
@@ -268,7 +270,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .kv.tight{gap:9px 16px}
 .kv div{min-width:0}
 .kv dt{font-size:10.5px;font-weight:650;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-2);margin-bottom:2px}
-.kv dd{margin:0;font-size:13px;color:var(--ink)}
+.kv dd{margin:0;font-size:13px;color:var(--ink);overflow-wrap:anywhere}
 .mini-timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .mini-timeline li{padding:7px 0;border-bottom:1px dashed var(--line);display:flex;flex-direction:column;gap:1px}
 .mini-timeline li:last-child{border-bottom:0}
@@ -517,13 +519,17 @@ button,input,select,textarea{font:inherit;color:inherit}
   .detail-grid{grid-template-columns:1fr}
   .detail-side{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .settings-grid{grid-template-columns:1fr}
-  .settings-grid .span-2{grid-column:auto}
+  .settings-grid .span-2,.settings-grid .form-actions{grid-column:auto}
   .brain-config-grid{grid-template-columns:1fr}
   .dept-grid{grid-template-columns:1fr}
 }
 @media (max-width:960px){
   .sidebar{position:fixed;left:0;top:0;transform:translateX(-104%);transition:transform .22s ease;box-shadow:var(--shadow-lg)}
   .sidebar.open{transform:none}
+  .sidebar-close{display:grid;place-items:center;position:absolute;top:14px;right:12px;width:34px;height:34px;
+    border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);
+    color:#dbe5f0;cursor:pointer;z-index:1}
+  .sidebar-close:hover{background:rgba(255,255,255,.14)}
   .topbar .menu-toggle{display:inline-flex}
   .content{padding:20px 18px 34px}
   .topbar{padding:0 16px;gap:10px}
@@ -560,6 +566,57 @@ button,input,select,textarea{font:inherit;color:inherit}
   .footer{flex-direction:column;gap:4px}
   .secret-box code{font-size:15px}
   .table th,.table td{padding:9px 7px}
+}
+/* ---------- bảng dạng thẻ trên màn hình hẹp ---------- */
+@media (max-width:720px){
+  .table-wrap{overflow:visible;margin:0}
+  .table{display:block;font-size:13px}
+  .table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .table tbody{display:block}
+  .table tr{display:block;border:1px solid var(--line);border-radius:12px;padding:6px 12px;margin:0 0 10px;background:var(--surface)}
+  .table tbody tr:hover{background:var(--surface)}
+  .table tbody tr:last-child{margin-bottom:0}
+  .table td{display:grid;grid-template-columns:minmax(92px,36%) minmax(0,1fr);gap:3px 12px;align-items:start;
+    padding:8px 0;border-bottom:1px dashed var(--line);text-align:right;white-space:normal;vertical-align:top;
+    overflow-wrap:anywhere}
+  .table td code{overflow-wrap:anywhere}
+  .table tbody tr td:last-child{border-bottom:0}
+  .table td::before{content:attr(data-label);grid-column:1;grid-row:1;text-align:left;font-size:10px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);padding-top:3px}
+  .table td > *{grid-column:2;justify-self:end;min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .table td .person{justify-self:stretch;text-align:left}
+  .table td .person small{max-width:none;white-space:normal}
+  .table td .badge{white-space:normal;justify-self:end}
+  .table td.nowrap{white-space:normal}
+  .table td.row-actions{grid-template-columns:1fr;text-align:left;justify-items:stretch}
+  .table td.row-actions::before{grid-column:1;grid-row:1}
+  .table td.row-actions > *{grid-column:1;justify-self:stretch}
+  .table td.row-actions .btn{width:100%}
+  .table td.row-actions form{display:block}
+  .table td.row-actions form .btn{margin-top:4px}
+  /* Ma trận phân quyền: 4 lựa chọn gọn một hàng thay vì bảng 6 cột bị cắt. */
+  .perm-table tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:10px 12px}
+  .perm-table td:first-child,.perm-table td:nth-child(2){grid-column:1/-1;text-align:left}
+  .perm-table td:first-child{display:block;padding-bottom:2px;border-bottom:0}
+  .perm-table td:first-child::before{content:none}
+  .perm-table td:nth-child(2){display:flex;align-items:center;gap:8px;justify-content:space-between;
+    padding-top:0;border-bottom:1px dashed var(--line)}
+  .perm-table td:nth-child(2)::before{grid-row:auto;padding-top:0}
+  .perm-table td.radio-cell{display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;
+    gap:4px;padding:6px 7px;border:1px solid var(--line);border-radius:8px;text-align:center;min-width:0}
+  .perm-table td.radio-cell::before{grid-row:auto;padding-top:0;text-align:center;font-size:9.5px;letter-spacing:.03em}
+  .perm-table td.radio-cell .radio-pill{justify-self:center;align-self:center}
+  /* Module registry: đầu thẻ xếp dọc, không để tiêu đề bị bóp thành một chữ mỗi dòng. */
+  .module-reg-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;align-items:start}
+  .module-reg-title{grid-column:2}
+  .module-reg-title p{overflow-wrap:anywhere}
+  .module-reg-badges{grid-column:1/-1;justify-content:flex-start}
+  .module-reg-head > form{grid-column:1/-1}
+  .module-reg-head > form .btn{width:100%}
+  .module-reg-card{padding:16px}
+  /* Thanh lưu cố định che nội dung trên màn hình nhỏ. */
+  .form-actions.sticky-actions{position:static;background:transparent;border:0;box-shadow:none;padding:0}
+  .secret-box code{overflow-wrap:anywhere}
 }
 @media print{
   .sidebar,.topbar,.footer,.page-actions,.form-actions{display:none}

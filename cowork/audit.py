@@ -1,16 +1,27 @@
 """Sổ kiểm toán append-only (trigger DB chặn UPDATE/DELETE)."""
 from __future__ import annotations
 
+import ipaddress
 import json
 import sqlite3
 
-from . import db
+from . import config, db
 
 
 def _ip(request) -> str | None:
     if request is None:
         return None
     try:
+        if config.TIN_PROXY:
+            # Caddy ghi đè X-Real-IP bằng peer thật; ưu tiên nó hơn XFF (có thể bị nối thêm).
+            for header in ("x-real-ip", "x-forwarded-for"):
+                raw = (request.headers.get(header) or "").split(",")[0].strip()
+                if not raw:
+                    continue
+                try:
+                    return str(ipaddress.ip_address(raw))
+                except ValueError:
+                    continue
         return request.client.host if request.client else None
     except Exception:  # noqa: BLE001 - audit không được làm hỏng nghiệp vụ
         return None

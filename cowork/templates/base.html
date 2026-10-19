@@ -19,13 +19,16 @@
     </a>
 
     {% if user %}
+    <button class="sidebar-close" type="button" data-close-sidebar aria-label="Đóng menu">
+      {{ ui.icon('x', 18) }}
+    </button>
     <div class="workspace-chip">
       <span class="ws-dot" aria-hidden="true"></span>
       <div><b>{{ user.tenant_name }}</b><small>Không gian nội bộ</small></div>
       <span class="ws-lock" title="Đã xác thực">{{ ui.icon('lock', 14) }}</span>
     </div>
 
-    <nav class="nav">
+    <nav class="nav" aria-label="Danh mục COWORK">
       {% if nav_workspace %}
       <p class="nav-label">Không gian làm việc</p>
       {% for m in nav_workspace %}
