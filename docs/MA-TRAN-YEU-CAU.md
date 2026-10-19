@@ -22,11 +22,11 @@
 | 16 | Session revocation | `auth.thu_hoi_phien`, `thu_hoi_cua_user`; admin UI | `test_thu_hoi_phien_chan_ngay`; UI | ✅ local |
 | 17 | Partner | Vai trò `partner`, `partner_org`, `/doi-tac` | Agent UI | ✅ local |
 | 18 | SSO COWORK → Brain | `brain.tao_ticket`, `brain-bridge/cowork_bridge.py`, `/cowork/vao` | Controller SSO + `tests/test_brain_ag04.py` | ✅ staging |
-| 19 | Không đăng nhập/MFA lần hai | Brain tạo phiên native; MFA guard chỉ chặn tài khoản MFA | Controller flow + MFA 403 | ✅ staging |
+| 19 | Không đăng nhập/MFA lần hai | Brain tạo phiên native; owner COWORK MFA → bridge cho qua | `evidence/PRODUCTION-owner-brain-20261019.json` | ✅ production |
 | 20 | Kiểm tra quyền tại backend Brain | Bridge từ chối ticket nếu thiếu `brain.use`/`brain.view`; Brain route tự kiểm | Controller + AG-04 | ✅ staging |
 | 21 | Giữ AI Local trên Mac Studio | Ollama `qwen2.5:7b-instruct`; `providerId=local`, `nhan=real` | Task `T-G02-000003`; `localOnly` | ✅ staging |
 | 22 | Không xây lại AI Brain | Không sửa DB/schema; bridge feature-flag | Snapshot production 7 users, DB ok | ✅ |
-| 23 | Không tắt bảo vệ cũ sớm | `MFA_BAT=1`; `ALLOW_MFA_USERS=0` | MFA 403 evidence | ✅ |
+| 23 | Không tắt bảo vệ cũ sớm | `MFA_BAT=1`; owner COWORK MFA bật rồi mới `ALLOW_MFA_USERS=1` | owner Brain 200 + logout 401 | ✅ production |
 | 24 | Không đụng DNS/public URL | DNS giữ nguyên; Caddy block thêm 19/10/2026, không đổi DNS | `docs/CAU-HINH-TEN-MIEN.md` | ✅ |
 | 26 | MFA TOTP cho COWORK | Enroll + login challenge + 10 mã dự phòng + CLI reset | `tests/test_mfa_controller.py`, `evidence/PRODUCTION-mfa-smoke-20261019.json` | ✅ |
 | 25 | Tên miền chính thức | `https://cowork.vipgroup.com.vn` live HTTPS + TLS | `evidence/PRODUCTION-DEPLOY-20261019.md` | ✅ |

@@ -120,7 +120,7 @@
 - Vào được Brain với đúng danh tính nhân viên (`/api/auth/toi` trả đúng ID).
 - Không có form đăng nhập/MFA thứ hai.
 - Audit COWORK có `brain.launch`; audit Brain có `COWORK: Mở phiên`.
-- `anh-thanh` (đang bật MFA) **không** mở được qua COWORK trong giai đoạn này — đây là chốt an toàn có chủ ý, không phải lỗi.
+- `anh-thanh` đã bật MFA COWORK và **mở được** Brain qua COWORK (không hỏi MFA Brain lần hai) — đã test production. Nhân viên cũng mở bình thường.
 
 **Bằng chứng:** ảnh Brain sau khi mở + `/api/auth/toi` + audit hai phía.
 

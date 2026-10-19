@@ -225,7 +225,7 @@ Thêm vào `.env` Brain (bí mật lấy từ `~/VIP-AI/cowork/data/brain_secret
 COWORK_BRIDGE_BAT=1
 COWORK_SHARED_SECRET=<cùng giá trị với COWORK>
 COWORK_INTERNAL_URL=http://127.0.0.1:8899
-COWORK_BRIDGE_ALLOW_MFA_USERS=0
+COWORK_BRIDGE_ALLOW_MFA_USERS=1  # từ 18:35 19/10/2026, sau khi owner bật MFA COWORK
 COWORK_BRIDGE_COOKIE_SECURE=1
 ```
 `chmod 600 .env`.
@@ -239,7 +239,7 @@ Kiểm tra hồi quy:
 - Đăng nhập trực tiếp Brain + MFA vẫn 200.
 - `/cowork/vao` không có ticket → 400/401.
 - COWORK mở Brain bằng nhân viên → phiên Brain native, AI Local trả lời.
-- `anh-thanh` mở qua COWORK → **403** vì `ALLOW_MFA_USERS=0` (giữ đúng quyết định).
+- `anh-thanh` mở qua COWORK → **200** sau khi bật MFA COWORK và `ALLOW_MFA_USERS=1`; test 18:35.
 
 ### 5.4. Chưa bỏ MFA
 Không đặt `COWORK_BRIDGE_ALLOW_MFA_USERS=1` và không tắt `MFA_BAT` cho tới khi chủ dự án nghiệm thu COWORK an toàn và ra quyết định riêng.
@@ -287,6 +287,6 @@ curl -sI https://cowork.vipgroup.com.vn/ | grep -Ei 'strict-transport|content-se
 - Tunnel: `com.vipgroup.cowork.tunnel-vps`, pid 18533, khóa riêng `id_ed25519_cowork_vps_tunnel`, VPS `127.0.0.1:18835` 200.
 - Caddy: block đã thêm, validate/reload OK; cert `CN=cowork.vipgroup.com.vn` hạn 17/01/2027; hash `be7a8ef8…5434`.
 - Brain bridge: thêm file + 2 dòng main.py; `.env` bật cờ; backup `~/VIP-AI/brain/backups/cowork-20261019-180225/`; health 200, bridge bật.
-- Smoke test production: owner login 303; tạo nhân viên 200; nhân viên 303; SSO Brain 303/200; chat local/real qwen2.5:7b-instruct, task `T-G02-000035`, chi phí 0; MFA owner 403; thu hồi COWORK 403/Brain 401; archive 303.
+- Smoke test production: owner login 303; tạo nhân viên 200; nhân viên 303; SSO Brain 303/200; chat local/real qwen2.5:7b-instruct, task `T-G02-000035`, chi phí 0; MFA owner 403 (trước 18:35); sau đó owner mở Brain 200, thu hồi COWORK 403/Brain 401; archive 303.
 - Backup COWORK: `com.vipgroup.cowork.backup` 03:20; bản `cowork-20261019-180321.db`.
 - Bằng chứng: `evidence/PRODUCTION-DEPLOY-20261019.md`, `evidence/PRODUCTION-smoke-20261019.json`.

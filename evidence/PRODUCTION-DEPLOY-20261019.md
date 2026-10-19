@@ -68,7 +68,7 @@
   - `COWORK_BRIDGE_BAT=1`
   - `COWORK_SHARED_SECRET=<khớp COWORK data/brain_secret.key>`
   - `COWORK_INTERNAL_URL=http://127.0.0.1:8899`
-  - `COWORK_BRIDGE_ALLOW_MFA_USERS=0`
+  - `COWORK_BRIDGE_ALLOW_MFA_USERS=1` (từ 18:35; trước đó 0)
   - `COWORK_BRIDGE_COOKIE_SECURE=1`
 - Restart `com.vipai.brain.backend` → health 200; bridge `{"bridge":"bat","cookieSecure":true,"choMfa":false,"coBiMat":true}`.
 - `/cowork/vao` không ticket → 400; `/api/cowork/thu-hoi` không chữ ký → 401.
@@ -89,7 +89,7 @@ Chạy trên Mac Studio qua tên miền chính thức, owner password đọc t�
 | Module nhân viên | dashboard, brain, tasks, knowledge, usage |
 | Mở Brain từ COWORK | 303 → `/cowork/vao?ticket=...` 303 → `/api/auth/toi` 200 đúng user |
 | Chat AI Local | 200 · `providerId=local` · `nhan=real` · `qwen2.5:7b-instruct` · chi phí 0 · task `T-G02-000035` · 901 ký tự |
-| MFA guard owner | 403 “Chưa bỏ MFA cho tài khoản này” |
+| MFA guard owner | 403 “Chưa bỏ MFA cho tài khoản này” (trước 18:35; sau đó owner mở được — §11) |
 | Thu hồi quyền Brain | COWORK `/brain` 403; Brain `/api/auth/toi` 401 |
 | Cấp lại | COWORK `/brain` 200 |
 | Lưu trữ tài khoản QA | 303, `archived` |
@@ -123,7 +123,7 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
 ## 7. HẠN CHẾ / VIỆC TIẾP THEO
 
 1. **COWORK chưa có MFA**: hiện chỉ mật khẩu + rate limit; nên bổ sung TOTP cho Super Admin trước khi mở rộng người dùng.
-2. **Owner `anh-thanh` chưa mở Brain qua COWORK** do `ALLOW_MFA_USERS=0` (có chủ ý). Sau nghiệm thu COWORK, chủ dự án quyết định bật cờ hoặc bỏ MFA Brain.
+2. **Owner đã mở Brain qua COWORK** từ 18:35 (`ALLOW_MFA_USERS=1`) sau khi bật MFA COWORK; rollback `=0` nếu cần.
 3. **Offsite backup COWORK** chưa tự động sang Synology (Brain đã có); cần bổ sung job mã hoá nếu muốn.
 4. **Caddyfile chưa `caddy fmt`** — chỉ là cảnh báo định dạng.
 5. **HEAD `/` trả 405** (FastAPI chỉ có GET); health check dùng `/api/health`.
@@ -177,3 +177,17 @@ launchctl kickstart -k gui/$(id -u)/com.vipai.brain.backend
   - Backup: `~/Caddyfile.bak-before-fmt-20261019-182534.txt` + `/data/Caddyfile.bak-before-fmt-...`.
   - Hash trước `be7a8ef8…` → sau `eea7ed56…`; validate/reload OK; cert/health giữ nguyên.
 - Full suite **95 passed**.
+
+
+---
+
+## 11. OWNER MỞ BRAIN QUA COWORK (19/10/2026 18:35)
+
+- Owner đã bật MFA COWORK → đặt `COWORK_BRIDGE_ALLOW_MFA_USERS=1` trong Brain `.env` (backup `~/VIP-AI/backups/brain-env-before-allow-mfa-20261019-183435`).
+- Bridge báo `choMfa:true`; health 200.
+- Test production thật:
+  - COWORK mật khẩu → MFA 303; mở Brain → `/cowork/vao` 303 → `/api/auth/toi` 200 đúng `anh-thanh`.
+  - Chat: `providerId=local`, `nhan=real`, `qwen2.5:7b-instruct`, chi phí 0, task `T-G02-000036`, 737 ký tự.
+  - Logout COWORK → Brain `/api/auth/toi` **401** (thu hồi).
+- Bằng chứng: `evidence/PRODUCTION-owner-brain-20261019.json`.
+- Rollback: đặt `COWORK_BRIDGE_ALLOW_MFA_USERS=0` + restart Brain.

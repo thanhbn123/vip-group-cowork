@@ -110,7 +110,7 @@ Brain /api/auth/toi trước: 200 → sau: 401
 
 ### 5.5. MFA
 - COWORK: TOTP đã triển khai; smoke production bật MFA cho admin tạm, logout, login mật khẩu → `/dang-nhap/mfa`, nhập TOTP → `/`, `/api/me` 200. Owner production chưa bật.
-- Brain: `anh-thanh` mở Brain qua COWORK bị **403 “Chưa bỏ MFA cho tài khoản này”**, không set cookie, không tạo shadow; `COWORK_BRIDGE_ALLOW_MFA_USERS=0` giữ nguyên.
+- Brain: sau khi owner bật MFA COWORK, đã đặt `COWORK_BRIDGE_ALLOW_MFA_USERS=1`; owner mở Brain qua COWORK **không hỏi MFA lần hai**, `/api/auth/toi` đúng `anh-thanh`, chat local thật; logout thu hồi Brain 401.
 - `evidence/controller-mfa-guard.html`, `AG04-report.md` mục f.
 
 ### 5.6. Brain production không bị chạm
@@ -151,10 +151,11 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
    - COWORK `https://cowork.vipgroup.com.vn`
    - Brain `https://ai.vipgroup.com.vn`
    - Mật khẩu owner: `ssh vip-ai-studio 'cat ~/VIP-AI/cowork/secrets/owner-anh-thanh.txt'` (file 0600).
+   - MFA owner: `ssh vip-ai-studio 'cat ~/VIP-AI/cowork/secrets/owner-mfa-anh-thanh.txt'` (file 0600; secret + 10 mã dự phòng).
 2. Làm 8 bước theo `docs/NGHIEM-THU.md` trên production (3 cửa sổ riêng cho Super Admin / Quản trị / Nhân viên).
 3. Ký bảng PASS/FAIL trong `docs/NGHIEM-THU.md`.
-4. Quyết định MFA COWORK và việc bật `COWORK_BRIDGE_ALLOW_MFA_USERS=1` cho tài khoản owner đang MFA.
-5. Theo dõi backup 03:20 hằng ngày; xem xét offsite backup COWORK.
+4. MFA COWORK đã bật cho owner; bridge đã đặt `ALLOW_MFA_USERS=1` và test owner mở Brain 200 — chỉ cần anh xác nhận.
+5. Theo dõi backup local 03:20 + offsite 03:40; kiểm tra `~/VIP-AI/backups/status-cowork.json`.
 
 ---
 
@@ -163,7 +164,7 @@ Chi tiết: `docs/TRIEN-KHAI-PRODUCTION.md`; rollback: `docs/ROLLBACK.md`.
 | Rủi ro | Mức | Xử lý |
 |---|---|---|
 | MFA owner đã bật; file khôi phục 0600 | Thấp | Không chia sẻ file; CLI `mfa-reset` là break-glass |
-| MFA owner chặn mở Brain qua COWORK | Có chủ đích | Giữ `ALLOW_MFA_USERS=0` tới khi chủ dự án nghiệm thu COWORK |
+| Bridge cho MFA users | Có chủ đích | `ALLOW_MFA_USERS=1` sau khi COWORK MFA bật; rollback `=0` |
 | Offsite backup COWORK | Thấp | ✅ job 03:40 đã cài; test tạo file `.enc` 224K, retention 14 |
 | Access log ghi ticket query | Thấp | Ticket one-time/TTL 60s; tắt/lọc log hoặc chuyển POST khi lên thật |
 | MFA secret staging thiếu | Thấp | Chỉ ảnh hưởng login trực tiếp staging; bridge vẫn chặn đúng |

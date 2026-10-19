@@ -53,7 +53,7 @@
 - Caddyfile root-owned + mount read-only; luôn sao lưu và dùng `docker run -v` để sửa.
 
 ### 2.5. Brain production
-- Bridge mặc định `COWORK_BRIDGE_ALLOW_MFA_USERS=0`; giữ nguyên tới nghiệm thu.
+- Bridge `COWORK_BRIDGE_ALLOW_MFA_USERS=1` sau khi owner bật MFA COWORK; owner đã test mở Brain không hỏi MFA lần hai.
 - Brain `/api/settings` authz gap và header chưa persist là nợ cũ của Brain, không do COWORK; ghi nhận để chủ dự án xử lý riêng.
 - Không xoá dữ liệu test Brain nếu chưa có phê duyệt.
 
@@ -116,6 +116,6 @@
 
 - Public: `https://cowork.vipgroup.com.vn` · `https://ai.vipgroup.com.vn`
 - COWORK LaunchAgent pid 18460; tunnel 18533; Brain pid 18620.
-- Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, MFA owner 403, thu hồi 403/401, archive.
+- Smoke production: owner login, tạo nhân viên, SSO Brain, chat local thật `qwen2.5:7b-instruct`, owner mở Brain 200 sau MFA, thu hồi 403/401, archive.
 - Biên bản: `evidence/PRODUCTION-DEPLOY-20261019.md`; smoke: `evidence/PRODUCTION-smoke-20261019.json`.
-- **Còn lại:** owner mở Brain qua COWORK (`ALLOW_MFA_USERS=0`). MFA owner + offsite đã xong.
+- **Đã xong:** MFA owner, owner mở Brain qua COWORK, offsite backup. Còn lại: chủ dự án ký nghiệm thu.

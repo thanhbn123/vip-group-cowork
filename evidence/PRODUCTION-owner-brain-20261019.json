@@ -1,0 +1,19 @@
+{
+  "password_step": 303,
+  "mfa_step": 303,
+  "brain_sso": {
+    "vao": 303,
+    "toi": 200
+  },
+  "brain_user": "anh-thanh",
+  "chat": {
+    "providerId": "local",
+    "nhan": "real",
+    "model": "qwen2.5:7b-instruct",
+    "chiPhi": 0.0,
+    "taskId": "T-G02-000036",
+    "doDaiTraLoi": 737
+  },
+  "logout": 303,
+  "brain_revoked_on_logout": 401
+}
